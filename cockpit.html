@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>集团主数据监测驾驶舱</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #0a1a2a;
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% 0,#183c5a 0,#0a1a2a 80% 100%);
+      position: relative;
+    }
+    /* 顶部科技感标题与装饰线条 */
+    .cockpit-header {
+      position: relative;
+      width: 100vw;
+      min-width: 1200px;
+      height: 90px;
+      margin-bottom: 12px;
+      z-index: 2;
+    }
+    .cockpit-header-title {
+      position: absolute;
+      left: 50%;
+      top: 32px;
+      transform: translateX(-50%);
+      font-size: 2.3rem;
+      font-weight: bold;
+      letter-spacing: 16px;
+      color: #6ec6ff;
+      text-shadow: 0 0 24px #2196f3, 0 2px 8px #0a1a2a;
+      z-index: 2;
+      white-space: nowrap;
+    }
+    .cockpit-header-svg {
+      width: 100vw;
+      height: 90px;
+      display: block;
+      position: absolute;
+      left: 0; top: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* 主体布局 */
+    .cockpit-main {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 18px 18px 18px;
+      display: flex;
+      gap: 18px;
+      min-height: 700px;
+      position: relative;
+      z-index: 2;
+    }
+    .cockpit-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    /* 卡片 */
+    .cockpit-card {
+      background: linear-gradient(135deg,rgba(18,34,56,0.98) 80%,rgba(33,118,199,0.08));
+      border-radius: 16px;
+      box-shadow: 0 0 24px 2px #2196f3, 0 2px 16px #0a1a2a;
+      border: 2px solid #1e88e5;
+      padding: 18px 18px 12px 18px;
+      min-height: 180px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+    .cockpit-card:hover {
+      box-shadow: 0 0 36px 6px #42a5f5, 0 2px 16px #0a1a2a;
+      border-color: #42a5f5;
+    }
+    .cockpit-card-title {
+      font-size: 1.18rem;
+      font-weight: 600;
+      color: #6ec6ff;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px #2196f3;
+    }
+    /* 数据大字 */
+    .cockpit-metrics {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 8px;
+    }
+    .cockpit-metric {
+      background: linear-gradient(135deg,#1e88e5 60%,#6ec6ff 100%);
+      border-radius: 10px;
+      padding: 10px 18px;
+      text-align: center;
+      flex: 1;
+      box-shadow: 0 0 8px #2196f3;
+      color: #fff;
+      position: relative;
+    }
+    .cockpit-metric-label {
+      font-size: 1rem;
+      color: #b3e5fc;
+      margin-bottom: 4px;
+    }
+    .cockpit-metric-value {
+      font-size: 2.1rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 8px #6ec6ff;
+      letter-spacing: 2px;
+    }
+    /* 表格 */
+    .cockpit-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: rgba(18,34,56,0.98);
+      border-radius: 10px;
+      overflow: hidden;
+      color: #fff;
+      font-size: 1rem;
+      margin-top: 8px;
+      box-shadow: 0 0 8px #2196f3;
+    }
+    .cockpit-table th, .cockpit-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #1e88e5;
+      text-align: center;
+    }
+    .cockpit-table th {
+      background: #183c5a;
+      color: #6ec6ff;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .cockpit-table tr:last-child td {
+      border-bottom: none;
+    }
+    /* 柱状图 */
+    .cockpit-bar {
+      width: 100%;
+      height: 180px;
+      margin-top: 8px;
+      background: linear-gradient(90deg,#0a1a2a 60%,#2196f3 100%);
+      border-radius: 10px;
+      box-shadow: 0 0 8px #2196f3;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 0 18px 12px 18px;
+    }
+    .cockpit-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .cockpit-bar-value {
+      width: 32px;
+      background: linear-gradient(180deg,#6ec6ff 0%,#2196f3 100%);
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 0 8px #2196f3;
+      margin-bottom: 6px;
+      transition: height 0.4s;
+    }
+    .cockpit-bar-label {
+      color: #90caf9;
+      font-size: 0.95rem;
+      margin-top: 2px;
+    }
+    /* 背景科技线条 */
+    .cockpit-bg-svg {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @media (max-width: 1200px) {
+      .cockpit-main { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="cockpit-bg-svg" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bgline" x1="0" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#2196f3" stop-opacity="0.12"/>
+        <stop offset="1" stop-color="#2196f3" stop-opacity="0.04"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080" fill="none"/>
+    <g stroke="url(#bgline)" stroke-width="2">
+      <line x1="0" y1="180" x2="1920" y2="180"/>
+      <line x1="0" y1="360" x2="1920" y2="360"/>
+      <line x1="0" y1="540" x2="1920" y2="540"/>
+      <line x1="0" y1="720" x2="1920" y2="720"/>
+      <line x1="0" y1="900" x2="1920" y2="900"/>
+    </g>
+  </svg>
+  <div class="cockpit-header">
+    <svg class="cockpit-header-svg" viewBox="0 0 1920 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="headerline" x1="0" y1="0" x2="1920" y2="0" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#2196f3" stop-opacity="0.5"/>
+          <stop offset="1" stop-color="#2196f3" stop-opacity="0.1"/>
+        </linearGradient>
+      </defs>
+      <polyline points="0,60 200,20 960,10 1720,20 1920,60" stroke="url(#headerline)" stroke-width="4" fill="none"/>
+      <rect x="900" y="0" width="120" height="24" rx="12" fill="#2196f3" fill-opacity="0.18"/>
+      <rect x="0" y="80" width="1920" height="2" fill="#2196f3" fill-opacity="0.12"/>
+    </svg>
+    <div class="cockpit-header-title">集团主数据监测</div>
+  </div>
+  <div class="cockpit-main">
+    <!-- 左栏 -->
+    <div class="cockpit-col">
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">主数据分发流统计</div>
+        <div class="cockpit-metrics">
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">分发总量</div>
+            <div class="cockpit-metric-value">234,566</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">分发成功数量</div>
+            <div class="cockpit-metric-value">163,456</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">分发失败数量</div>
+            <div class="cockpit-metric-value">7,111</div>
+          </div>
+        </div>
+        <div class="cockpit-bar">
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 80px;"></div>
+            <div class="cockpit-bar-label">1月</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 120px;"></div>
+            <div class="cockpit-bar-label">2月</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 100px;"></div>
+            <div class="cockpit-bar-label">3月</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 140px;"></div>
+            <div class="cockpit-bar-label">4月</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 110px;"></div>
+            <div class="cockpit-bar-label">5月</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 90px;"></div>
+            <div class="cockpit-bar-label">6月</div>
+          </div>
+        </div>
+        <table class="cockpit-table">
+          <thead>
+            <tr><th>主数据类型</th><th>分发总量</th><th>分发成功</th><th>分发失败</th><th>日期</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>主数据A</td><td>120,000</td><td>118,000</td><td>2,000</td><td>2023-05-17</td></tr>
+            <tr><td>主数据B</td><td>114,566</td><td>45,456</td><td>1,111</td><td>2023-05-17</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">主数据分发异常预警和明细</div>
+        <table class="cockpit-table">
+          <thead>
+            <tr><th>主数据类型</th><th>异常类型</th><th>异常数量</th><th>日期</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>主数据A</td><td>分发失败</td><td>200</td><td>2023-05-17</td></tr>
+            <tr><td>主数据B</td><td>分发延迟</td><td>100</td><td>2023-05-17</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 中栏 -->
+    <div class="cockpit-col">
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">主数据申请及审核情况</div>
+        <div class="cockpit-metrics">
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">新申请</div>
+            <div class="cockpit-metric-value">1,500</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">通过数量</div>
+            <div class="cockpit-metric-value">1,100</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">退回数量</div>
+            <div class="cockpit-metric-value">400</div>
+          </div>
+        </div>
+        <div class="cockpit-bar">
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 60px;"></div>
+            <div class="cockpit-bar-label">新申请</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 120px;"></div>
+            <div class="cockpit-bar-label">通过</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 40px;"></div>
+            <div class="cockpit-bar-label">退回</div>
+          </div>
+        </div>
+        <table class="cockpit-table">
+          <thead>
+            <tr><th>申请类型</th><th>新申请</th><th>通过</th><th>退回</th><th>日期</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>主数据A</td><td>800</td><td>600</td><td>200</td><td>2023-05-17</td></tr>
+            <tr><td>主数据B</td><td>700</td><td>500</td><td>200</td><td>2023-05-17</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">周期清理情况</div>
+        <div class="cockpit-metrics">
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">周期清理</div>
+            <div class="cockpit-metric-value">300</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">周期修复</div>
+            <div class="cockpit-metric-value">200</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">周期新增</div>
+            <div class="cockpit-metric-value">120</div>
+          </div>
+        </div>
+        <div class="cockpit-bar">
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 80px;"></div>
+            <div class="cockpit-bar-label">清理</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 120px;"></div>
+            <div class="cockpit-bar-label">修复</div>
+          </div>
+          <div class="cockpit-bar-col">
+            <div class="cockpit-bar-value" style="height: 60px;"></div>
+            <div class="cockpit-bar-label">新增</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 右栏 -->
+    <div class="cockpit-col">
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">主数据现状（卡片和表格）</div>
+        <div class="cockpit-metrics">
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">母主数据量</div>
+            <div class="cockpit-metric-value">3,500</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">集团内主数据量</div>
+            <div class="cockpit-metric-value">6,500</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">新增主数据量</div>
+            <div class="cockpit-metric-value">7,800</div>
+          </div>
+        </div>
+        <table class="cockpit-table">
+          <thead>
+            <tr><th>主数据类型</th><th>当前总量</th><th>下属系统总量</th><th>下属系统明细</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>母主数据</td><td>3,500</td><td>3,498</td><td>系统A: 1,200, 系统B: 2,298</td></tr>
+            <tr><td>集团内主数据</td><td>6,500</td><td>6,500</td><td>系统A: 3,000, 系统B: 3,500</td></tr>
+            <tr><td>新增主数据</td><td>7,800</td><td>7,765</td><td>系统A: 4,000, 系统B: 3,765</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cockpit-card">
+        <div class="cockpit-card-title">主数据预警（卡片和表格）</div>
+        <div class="cockpit-metrics">
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">预警主数据</div>
+            <div class="cockpit-metric-value">406</div>
+          </div>
+          <div class="cockpit-metric">
+            <div class="cockpit-metric-label">预警类型</div>
+            <div class="cockpit-metric-value">缺失</div>
+          </div>
+        </div>
+        <table class="cockpit-table">
+          <thead>
+            <tr><th>主数据类型</th><th>预警数量</th><th>预警类型</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>主数据A</td><td>406</td><td>缺失</td></tr>
+            <tr><td>主数据B</td><td>764</td><td>重复</td></tr>
+            <tr><td>主数据C</td><td>98</td><td>异常</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

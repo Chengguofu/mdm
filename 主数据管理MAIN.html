@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>主数据管理平台</title>
+  <style>
+    :root {
+      --theme-bg: #f4f8fb;
+      --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+      --theme-sidebar: #fff;
+      --theme-content: #f4f8fb;
+      --theme-topbar-font: #fff;
+      --theme-menu-active: #2176c7;
+      --theme-menu-hover: #185a99;
+      --theme-table-header: #f4f8fb;
+      --theme-table-header-font: #2176c7;
+      --theme-table-row-hover: #f0f6fd;
+      --theme-table-border: #e3eaf3;
+      --theme-btn: #2176c7;
+      --theme-btn-hover: #185a99;
+      --theme-avatar-bg: #eaf3fb;
+      --theme-avatar-font: #2176c7;
+      --theme-content-text: #185a99;
+      --theme-shadow-color: rgba(33, 118, 199, 0.06);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+      background: var(--theme-bg);
+      color: #222;
+    }
+    .layout {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .topbar {
+      height: 56px;
+      background: var(--theme-topbar);
+      color: var(--theme-topbar-font);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08);
+      z-index: 10;
+      position: relative;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo {
+      width: 120px;
+      height: 36px;
+      background: transparent;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #2176c7;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .topbar-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--theme-topbar-font);
+      letter-spacing: 1px;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+    }
+    .topbar-time {
+      background: rgba(255,255,255,0.13);
+      border-radius: 16px;
+      padding: 2px 18px;
+      font-size: 15px;
+      color: #fff;
+      margin-right: 4px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      height: 32px;
+    }
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.18s;
+      height: 32px;
+      line-height: 1;
+    }
+    .icon-btn .icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .icon-btn:hover {
+      background: #185a99;
+    }
+    .ai-avatar-icon {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 17px;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--theme-avatar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--theme-avatar-font);
+      margin-left: 6px;
+    }
+    .user-dropdown {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(33, 118, 199, 0.13);
+      min-width: 140px;
+      z-index: 100;
+      padding: 10px 0;
+      display: none;
+    }
+    .user-dropdown.show {
+      display: block;
+    }
+    .user-dropdown-item {
+      padding: 10px 24px;
+      font-size: 15px;
+      color: #2176c7;
+      cursor: pointer;
+      transition: background 0.18s;
+      white-space: nowrap;
+    }
+    .user-dropdown-item:hover {
+      background: #f0f6fd;
+      color: #185a99;
+    }
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      height: calc(100vh - 56px);
+    }
+    .sidebar {
+      width: 220px;
+      background: var(--theme-sidebar);
+      border-right: 1px solid var(--theme-table-border);
+      box-shadow: 2px 0 8px rgba(33, 118, 199, 0.03);
+      display: flex;
+      flex-direction: column;
+      padding-top: 12px;
+      overflow-y: auto;
+      height: 100%;
+      min-height: 0;
+    }
+    .menu {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 16px 0;
+    }
+    .menu-item {
+      padding: 0;
+      font-size: 16px;
+      color: #185a99;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+      font-weight: 500;
+    }
+    .menu-item-header {
+      padding: 12px 32px 12px 32px;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
+    }
+    .menu-item.active .menu-item-header, .menu-item:hover .menu-item-header {
+      background: var(--theme-table-row-hover);
+      color: var(--theme-menu-active);
+    }
+    .menu-item.active {
+      border-left: 4px solid var(--theme-menu-active);
+    }
+    .menu-item.is-favorited-and-hidden {
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      border: none !important;
+      line-height: 0 !important;
+      font-size: 0 !important; /* Ensure no text takes space */
+      display: none !important; /* Added to ensure the element is completely hidden */
+    }
+    /* Explicitly hide the header inside the hidden menu item */
+    .menu-item.is-favorited-and-hidden .menu-item-header {
+        display: none !important;
+        width: 0 !important; /* Ensure it takes no width either */
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .favorite-icon {
+      margin-left: auto;
+      font-size: 18px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s, opacity 0.2s;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .favorite-icon:hover {
+      opacity: 0.8;
+      background: rgba(255,255,255,0.3);
+    }
+    .favorite-icon.favorited {
+      color: #FFD700; /* Gold color for favorited */
+      background: rgba(255,215,0,0.1);
+    }
+    /* Styling for favorite icon in the favorited items list (Common Menu) */
+    #favoritedItemsList .submenu-item .favorite-icon {
+        color: #ccc !important; /* Make it gray when in favorited list */
+        background: rgba(255,255,255,0.7) !important; /* Add a subtle background */
+        cursor: pointer; /* Keep cursor pointer to indicate clickability */
+        margin-right: 0; /* Align to the very right */
+        padding: 2px 6px !important; /* Smaller padding for better fit in submenu */
+        border: 1px solid #ddd !important; /* Subtle border */
+        border-radius: 4px !important; /* Slightly rounded corners */
+        opacity: 0.9; /* Slight transparency */
+    }
+    #favoritedItemsList .submenu-item .favorite-icon:hover {
+        background: rgba(230,230,230,0.9) !important;
+        opacity: 1;
+    }
+    .menu-item-icon {
+      margin-right: 10px; /* Space between icon and text */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px; /* Ensure consistent icon size */
+      height: 20px;
+      color: #2176c7; /* A subtle color for the icons */
+    }
+    .menu-item-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+    .submenu {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 32px;
+      background: #f8fbff;
+      display: none; /* 默认隐藏二级菜单 */
+      transition: all 0.3s ease; /* 添加过渡动画 */
+    }
+    .menu-item.open .submenu {
+      display: block; /* 当菜单项有open类时显示二级菜单 */
+    }
+    .submenu-item {
+      padding: 10px 32px;
+      font-size: 15px;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.18s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .submenu-item .favorite-btn {
+      margin-left: 8px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+    }
+    .submenu-item .favorite-btn:hover {
+      color: #FFD700;
+      background: rgba(255,215,0,0.1);
+    }
+    .submenu-item .favorite-btn.favorited {
+      color: #FFD700;
+      background: rgba(255,215,0,0.1);
+    }
+    #favoritedItemsList .submenu-item {
+      padding: 8px 32px;
+      font-size: 14px;
+    }
+    #favoritedItemsList .submenu-item .favorite-btn {
+      color: #FFD700;
+      background: rgba(255,215,0,0.1);
+    }
+    .content {
+      flex: 1;
+      background: var(--theme-content);
+      padding: 32px;
+      min-width: 0;
+      overflow: auto;
+      position: relative;
+      height: 100%;
+    }
+    .menu-item .arrow {
+      margin-right: 8px;
+      font-size: 12px;
+      color: #bbb;
+      transition: transform 0.2s;
+    }
+    .menu-item.open .arrow {
+      transform: rotate(90deg);
+      color: var(--theme-menu-active);
+    }
+    /* 表格样式 */
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
+      padding: 18px 0 0 0;
+      overflow-x: auto;
+    }
+    table.model-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 15px;
+      background: #fff;
+      min-width: 1100px;
+    }
+    .model-table th, .model-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--theme-table-border);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .model-table th {
+      background: var(--theme-table-header);
+      color: var(--theme-table-header-font);
+      font-weight: 600;
+    }
+    .model-table tr:last-child td {
+      border-bottom: none;
+    }
+    .model-table tr:hover td {
+      background: var(--theme-table-row-hover);
+    }
+    .model-table td a {
+      color: #185a99;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .model-table td a:hover {
+      color: var(--theme-menu-active);
+    }
+    .model-table td {
+      color: #222;
+    }
+    .model-table td.center {
+      text-align: center;
+    }
+    .model-table td.checkbox-cell, .model-table th.checkbox-cell {
+      width: 36px;
+      text-align: center;
+    }
+    /* 查询区和按钮区样式 */
+    .query-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 24px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 0 0 0 6px;
+    }
+    .query-bar label {
+      font-size: 15px;
+      color: #185a99;
+      margin-right: 6px;
+    }
+    .query-bar input, .query-bar select {
+      padding: 6px 10px;
+      border: 1.2px solid #c0d3eb;
+      border-radius: 4px;
+      font-size: 15px;
+      background: #f9fbfd;
+      min-width: 120px;
+      margin-right: 8px;
+    }
+    .query-bar button {
+      background: var(--theme-btn);
+      color: #fff;
+      border: none;
+      padding: 6px 18px;
+      border-radius: 5px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-right: 8px;
+      transition: background 0.2s;
+    }
+    .query-bar button:hover {
+      background: var(--theme-btn-hover);
+    }
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .btn-main {
+      background: #4db6ac;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0 18px;
+      height: 36px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      transition: background 0.18s;
+    }
+    .btn-main:hover {
+      background: #399488;
+    }
+    .btn-line {
+      background: #fff;
+      color: #444;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 0 14px;
+      height: 36px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      transition: background 0.18s, border 0.18s;
+    }
+    .btn-line:hover {
+      background: #f5f7fa;
+      border-color: #b0b8c1;
+    }
+    .action-bar .icon {
+      margin-right: 6px;
+      display: flex;
+      align-items: center;
+    }
+    /* 主题设置下拉菜单 */
+    .theme-dropdown {
+      position: absolute;
+      top: 44px;
+      right: 0;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(33, 118, 199, 0.13);
+      min-width: 170px;
+      z-index: 100;
+      padding: 10px 0;
+      display: none;
+    }
+    .theme-dropdown.show {
+      display: block;
+    }
+    .theme-dropdown-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #6b7a8f;
+      padding: 0 20px 8px 20px;
+      margin-bottom: 2px;
+    }
+    .theme-dropdown-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 10px;
+    }
+    .theme-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+      white-space: nowrap;
+      color: #2176c7;
+    }
+    .theme-dropdown-item.selected {
+      background: #eaf3fb;
+      color: #2176c7;
+      font-weight: 600;
+    }
+    .theme-dropdown-item:hover {
+      background: #f0f6fd;
+      color: #2176c7;
+    }
+    .theme-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1.5px solid #e3eaf3;
+    }
+    /* AI对话抽屉 */
+    .drawer-mask {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(33, 118, 199, 0.10);
+      z-index: 3000;
+      display: none;
+    }
+    .drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 420px;
+      max-width: 98vw;
+      background: #fff;
+      box-shadow: -2px 0 16px rgba(33, 118, 199, 0.18);
+      z-index: 3100;
+      display: flex;
+      flex-direction: column;
+      animation: drawerIn .25s;
+    }
+    @keyframes drawerIn {
+      from { right: -440px; opacity: 0; }
+      to { right: 0; opacity: 1; }
+    }
+    .drawer-header {
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 1px solid #e3eaf3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #999;
+      cursor: pointer;
+    }
+    .drawer-content {
+      flex: 1;
+      padding: 0;
+      overflow-y: auto;
+      font-size: 15px;
+      color: #222;
+      background: #f8fbff;
+    }
+    .drawer-footer {
+      padding: 16px 24px;
+      background: #fff;
+      border-top: 1px solid #e3eaf3;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .drawer-footer input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1.2px solid #c0d3eb;
+      border-radius: 24px;
+      font-size: 15px;
+      background: #fff;
+    }
+    .drawer-footer button {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .drawer-footer button:hover {
+      background: #185a99;
+    }
+    @media (max-width: 700px) {
+      .sidebar { width: 120px; }
+      .menu-item, .submenu-item { font-size: 13px; padding-left: 12px; }
+      .content { padding: 10px; }
+      .topbar { font-size: 16px; padding: 0 10px; }
+      .table-wrap { padding: 4px 0 0 0; }
+      table.model-table { min-width: 800px; }
+      .topbar-title { font-size: 15px; }
+      .logo { width: 28px; height: 28px; font-size: 16px; }
+      .user-avatar { width: 24px; height: 24px; font-size: 13px; }
+      .drawer { width: 98vw; }
+    }
+    /* 快捷入口九宫格样式 */
+    .quick-access {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 280px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(33,118,199,0.10);
+      border-radius: 8px;
+      padding: 18px 16px 10px 16px;
+      margin: 0;
+      border: 1px solid var(--theme-table-border);
+      z-index: 10;
+    }
+    .quick-access-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .quick-access-title {
+      font-size: 15px;
+      color: #185a99;
+      font-weight: 600;
+    }
+    .add-quick-access {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: rgba(33, 118, 199, 0.08);
+      color: #2176c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    .add-quick-access:hover {
+      background: rgba(33, 118, 199, 0.18);
+    }
+    .quick-access-items {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .quick-access-item {
+      background: #f8fbff;
+      border: 1px solid #e3eaf3;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #2176c7;
+      cursor: pointer;
+      padding: 12px 0 8px 0;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s;
+      min-height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .quick-access-item:hover {
+      background: #eaf3fb;
+      border-color: #2176c7;
+      color: #185a99;
+    }
+    .quick-access-item .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.05);
+      color: #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      opacity: 0;
+      transition: all 0.2s;
+    }
+    .quick-access-item:hover .remove-btn {
+      opacity: 1;
+    }
+    .quick-access-item .remove-btn:hover {
+      background: rgba(255,0,0,0.1);
+      color: #ff4d4f;
+    }
+    .quick-entry-bar {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .quick-entry-item {
+      width: 80px;
+      height: 90px;
+      background: #fff;
+      border: 1.5px solid #f0f0f0;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.18s, border 0.18s;
+      position: relative;
+      user-select: none;
+    }
+    .quick-entry-item.dragging {
+      opacity: 0.5;
+      border: 1.5px dashed #26b3a0;
+    }
+    .quick-entry-item.drag-over {
+      border: 1.5px solid #26b3a0;
+      background: #eaf3fb;
+    }
+    .quick-entry-item .icon {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quick-entry-item .label {
+      font-size: 15px;
+      color: #666;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .quick-entry-item.add-btn .icon,
+    .quick-entry-item.edit-btn .icon {
+      color: #bbb;
+    }
+    .quick-entry-item.editing .remove-btn {
+      display: block;
+    }
+    .remove-btn {
+      display: none;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: #fff;
+      border: none;
+      color: #e57373;
+      font-size: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .quick-entry-item.editing .remove-btn {
+      display: block;
+    }
+    .quick-entry-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(33,118,199,0.08);
+      padding: 18px 18px 10px 18px;
+      margin-bottom: 16px;
+    }
+    .quick-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: #185a99;
+      margin-bottom: 12px;
+    }
+    .quick-entry-header .right-btns {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .quick-entry-add-btn {
+      background: #eaf3fb;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      color: #2176c7;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .quick-entry-edit-btn {
+      background: #eaf3fb;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      color: #bbb;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .quick-entry-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+    }
+    .quick-entry-item {
+      width: 110px;
+      height: 110px;
+      background: #fff;
+      border: 1.5px solid #f0f0f0;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.18s, border 0.18s;
+      position: relative;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    .quick-entry-item.dragging {
+      opacity: 0.5;
+      border: 1.5px dashed #26b3a0;
+    }
+    .quick-entry-item.drag-over {
+      border: 1.5px solid #26b3a0;
+      background: #eaf3fb;
+    }
+    .quick-entry-item .icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quick-entry-item .label {
+      font-size: 16px;
+      color: #444;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+    .quick-entry-item.editing .remove-btn {
+      display: block;
+    }
+    .remove-btn {
+      display: none;
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: #fff;
+      border: none;
+      color: #e57373;
+      font-size: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .quick-entry-item.editing .remove-btn {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo" style="padding:0;background:transparent;border-radius:8px;width:120px;height:36px;display:flex;align-items:center;justify-content:center;">
+          <img src="logo.png" alt="SGAI Logo" style="height:32px;max-width:100%;object-fit:contain;background:transparent;" />
+        </div>
+        <span class="topbar-title">主数据管理平台</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-time" id="topbarTime"></span>
+        <button class="icon-btn" title="消息" id="msgBtn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 20c1.38 0 2.5-1.12 2.5-2.5h-5A2.5 2 0 0 0 11 20Zm7-5V10c0-3.07-1.64-5.64-5-6.32V3a2 2 0 1 0-4 0v.68C5.64 4.36 4 6.92 4 10v5l-1 1v1h16v-1l-1-1Z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button class="icon-btn" title="AI对话" id="aiBtn">
+          <img src="panda.png" alt="AI助手" class="ai-avatar-icon" style="width:28px;height:28px;background:transparent;" />
+        </button>
+        <button class="icon-btn" title="查询" id="searchBtn">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="15.2" y1="15.2" x2="20" y2="20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="user-info" id="userInfo">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 18c0-2.5 3-4 7-4s7 1.5 7 4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          管理员
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item">个人信息</div>
+            <div class="user-dropdown-item">修改密码</div>
+            <div class="user-dropdown-item">退出登录</div>
+          </div>
+        </div>
+        <button class="icon-btn" title="设置" id="settingBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 6.2 18.82l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.38 5.2l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9.2 4.6V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+          </svg>
+        </button>
+        <div class="theme-dropdown" id="themeDropdown">
+          <div class="theme-dropdown-title">主题设置</div>
+          <div class="theme-dropdown-list">
+            <div class="theme-dropdown-item" data-theme="blue"><span class="theme-dot" style="background:#2176c7;"></span>默认科技蓝</div>
+            <div class="theme-dropdown-item" data-theme="dark"><span class="theme-dot" style="background:#181c24;"></span>深色模式</div>
+            <div class="theme-dropdown-item" data-theme="green"><span class="theme-dot" style="background:#2ecc71;"></span>森林绿色</div>
+            <div class="theme-dropdown-item" data-theme="purple"><span class="theme-dot" style="background:#8e44ad;"></span>罗兰紫</div>
+            <div class="theme-dropdown-item" data-theme="orange"><span class="theme-dot" style="background:#ff9800;"></span>活力橙色</div>
+            <div class="theme-dropdown-item" data-theme="red"><span class="theme-dot" style="background:#e74c3c;"></span>中国红</div>
+            <div class="theme-dropdown-item" data-theme="gray"><span class="theme-dot" style="background:#7f8c8d;"></span>中性灰色</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <nav class="sidebar">
+        <!-- 侧边栏内容（不再包含快捷入口） -->
+        <ul class="menu" id="mainMenu">
+          <li class="menu-item active" id="favoriteMenu">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Common Menu -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20.72c-.89-.52-1.79-1.07-2.69-1.64C4.91 17.48 2 15 2 10.5 2 7.17 4.18 4.29 7.5 4.03 10.82 3.77 14 5.37 16 8h-4"></path><circle cx="17.5" cy="15.5" r="4.5"></circle><path d="M21 21l-1.5-1.5"></path></svg>
+              </span>
+              <span>常用菜单</span>
+            </div>
+            <ul class="submenu" id="favoritedItemsList">
+              <!-- Favorited items will be dynamically loaded here -->
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-standard-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Standard Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book"><path d="M4 19.5V10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9.5a2.5 2.5 0 0 1-5 0A2.5 2.5 0 0 1 12 19.5a2.5 2.5 0 0 1-5 0A2.5 2.5 0 0 1 4 19.5z"></path></svg>
+              </span>
+              <span>数据标准管理</span>
+              <span class="favorite-icon" data-menu-id="data-standard-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-content="model-query" data-url="model_query.html">数据模型管理</li>
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-info-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Information Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="16" y1="21" x2="8" y2="21"></line></svg>
+              </span>
+              <span>数据信息管理</span>
+              <span class="favorite-icon" data-menu-id="data-info-management">★</span>
+            </div>
+            <ul class="submenu">
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-flow-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Flow Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-branch"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+              </span>
+              <span>数据流程管理</span>
+              <span class="favorite-icon" data-menu-id="data-flow-management">★</span>
+            </div>
+            <ul class="submenu">
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-quality-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Quality Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </span>
+              <span>数据质量管理</span>
+              <span class="favorite-icon" data-menu-id="data-quality-management">★</span>
+            </div>
+            <ul class="submenu">
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-cleansing-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Cleansing Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </span>
+              <span>数据清洗管理</span>
+              <span class="favorite-icon" data-menu-id="data-cleansing-management">★</span>
+            </div>
+            <ul class="submenu">
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-service-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Service Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-server"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6" y2="6"></line><line x1="6" y1="18" x2="6" y2="18"></line></svg>
+              </span>
+              <span>数据服务管理</span>
+              <span class="favorite-icon" data-menu-id="data-service-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-item-id="receive-config">数据接收接口配置</li>
+              <li class="submenu-item" data-item-id="receive-log">数据接收接口日志</li>
+              <li class="submenu-item" data-item-id="push-config">数据推送接口配置</li>
+              <li class="submenu-item" data-item-id="push-log">数据推送接口日志</li>
+              <li class="submenu-item" data-item-id="filter-config">筛选配置</li>
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-analysis-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+              </span>
+              <span>数据分析管理</span>
+              <span class="favorite-icon" data-menu-id="data-analysis-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-item-id="cockpit">管理驾驶舱</li>
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="system-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for System Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+              </span>
+              <span>系统管理</span>
+              <span class="favorite-icon" data-menu-id="system-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-item-id="sys-dict">系统字典</li>
+              <li class="submenu-item" data-item-id="account">账号管理</li>
+              <li class="submenu-item" data-item-id="role">角色管理</li>
+              <li class="submenu-item" data-item-id="menu">系统菜单管理</li>
+              <li class="submenu-item" data-item-id="notice">通知公告管理</li>
+              <li class="submenu-item" data-item-id="job">任务调度中心</li>
+              <li class="submenu-item" data-item-id="monitor">系统监控中心</li>
+              <li class="submenu-item" data-item-id="log">系统日志中心</li>
+              <li class="submenu-item" data-item-id="lang">多语言管理</li>
+              <li class="submenu-item" data-item-id="data-perm">数据权限</li>
+              <li class="submenu-item" data-item-id="sys-setting">系统设置</li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <div class="content" id="mainContent">
+        <!-- 主页内容等原有内容 -->
+        <div id="homePage">
+          <div style="display: flex; gap: 16px;">
+            <div style="flex:2; display:flex; flex-direction:column; gap:16px;">
+              <!-- 快捷入口卡片区域 -->
+              <div class="quick-entry-card">
+                <div class="quick-entry-header">
+                  <span>快捷入口</span>
+                  <span class="right-btns">
+                    <button class="quick-entry-add-btn" onclick="openAddQuickEntry()" title="添加快捷入口">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#2176c7" stroke-width="2" fill="#eaf3fb"/><line x1="12" y1="8" x2="12" y2="16" stroke="#2176c7" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="#2176c7" stroke-width="2"/></svg>
+                    </button>
+                    <button class="quick-entry-edit-btn" onclick="toggleQuickEntryEdit()" title="编辑快捷入口">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="#bbb" stroke-width="2" fill="#fff"/><path d="M8 16l8-8M9 7h6v6" stroke="#bbb" stroke-width="2"/></svg>
+                    </button>
+                  </span>
+                </div>
+                <div class="quick-entry-bar" id="quickEntryBar"></div>
+              </div>
+              <!-- 通知公告区域（下移） -->
+              <div style="background:var(--theme-sidebar); border-radius:8px; box-shadow:0 2px 8px var(--theme-shadow-color); overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:var(--theme-topbar-font); font-size:20px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
+                  <svg width="24" height="24" fill="none" style="margin-right:8px;"><rect x="3" y="6" width="18" height="12" rx="3" stroke="var(--theme-topbar-font)" stroke-width="2"/><path d="M7 10h6M7 14h10" stroke="var(--theme-topbar-font)" stroke-width="2" stroke-linecap="round"/></svg>
+                  通知公告
+                  <span style="margin-left:auto; font-size:15px; color:var(--theme-topbar-font); font-weight:400;">2025-06-11</span>
+                </div>
+                <div style="padding:14px 20px; font-size:15px; color:var(--theme-content-text); border-bottom:1px solid var(--theme-table-border);">
+                  <ul style="margin:0; padding-left:18px;">
+                    <li>关于主数据平台升级维护的通知</li>
+                  </ul>
+                </div>
+              </div>
+              <div style="background:var(--theme-sidebar); border-radius:8px; box-shadow:0 2px 8px var(--theme-shadow-color); overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#f46b45 0%,#eea849 100%); color:var(--theme-topbar-font); font-size:20px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
+                  <svg width="24" height="24" fill="none" style="margin-right:8px;"><rect x="3" y="6" width="18" height="12" rx="3" stroke="var(--theme-topbar-font)" stroke-width="2"/><path d="M7 10h10M7 14h6" stroke="var(--theme-topbar-font)" stroke-width="2" stroke-linecap="round"/></svg>
+                  待办任务
+                </div>
+                <div style="padding:14px 20px; font-size:15px; color:var(--theme-content-text);">
+                  <ul style="margin:0; padding-left:18px;">
+                    <li>【项目审批】项目启动申请 - 王经理</li>
+                    <li>【费用报销】2024年差旅费报销 - 李会计</li>
+                    <li>【合同签署】新供应商合同审批 - 张总</li>
+                    <li>【数据修改】重要数据变更请求 - 陈工程师</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:16px;">
+              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
+                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/><path d="M7 10h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                  标准及运维细则
+                </div>
+                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
+                  <ul style="margin:0; padding-left:18px;">
+                    <li>2025新发布标准</li>
+                  </ul>
+                </div>
+              </div>
+              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
+                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/><path d="M7 10h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                  规章制度
+                </div>
+                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
+                  <ul style="margin:0; padding-left:18px;">
+                    <li>2025年度公司考勤管理制度</li>
+                  </ul>
+                </div>
+              </div>
+              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
+                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><path d="M5 11h12M5 15h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/></svg>
+                  网站链接
+                </div>
+                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
+                  <ul style="margin:0; padding-left:18px;">
+                    <li><a href="https://www.example.com" target="_blank" style="color:#2176c7; text-decoration:underline;">外部链接</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- AI对话抽屉 -->
+  <div class="drawer-mask" id="drawerMask">
+    <div class="drawer" id="drawerBox">
+      <div class="drawer-header" style="padding:14px 20px; font-size:16px; font-weight:600; color:#333; border-bottom:1px solid #e3eaf3; display:flex; align-items:center; justify-content:space-between; background:#fff;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="panda.png" alt="AI Assistant Logo" style="width:28px; height:28px; background:transparent;">
+          <span style="font-size:16px; font-weight:600; color:#333;">AI助手</span>
+        </div>
+        <button style="background:none; border:none; font-size:22px; color:#999; cursor:pointer;" onclick="closeDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="drawer-content" id="drawerContent" style="display:flex;flex-direction:column;height:100%;padding:0;background:#f8fbff;">
+        <!-- Logo and Welcome Message -->
+        <div style="text-align:center; padding:100px 24px 20px;">
+          <img src="AIlogo.png" alt="SGAI Logo" style="width:180px;height:auto;object-fit:contain; margin: 0 auto; display: block;" />
+        </div>
+        <div style="text-align:center; padding:0 24px 20px; color:#333; font-size:20px; font-weight:600;">你好，我是首自信智能AI助手，请问有什么可以帮助你的？</div>
+
+        <!-- Chat History -->
+        <div id="chatHistory" style="flex:1;overflow-y:auto;padding:0 24px 12px 24px;display:flex;flex-direction:column;gap:16px;"></div>
+
+        <!-- Footer Input Area -->
+        <div class="drawer-footer" style="padding:16px 24px; background:#fff; border-top:1px solid #e3eaf3;">
+          <div style="background:#f8fbff; border:1px solid #e3eaf3; border-radius:28px; padding:12px 20px; display:flex; flex-direction:column; gap:8px; box-shadow:0 1px 4px rgba(33,118,199,0.08);">
+            <!-- Input Field Container -->
+            <div style="position:relative; display:flex; align-items:center; width:100%;">
+              <input type="text" placeholder="搜资料、提问题、找答案" id="aiInput" style="flex:1; border:none; outline:none; font-size:16px; background:transparent; color:#333; height:40px; padding-right:50px;">
+              <!-- Submit Button inside Input Field (bottom-right) -->
+              <button style="background:#2176c7; border:none; border-radius:50%; width:48px; height:48px; display:flex; justify-content:center; align-items:center; cursor:pointer; box-shadow:0 2px 6px rgba(33,118,199,0.3); position:absolute; right:0px; bottom:2px;" onclick="sendAIMessage()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="19" x2="12" y2="5"></line>
+                  <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-start; padding-top:4px;">
+              <!-- "深度搜索" Button -->
+              <button style="background:#f0f6fd; border:1px solid #c0d3eb; padding:6px 14px; border-radius:20px; font-size:14px; color:#2176c7; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2176c7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16V9M9 9l3-3 3 3"></path><circle cx="12" cy="18" r="1"></circle></svg>
+                深度搜索
+              </button>
+              <!-- Microphone Icon -->
+              <button style="background:none; border:none; font-size:20px; color:#666; cursor:pointer; padding:0 4px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 搜索弹窗 -->
+  <div id="searchModalMask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.18);z-index:4000;align-items:center;justify-content:center;">
+    <div id="searchModal" style="background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(33,118,199,0.13);padding:32px 32px 28px 32px;min-width:320px;max-width:90vw;display:flex;flex-direction:column;align-items:center;">
+      <div style="font-size:20px;font-weight:600;color:#2176c7;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="10" cy="10" r="7" stroke="#2176c7" stroke-width="1.5" fill="none"/><line x1="15.2" y1="15.2" x2="20" y2="20" stroke="#2176c7" stroke-width="1.5" stroke-linecap="round"/></svg>
+        站内搜索
+      </div>
+      <input id="searchInput" type="text" placeholder="请输入关键字..." style="width:320px;max-width:70vw;padding:12px 18px;font-size:17px;border:1.5px solid #c0d3eb;border-radius:8px;outline:none;transition:border 0.2s;" autofocus />
+      <div style="margin-top:18px;display:flex;gap:18px;">
+        <button id="searchSubmitBtn" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:6px;font-size:16px;">搜索</button>
+        <button id="searchCloseBtn" style="background:#eaf3fb;color:#2176c7;padding:8px 32px;border:none;border-radius:6px;font-size:16px;">关闭</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // 顶部时间显示
+    function updateTopbarTime() {
+      const now = new Date();
+      const weekMap = ['日','一','二','三','四','五','六'];
+      const y = now.getFullYear();
+      const m = (now.getMonth() + 1).toString().padStart(2, '0');
+      const d = now.getDate().toString().padStart(2, '0');
+      const h = now.getHours().toString().padStart(2, '0');
+      const min = now.getMinutes().toString().padStart(2, '0');
+      const s = now.getSeconds().toString().padStart(2, '0');
+      const week = weekMap[now.getDay()];
+      document.getElementById('topbarTime').textContent = `${y}-${m}-${d} 星期${week} ${h}:${min}:${s}`;
+    }
+    setInterval(updateTopbarTime, 1000);
+    updateTopbarTime();
+
+    // 收藏功能逻辑
+    const favoritedItemsList = document.getElementById('favoritedItemsList');
+
+    function loadFavorites() {
+      const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
+      const favoritedList = document.getElementById('favoritedItemsList');
+      favoritedList.innerHTML = ''; // Clear existing items
+
+      document.querySelectorAll('.menu-item').forEach(item => {
+        const menuId = item.dataset.menuId;
+        const favoriteIcon = item.querySelector('.favorite-icon');
+        if (favoriteIcon) {
+          if (favoritedItems.includes(menuId)) {
+            item.classList.add('is-favorited-and-hidden');
+            favoriteIcon.classList.add('favorited');
+          } else {
+            item.classList.remove('is-favorited-and-hidden');
+            favoriteIcon.classList.remove('favorited');
+          }
+        }
+      });
+
+      favoritedItems.forEach(menuId => {
+        const originalMenuItem = document.querySelector(`.menu-item[data-menu-id="${menuId}"]`);
+        if (originalMenuItem) {
+          const submenuItems = originalMenuItem.querySelectorAll('.submenu-item');
+          submenuItems.forEach(subItem => {
+            const clonedSubItem = subItem.cloneNode(true);
+
+            // Create a container for the submenu item text and the favorite icon
+            const wrapperDiv = document.createElement('div');
+            wrapperDiv.style.display = 'flex';
+            wrapperDiv.style.alignItems = 'center';
+            wrapperDiv.style.justifyContent = 'space-between';
+            wrapperDiv.style.width = '100%';
+
+            const spanText = document.createElement('span');
+            spanText.textContent = clonedSubItem.textContent; // Get the text content
+            spanText.style.flexGrow = '1'; // Allow text to take available space
+
+            const clonedFavoriteIcon = document.createElement('span');
+            clonedFavoriteIcon.classList.add('favorite-icon'); // Removed 'favorited' class here, it's styled by #favoritedItemsList .favorite-icon
+            clonedFavoriteIcon.textContent = '★'; // Always show star in favorited list
+            clonedFavoriteIcon.setAttribute('data-menu-id', menuId); // Keep the parent menu ID
+
+            // Append text and icon to the wrapper
+            wrapperDiv.appendChild(spanText);
+            wrapperDiv.appendChild(clonedFavoriteIcon);
+
+            // Clear the original content and append the wrapper
+            clonedSubItem.innerHTML = '';
+            clonedSubItem.appendChild(wrapperDiv);
+
+            // Add data-url to the cloned item for navigation
+            clonedSubItem.dataset.url = subItem.dataset.url;
+
+            // Rebind the click event for the cloned favorite icon
+            clonedFavoriteIcon.onclick = (event) => {
+              event.stopPropagation(); // Prevent submenu item click
+              toggleFavorite(menuId);
+            };
+
+            // Rebind the click event for the cloned submenu item to navigate
+            clonedSubItem.onclick = () => {
+              const url = clonedSubItem.dataset.url;
+              if (url) {
+                document.getElementById('contentFrame').src = url;
+                // Remove 'active' from all menu items
+                document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
+                // Add 'active' to the cloned submenu item
+                clonedSubItem.classList.add('active');
+                // Expand its parent menu if it's collapsed (optional, but good UX)
+                const parentMenuItem = clonedSubItem.closest('.menu-item');
+                if (parentMenuItem && !parentMenuItem.classList.contains('expanded')) {
+                  parentMenuItem.classList.add('expanded');
+                }
+              }
+            };
+
+            favoritedList.appendChild(clonedSubItem);
+          });
+        }
+      });
+    }
+
+    function toggleFavorite(menuId) {
+      let favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
+      const menuItem = document.querySelector(`.menu-item[data-menu-id="${menuId}"]`);
+      const favoriteIconMain = menuItem ? menuItem.querySelector('.favorite-icon') : null;
+
+      if (favoritedItems.includes(menuId)) {
+        // Remove from favorites
+        favoritedItems = favoritedItems.filter(id => id !== menuId);
+        if (menuItem) {
+          menuItem.classList.remove('is-favorited-and-hidden');
+        }
+        if (favoriteIconMain) {
+          favoriteIconMain.classList.remove('favorited');
+        }
+      } else {
+        // Add to favorites
+        favoritedItems.push(menuId);
+        if (menuItem) {
+          menuItem.classList.add('is-favorited-and-hidden');
+        }
+        if (favoriteIconMain) {
+          favoriteIconMain.classList.add('favorited');
+        }
+      }
+      localStorage.setItem('favoritedItems', JSON.stringify(favoritedItems));
+      loadFavorites(); // Reload favorites to update both lists
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // ... existing code ...
+
+      // Adjust arrow position for all collapsible menu items to the left
+      document.querySelectorAll('.menu-item-header').forEach(header => {
+        const arrow = header.querySelector('.favorite-arrow');
+        if (arrow && header.firstChild !== arrow) { // Only move if not already first
+          header.insertBefore(arrow, header.firstChild);
+        }
+      });
+
+      loadFavorites();
+    });
+
+    // 菜单展开收起逻辑
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      const header = item.querySelector('.menu-item-header');
+      if (header) {
+        header.onclick = function(e) {
+          // 如果点击的是收藏图标，不处理展开/收起
+          if (e.target.classList.contains('favorite-icon')) return;
+
+          // 切换当前菜单项的展开状态
+          const isOpen = item.classList.contains('open');
+          
+          // 关闭所有其他菜单项
+            menuItems.forEach(i => {
+            if (i !== item) {
+              i.classList.remove('open');
+            }
+          });
+
+          // 切换当前菜单项的展开状态
+          item.classList.toggle('open');
+        };
+      }
+    });
+
+    // 二级菜单高亮及内容切换
+    const submenuItems = document.querySelectorAll('.submenu-item');
+    submenuItems.forEach(item => {
+      item.onclick = function(e) {
+        if (e.target.classList.contains('favorite-icon')) return;
+        submenuItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        e.stopPropagation();
+        if (this.dataset.itemId === 'cockpit') {
+          showCockpitPage();
+        } else if (this.dataset.itemId === 'notice') {
+          showNoticeTable();
+        } else if (this.dataset.itemId === 'filter-config') {
+          showConditionPage();
+        } else if (this.dataset.itemId === 'receive-config') {
+          showDataCollectionConfigPage();
+        } else if (this.dataset.itemId === 'push-config') {
+          showDataPushConfigPage();
+        } else if (this.dataset.itemId === 'push-log') {
+          showPushLogTabs();
+        } else {
+          const content = this.dataset.content;
+          if (content === 'model-query') {
+          showModelQueryTable();
+        } else {
+            document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
+          }
+        }
+      };
+    });
+
+    function showNoticeTable() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="notice-action-bar" style="display:flex;gap:8px;margin-bottom:12px;">
+          <button id="noticeQuickSearch"><span style='font-size:18px;'>🔍</span> 快速查询</button>
+          <button id="noticeAddBtn"><span style='font-size:18px;'>＋</span> 添加</button>
+          <button><span style='font-size:18px;'>📝</span> 编辑</button>
+          <button><span style='font-size:18px;'>📢</span> 发布</button>
+          <button><span style='font-size:18px;'>⛔</span> 禁止</button>
+          <button><span style='font-size:18px;'>🗑️</span> 删除</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>文件标题</th>
+                <th>文件分类</th>
+                <th>是否发布</th>
+                <th>创建时间</th>
+                <th>创建人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>外部链接</td><td>友情链接</td><td>是</td><td>2025-06-11 13:32:01</td><td>admin</td></tr>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>2025年度公司考勤管理制度</td><td>规章制度</td><td>是</td><td>2025-06-11 13:30:34</td><td>admin</td></tr>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>2025新发布标准</td><td>标准及运维细则</td><td>是</td><td>2025-06-11 13:27:42</td><td>admin</td></tr>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>通知</td><td>通知公告</td><td>是</td><td>2025-06-11 13:20:17</td><td>admin</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="noticeAddModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2000;align-items:center;justify-content:center;">
+          <div class="modal-content" style="background:#fff;border-radius:8px;max-width:900px;width:90vw;max-height:90vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+            <div style="background:#185a99;color:#fff;font-size:20px;font-weight:500;padding:16px 24px;border-radius:8px 8px 0 0;">文件添加 <span style='position:absolute;right:24px;top:16px;cursor:pointer;font-size:24px;' id="noticeAddClose">×</span></div>
+            <form id="noticeAddForm" style="padding:24px;display:flex;flex-direction:column;gap:18px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <label style="width:100px;">文件标题<span style="color:red">*</span>：</label>
+                <input type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;" required />
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <label style="width:100px;">文件分类<span style="color:red">*</span>：</label>
+                <select id="noticeFileCategory" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;">
+                  <option>规章制度</option>
+                  <option>标准及运维细则</option>
+                  <option>通知公告</option>
+                  <option>友情链接</option>
+                </select>
+              </div>
+              <div id="noticeFileUploadRow" style="display:flex;align-items:center;gap:12px;">
+                <label style="width:100px;">上传文件<span style="color:red">*</span>：</label>
+                <input type="file" style="flex:1;" />
+              </div>
+              <div id="noticeLinkRow" style="display:none;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <label style="width:100px;">链接地址<span style='color:red'>*</span>：</label>
+                  <input type="url" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;" placeholder="请输入链接地址" />
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <label style="width:100px;">链接图标：</label>
+                  <input type="file" accept="image/*" style="flex:1;" />
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <label style="width:100px;">权限范围：</label>
+                <input id="noticePermInput" type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;background:#f8fbff;cursor:pointer;" placeholder="点击选择权限范围" readonly />
+                <button type="button" id="noticePermBtn" style="margin-left:6px;">选择</button>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <label style="width:100px;">发布内容：</label>
+                <div style="flex:1;">
+                  <div style="background:#f8fbff;border:1px solid #e3eaf3;border-radius:4px;padding:8px 0 0 8px;min-height:120px;">
+                    <div style="margin-bottom:8px;">
+                      <button type="button" style="font-weight:bold;">B</button>
+                      <button type="button" style="font-style:italic;">I</button>
+                      <button type="button" style="text-decoration:underline;">U</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                      <button type="button">T</button>
+                    </div>
+                    <textarea style="width:100%;min-height:80px;border:none;outline:none;background:transparent;"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+                <button type="submit" style="background:#185a99;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">提交</button>
+                <button type="button" id="noticeAddClose2" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">关闭</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- 权限范围选择弹窗 -->
+        <div id="permSelectModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2100;align-items:center;justify-content:center;">
+          <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+            <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">选择权限范围 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="permSelectClose">×</span></div>
+            <div style="padding:20px;">
+              <div style="display:flex;gap:12px;margin-bottom:16px;">
+                <button type="button" class="perm-tab active" data-tab="user">人员</button>
+                <button type="button" class="perm-tab" data-tab="org">组织架构</button>
+                <button type="button" class="perm-tab" data-tab="post">岗位</button>
+              </div>
+              <div id="permTabContent">
+                <!-- 默认显示人员多选 -->
+                <div class="perm-list" data-tab="user">
+                  <label><input type="checkbox" value="张三"> 张三</label><br/>
+                  <label><input type="checkbox" value="李四"> 李四</label><br/>
+                  <label><input type="checkbox" value="王五"> 王五</label><br/>
+                </div>
+                <div class="perm-list" data-tab="org" style="display:none;">
+                  <label><input type="checkbox" value="市场部"> 市场部</label><br/>
+                  <label><input type="checkbox" value="财务部"> 财务部</label><br/>
+                  <label><input type="checkbox" value="研发部"> 研发部</label><br/>
+                </div>
+                <div class="perm-list" data-tab="post" style="display:none;">
+                  <label><input type="checkbox" value="经理"> 经理</label><br/>
+                  <label><input type="checkbox" value="专员"> 专员</label><br/>
+                  <label><input type="checkbox" value="实习生"> 实习生</label><br/>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+                <button type="button" id="permSelectOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
+                <button type="button" id="permSelectCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      // 绑定添加按钮事件
+      document.getElementById('noticeAddBtn').onclick = function() {
+        document.getElementById('noticeAddModal').style.display = 'flex';
+      };
+      document.getElementById('noticeAddClose').onclick = function() {
+        document.getElementById('noticeAddModal').style.display = 'none';
+      };
+      document.getElementById('noticeAddClose2').onclick = function() {
+        document.getElementById('noticeAddModal').style.display = 'none';
+      };
+      // 分类切换联动
+      var categorySelect = document.getElementById('noticeFileCategory');
+      var fileRow = document.getElementById('noticeFileUploadRow');
+      var linkRow = document.getElementById('noticeLinkRow');
+      categorySelect.onchange = function() {
+        if (categorySelect.value === '友情链接') {
+          fileRow.style.display = 'none';
+          linkRow.style.display = 'flex';
+          linkRow.querySelector('input[type=url]').setAttribute('required', 'required');
+        } else {
+          fileRow.style.display = 'flex';
+          linkRow.style.display = 'none';
+          linkRow.querySelector('input[type=url]').removeAttribute('required');
+        }
+      };
+      // 权限范围弹窗相关
+      document.getElementById('noticePermInput').onclick = openPermModal;
+      document.getElementById('noticePermBtn').onclick = openPermModal;
+      function openPermModal() {
+        document.getElementById('permSelectModal').style.display = 'flex';
+      }
+      document.getElementById('permSelectClose').onclick = function() {
+        document.getElementById('permSelectModal').style.display = 'none';
+      };
+      document.getElementById('permSelectCancel').onclick = function() {
+        document.getElementById('permSelectModal').style.display = 'none';
+      };
+      // tab切换
+      document.querySelectorAll('.perm-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.perm-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          document.querySelectorAll('.perm-list').forEach(list => {
+            list.style.display = list.getAttribute('data-tab') === tabName ? '' : 'none';
+          });
+        };
+      });
+      // 确定选择
+      document.getElementById('permSelectOk').onclick = function() {
+        let selected = [];
+        document.querySelectorAll('.perm-list').forEach(list => {
+          list.querySelectorAll('input[type=checkbox]:checked').forEach(cb => {
+            selected.push(cb.value);
+          });
+        });
+        document.getElementById('noticePermInput').value = selected.join(', ');
+        document.getElementById('permSelectModal').style.display = 'none';
+      };
+    }
+
+    function showPushLogTabs() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="pushlog-layout" style="display:flex;gap:18px;">
+          <div class="pushlog-left" style="width:260px;min-width:200px;background:#f8fbff;border-radius:8px;padding:12px 0 12px 0;box-shadow:0 2px 8px rgba(33,118,199,0.06);overflow:auto;">
+            <div style="font-weight:600;font-size:16px;color:#2176c7;padding:0 18px 10px 18px;">主数据列表</div>
+            <ul class="pushlog-mdm-list" style="list-style:none;margin:0;padding:0 8px;">
+              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">物料代码管理</li>
+              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">物料体系管理</li>
+              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">单位类主数据</li>
+              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">数据管理</li>
+              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">字典表管理</li>
+            </ul>
+          </div>
+          <div class="pushlog-right" style="flex:1;min-width:0;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(33,118,199,0.06);padding:0 0 18px 0;overflow:auto;">
+            <div class="pushlog-tab-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;">
+              <div class="pushlog-tab active" data-tab="can-sync" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">可同步数据</div>
+              <div class="pushlog-tab" data-tab="wait-sync" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">待同步数据列表</div>
+              <div class="pushlog-tab" data-tab="push-log" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">推送日志</div>
+              <div class="pushlog-tab" data-tab="push-fail-log" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">推送失败日志</div>
+            </div>
+            <div class="pushlog-tab-content" id="pushlogTabContent">
+              ${renderCanSyncTable()}
+            </div>
+          </div>
+        </div>
+      `;
+      bindPushLogTabEventsV2();
+    }
+    function renderCanSyncTable() {
+      return `
+        <div class="action-bar" style="margin:18px 0 10px 0;">
+          <button>查询</button>
+          <button>手动分发</button>
+          <button>添加到待同步列表</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>主键</th>
+                <th>同步标识</th>
+                <th>据点物料编码</th>
+                <th>选择物料</th>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>营运据点</th>
+                <th>据点生命周期</th>
+                <th>税种</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    function renderWaitSyncTable() {
+      return `
+        <div class="action-bar" style="margin:18px 0 10px 0;">
+          <button>查询</button>
+          <button>手动分发</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>主键</th>
+                <th>同步标识</th>
+                <th>据点物料编码</th>
+                <th>选择物料</th>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>营运据点</th>
+                <th>据点生命周期</th>
+                <th>税种</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    function renderPushLogTable() {
+      return `
+        <div class="action-bar" style="margin:18px 0 10px 0;">
+          <button>查询</button>
+          <button>手动分发</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>主键</th>
+                <th>同步标识</th>
+                <th>据点物料编码</th>
+                <th>选择物料</th>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>营运据点</th>
+                <th>据点生命周期</th>
+                <th>税种</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    function renderPushFailLogTable() {
+      return `
+        <div class="action-bar" style="margin:18px 0 10px 0;">
+          <button>查询</button>
+          <button>手动分发</button>
+          <button>添加到待同步列表</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>主键</th>
+                <th>同步标识</th>
+                <th>据点物料编码</th>
+                <th>选择物料</th>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>营运据点</th>
+                <th>据点生命周期</th>
+                <th>税种</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    function bindPushLogTabEventsV2() {
+      document.querySelectorAll('.pushlog-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.pushlog-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          const tabContent = document.getElementById('pushlogTabContent');
+          if (tabName === 'can-sync') {
+            tabContent.innerHTML = renderCanSyncTable();
+          } else if (tabName === 'wait-sync') {
+            tabContent.innerHTML = renderWaitSyncTable();
+          } else if (tabName === 'push-log') {
+            tabContent.innerHTML = renderPushLogTable();
+          } else if (tabName === 'push-fail-log') {
+            tabContent.innerHTML = renderPushFailLogTable();
+          }
+        };
+      });
+    }
+
+    function showModelQueryTable() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="model-tabs-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
+          <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">模型查询</div>
+          <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型申请</div>
+          <div class="model-tab" data-tab="modify" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型修改</div>
+          <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型冻结</div>
+          <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型解冻</div>
+          <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型检索</div>
+        </div>
+        <div class="model-tab-content" id="modelTabContent">
+          ${renderModelQueryTab()}
+        </div>
+      `;
+      bindModelTabEvents();
+    }
+    function renderModelQueryTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>参数</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='类型' style='width:98%;'></td>
+              <td><input type='text' placeholder='层级展示' style='width:98%;'></td>
+              <td><input type='text' placeholder='参数' style='width:98%;'></td>
+              <td><input type='text' placeholder='创建人' style='width:98%;'></td>
+              <td><input type='text' placeholder='创建时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='当前修改人' style='width:98%;'></td>
+              <td><input type='text' placeholder='最后修改人' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">元数据</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">模型类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">文件类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">字段类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">是否</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">操作类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">数据状态</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">大小写转换</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">模型的分类</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">全半角转换</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    function renderModelApplyTab() {
+      return `
+        <div class="action-bar">
+          <button class="btn-main"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>新增</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/><path d="M12 20h9"/></svg>
+          </span>编辑</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+          </span>删除</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>参数</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">元数据</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">模型类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">文件类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">字段类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">是否</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">操作类型</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">数据状态</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">大小写转换</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">模型的分类</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">全半角转换</a></td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td></td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+              </tr>
+            </tbody>
+          </table>
+            </div>
+          `;
+    }
+    function renderModelModifyTab() { return renderModelQueryTab(); }
+    function renderModelFreezeTab() { return renderModelQueryTab(); }
+    function renderModelUnfreezeTab() { return renderModelQueryTab(); }
+    function renderModelSearchTab() { return renderModelQueryTab(); }
+    function bindModelTabEvents() {
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          const tabContent = document.getElementById('modelTabContent');
+          if (tabName === 'query') {
+            tabContent.innerHTML = renderModelQueryTab();
+            bindModelQueryQuickSearch();
+          } else if (tabName === 'apply') {
+            tabContent.innerHTML = renderModelApplyTab();
+          } else if (tabName === 'modify') {
+            tabContent.innerHTML = renderModelModifyTab();
+          } else if (tabName === 'freeze') {
+            tabContent.innerHTML = renderModelFreezeTab();
+          } else if (tabName === 'unfreeze') {
+            tabContent.innerHTML = renderModelUnfreezeTab();
+          } else if (tabName === 'search') {
+            tabContent.innerHTML = renderModelSearchTab();
+          }
+        };
+      });
+      bindModelQueryQuickSearch();
+    }
+    function bindModelQueryQuickSearch() {
+      const btn = document.getElementById('modelQuickSearchBtn');
+      if (!btn) return;
+      let show = false;
+      btn.onclick = function() {
+        show = !show;
+        const tabContent = document.getElementById('modelTabContent');
+        tabContent.innerHTML = renderModelQueryTab(show);
+        bindModelQueryQuickSearch();
+      };
+    }
+    // 主题设置下拉菜单逻辑
+    const settingBtn = document.getElementById('settingBtn');
+    const themeDropdown = document.getElementById('themeDropdown');
+    let themeDropdownOpen = false;
+    settingBtn.onclick = function(e) {
+      themeDropdownOpen = !themeDropdownOpen;
+      themeDropdown.style.display = themeDropdownOpen ? 'block' : 'none';
+      themeDropdown.classList.toggle('show', themeDropdownOpen);
+      e.stopPropagation();
+      // 高亮当前主题
+      const theme = localStorage.getItem('theme') || 'blue';
+      document.querySelectorAll('.theme-dropdown-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.theme === theme);
+      });
+    };
+    document.querySelectorAll('.theme-dropdown-item').forEach(item => {
+      item.onclick = function(e) {
+        document.querySelectorAll('.theme-dropdown-item').forEach(i => i.classList.remove('selected'));
+        this.classList.add('selected');
+        setTheme(this.dataset.theme);
+        themeDropdown.style.display = 'none';
+        themeDropdown.classList.remove('show');
+        themeDropdownOpen = false;
+        e.stopPropagation();
+      };
+    });
+    document.addEventListener('click', function(e) {
+      if (themeDropdownOpen && !themeDropdown.contains(e.target) && e.target !== settingBtn) {
+        themeDropdown.style.display = 'none';
+        themeDropdown.classList.remove('show');
+        themeDropdownOpen = false;
+      }
+      if (userDropdownOpen && !userDropdown.contains(e.target) && e.target !== userInfo) {
+        userDropdown.classList.remove('show');
+        userDropdownOpen = false;
+      }
+    });
+    function setTheme(theme) {
+      if (theme === 'blue') {
+        document.documentElement.style.setProperty('--theme-bg', '#f4f8fb');
+        document.documentElement.style.setProperty('--theme-topbar', 'linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%)');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#f4f8fb');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#2176c7');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#185a99');
+        document.documentElement.style.setProperty('--theme-table-header', '#f4f8fb');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#2176c7');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#f0f6fd');
+        document.documentElement.style.setProperty('--theme-table-border', '#e3eaf3');
+        document.documentElement.style.setProperty('--theme-btn', '#2176c7');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#185a99');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#eaf3fb');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#2176c7');
+        document.documentElement.style.setProperty('--theme-content-text', '#185a99');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(33, 118, 199, 0.06)');
+      } else if (theme === 'white') {
+        document.documentElement.style.setProperty('--theme-bg', '#fff');
+        document.documentElement.style.setProperty('--theme-topbar', '#fff');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#fff');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#2176c7');
+        document.documentElement.style.setProperty('--theme-menu-active', '#2176c7');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#185a99');
+        document.documentElement.style.setProperty('--theme-table-header', '#f4f8fb');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#2176c7');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#f0f6fd');
+        document.documentElement.style.setProperty('--theme-table-border', '#e3eaf3');
+        document.documentElement.style.setProperty('--theme-btn', '#2176c7');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#185a99');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#eaf3fb');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#2176c7');
+        document.documentElement.style.setProperty('--theme-content-text', '#185a99');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(33, 118, 199, 0.06)');
+      } else if (theme === 'dark') {
+        document.documentElement.style.setProperty('--theme-bg', '#181c24');
+        document.documentElement.style.setProperty('--theme-topbar', '#222');
+        document.documentElement.style.setProperty('--theme-sidebar', '#23272f');
+        document.documentElement.style.setProperty('--theme-content', '#181c24');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#ffe082');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#fff');
+        document.documentElement.style.setProperty('--theme-table-header', '#23272f');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#ffe082');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#23272f');
+        document.documentElement.style.setProperty('--theme-table-border', '#333');
+        document.documentElement.style.setProperty('--theme-btn', '#ffe082');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#fff');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#23272f');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#ffe082');
+        document.documentElement.style.setProperty('--theme-content-text', '#e0e0e0');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(0, 0, 0, 0.3)');
+      } else if (theme === 'green') {
+        document.documentElement.style.setProperty('--theme-bg', '#eafaf1');
+        document.documentElement.style.setProperty('--theme-topbar', 'linear-gradient(90deg, #2ecc71 60%, #27ae60 100%)');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#eafaf1');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#27ae60');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#145a32');
+        document.documentElement.style.setProperty('--theme-table-header', '#eafaf1');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#27ae60');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#d4efdf');
+        document.documentElement.style.setProperty('--theme-table-border', '#b7e1cd');
+        document.documentElement.style.setProperty('--theme-btn', '#27ae60');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#145a32');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#d4efdf');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#27ae60');
+        document.documentElement.style.setProperty('--theme-content-text', '#185a99');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(0, 128, 0, 0.1)');
+      } else if (theme === 'purple') {
+        document.documentElement.style.setProperty('--theme-bg', '#f6f0fa');
+        document.documentElement.style.setProperty('--theme-topbar', 'linear-gradient(90deg, #8e44ad 60%, #6c3483 100%)');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#f6f0fa');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#8e44ad');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#512e5f');
+        document.documentElement.style.setProperty('--theme-table-header', '#f6f0fa');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#8e44ad');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#e8daef');
+        document.documentElement.style.setProperty('--theme-table-border', '#d2b4de');
+        document.documentElement.style.setProperty('--theme-btn', '#8e44ad');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#512e5f');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#e8daef');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#8e44ad');
+        document.documentElement.style.setProperty('--theme-content-text', '#512e5f');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(128, 0, 128, 0.1)');
+      } else if (theme === 'orange') {
+        document.documentElement.style.setProperty('--theme-bg', '#fff7ed');
+        document.documentElement.style.setProperty('--theme-topbar', 'linear-gradient(90deg, #ff9800 60%, #f57c00 100%)');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#fff7ed');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#ff9800');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#e65100');
+        document.documentElement.style.setProperty('--theme-table-header', '#fff7ed');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#ff9800');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#ffe0b2');
+        document.documentElement.style.setProperty('--theme-table-border', '#ffcc80');
+        document.documentElement.style.setProperty('--theme-btn', '#ff9800');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#e65100');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#ffe0b2');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#ff9800');
+        document.documentElement.style.setProperty('--theme-content-text', '#e65100');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(255, 165, 0, 0.1)');
+      } else if (theme === 'red') {
+        document.documentElement.style.setProperty('--theme-bg', '#fff0f0');
+        document.documentElement.style.setProperty('--theme-topbar', 'linear-gradient(90deg, #e74c3c 60%, #c0392b 100%)');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#fff0f0');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#e74c3c');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#922b21');
+        document.documentElement.style.setProperty('--theme-table-header', '#fff0f0');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#e74c3c');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#fadbd8');
+        document.documentElement.style.setProperty('--theme-table-border', '#f5b7b1');
+        document.documentElement.style.setProperty('--theme-btn', '#e74c3c');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#922b21');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#fadbd8');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#e74c3c');
+        document.documentElement.style.setProperty('--theme-content-text', '#922b21');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(255, 0, 0, 0.1)');
+      } else if (theme === 'gray') {
+        document.documentElement.style.setProperty('--theme-bg', '#f7f7f7');
+        document.documentElement.style.setProperty('--theme-topbar', '#7f8c8d');
+        document.documentElement.style.setProperty('--theme-sidebar', '#fff');
+        document.documentElement.style.setProperty('--theme-content', '#f7f7f7');
+        document.documentElement.style.setProperty('--theme-topbar-font', '#fff');
+        document.documentElement.style.setProperty('--theme-menu-active', '#7f8c8d');
+        document.documentElement.style.setProperty('--theme-menu-hover', '#222');
+        document.documentElement.style.setProperty('--theme-table-header', '#f7f7f7');
+        document.documentElement.style.setProperty('--theme-table-header-font', '#7f8c8d');
+        document.documentElement.style.setProperty('--theme-table-row-hover', '#e0e0e0');
+        document.documentElement.style.setProperty('--theme-table-border', '#bfc9ca');
+        document.documentElement.style.setProperty('--theme-btn', '#7f8c8d');
+        document.documentElement.style.setProperty('--theme-btn-hover', '#222');
+        document.documentElement.style.setProperty('--theme-avatar-bg', '#e0e0e0');
+        document.documentElement.style.setProperty('--theme-avatar-font', '#7f8c8d');
+        document.documentElement.style.setProperty('--theme-content-text', '#222');
+        document.documentElement.style.setProperty('--theme-shadow-color', 'rgba(0, 0, 0, 0.08)');
+      }
+      localStorage.setItem('theme', theme);
+    }
+    // 记忆主题
+    setTheme('blue');
+    // AI对话抽屉逻辑
+    document.getElementById('aiBtn').onclick = function() {
+      document.getElementById('drawerMask').style.display = 'block';
+    };
+    function closeDrawer() {
+      document.getElementById('drawerMask').style.display = 'none';
+    }
+    document.getElementById('drawerMask').onclick = function(e) {
+      if (e.target === this) closeDrawer();
+    };
+    // AI助手对话框逻辑
+    function openAIDrawer() {
+      document.getElementById('aiDrawer').style.width = '400px';
+      document.getElementById('drawerOverlay').style.display = 'block';
+    }
+
+    function closeAIDrawer() {
+      document.getElementById('aiDrawer').style.width = '0';
+      document.getElementById('drawerOverlay').style.display = 'none';
+    }
+
+    function sendAIMessage() {
+      const aiInput = document.getElementById('aiInput');
+      const messageText = aiInput.value.trim();
+      if (messageText === '') return;
+
+      const chatMessages = document.getElementById('chatHistory');
+
+      // 用户消息
+      const userMessageDiv = document.createElement('div');
+      userMessageDiv.style.cssText = 'display:flex; justify-content:flex-end; margin-bottom:10px;';
+      userMessageDiv.innerHTML = `
+        <div style="background:#dcf8c6; padding:10px 15px; border-radius:15px; max-width:70%; word-wrap:break-word; text-align:right;">
+          ${messageText}
+        </div>
+      `;
+      chatMessages.appendChild(userMessageDiv);
+
+      // 模拟AI回复
+      const aiReplyText = "您好，我是首自信智能AI助手，很高兴为您服务！"; // 模拟AI回复内容
+      const aiMessageDiv = document.createElement('div');
+      aiMessageDiv.style.cssText = 'display:flex; justify-content:flex-start; margin-bottom:10px;';
+      aiMessageDiv.innerHTML = `
+        <div style="background:#f1f0f0; padding:10px 15px; border-radius:15px; max-width:70%; word-wrap:break-word; text-align:left;">
+          ${aiReplyText}
+        </div>
+      `;
+      chatMessages.appendChild(aiMessageDiv);
+
+      aiInput.value = ''; // 清空输入框
+      chatMessages.scrollTop = chatMessages.scrollHeight; // 滚动到底部
+    }
+
+    // 附件上传处理 (如果需要保留)
+    function handleFileUpload(event) {
+      const files = event.target.files;
+      if (files.length > 0) {
+        console.log('Files selected:', files);
+        // 这里可以添加文件上传的实际处理逻辑
+        alert(`已选择文件：${Array.from(files).map(f => f.name).join(', ')}`);
+      }
+    }
+
+    // 用户下拉菜单逻辑
+    const userInfo = document.getElementById('userInfo');
+    const userDropdown = document.getElementById('userDropdown');
+    let userDropdownOpen = false;
+    userInfo.onclick = function(e) {
+      userDropdownOpen = !userDropdownOpen;
+      userDropdown.classList.toggle('show', userDropdownOpen);
+      e.stopPropagation();
+    };
+
+    // 初始化收藏功能
+    function initializeFavorites() {
+      // 为所有子菜单项添加收藏按钮
+      document.querySelectorAll('.submenu-item').forEach(item => {
+        if (!item.querySelector('.favorite-btn')) {
+          const favoriteBtn = document.createElement('span');
+          favoriteBtn.className = 'favorite-btn';
+          favoriteBtn.innerHTML = '★';
+          favoriteBtn.title = '添加到常用菜单';
+          
+          // 检查是否已收藏
+          const itemId = item.getAttribute('data-item-id');
+          const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
+          if (favoritedItems.includes(itemId)) {
+            favoriteBtn.classList.add('favorited');
+          }
+          
+          favoriteBtn.onclick = (e) => {
+            e.stopPropagation(); // 阻止事件冒泡
+            toggleFavorite(item);
+          };
+          
+          item.appendChild(favoriteBtn);
+        }
+      });
+      
+      // 加载收藏的菜单项
+      loadFavoritedItems();
+    }
+
+    // 切换收藏状态
+    function toggleFavorite(item) {
+      const itemId = item.getAttribute('data-item-id');
+      const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
+      const favoriteBtn = item.querySelector('.favorite-btn');
+      
+      if (favoritedItems.includes(itemId)) {
+        // 取消收藏
+        const index = favoritedItems.indexOf(itemId);
+        favoritedItems.splice(index, 1);
+        favoriteBtn.classList.remove('favorited');
+      } else {
+        // 添加收藏
+        favoritedItems.push(itemId);
+        favoriteBtn.classList.add('favorited');
+      }
+      
+      localStorage.setItem('favoritedItems', JSON.stringify(favoritedItems));
+      loadFavoritedItems();
+    }
+
+    // 加载收藏的菜单项到常用菜单
+    function loadFavoritedItems() {
+      const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
+      const favoritedList = document.getElementById('favoritedItemsList');
+      favoritedList.innerHTML = '';
+      
+      favoritedItems.forEach(itemId => {
+        const originalItem = document.querySelector(`.submenu-item[data-item-id="${itemId}"]`);
+        if (originalItem) {
+          const clonedItem = originalItem.cloneNode(true);
+          const favoriteBtn = clonedItem.querySelector('.favorite-btn');
+          
+          // 修改收藏按钮样式和行为
+          favoriteBtn.classList.add('favorited');
+          favoriteBtn.title = '取消收藏';
+          favoriteBtn.onclick = (e) => {
+            e.stopPropagation();
+            toggleFavorite(originalItem);
+          };
+          
+          // 保持原有的点击事件
+          clonedItem.onclick = originalItem.onclick;
+          
+          favoritedList.appendChild(clonedItem);
+        }
+      });
+    }
+
+    // 在页面加载完成后初始化收藏功能
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeFavorites();
+      // LOGO点击显示首页
+      const logo = document.querySelector('.logo');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.onclick = function() {
+          document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
+        };
+      }
+    });
+
+    // 快捷入口数据示例
+    const ALL_ENTRIES = [
+      {type: 'user', label: '用户', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#ff7b7b"/><path d="M4 20c0-2.5 3-4 8-4s8 1.5 8 4" stroke="#ff7b7b" stroke-width="2" fill="none"/><circle cx="16" cy="10" r="2" fill="#ffb6b6"/></svg>'},
+      {type: 'group', label: '社团', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="4" fill="#b388ff"/><circle cx="16" cy="12" r="4" fill="#b388ff"/></svg>'},
+      {type: 'image', label: '图片', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="#d4f574"/><circle cx="8" cy="10" r="2" fill="#b2d235"/><path d="M3 19l5-5a2 2 0 0 1 3 0l5 5" stroke="#b2d235" stroke-width="2" fill="none"/></svg>'},
+      {type: 'content', label: '内容', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" fill="#4fc3f7"/><rect x="7" y="8" width="10" height="2" rx="1" fill="#fff"/><rect x="7" y="12" width="7" height="2" rx="1" fill="#fff"/></svg>'},
+      {type: 'goods', label: '商品', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="13" rx="3" fill="#ffb980"/><path d="M4 7l8-5 8 5" stroke="#ff9800" stroke-width="2" fill="none"/></svg>'},
+      {type: 'video', label: '视频', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="#4fc3f7"/><polygon points="10,9 16,12 10,15" fill="#fff"/></svg>'},
+      {type: 'live', label: '直播', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="10" rx="3" fill="#ffb6b6"/><rect x="8" y="10" width="8" height="4" rx="2" fill="#fff"/></svg>'}
+    ];
+    const STORAGE_KEY = 'quickEntryList';
+    function getQuickEntryList() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch { return []; }
+    }
+    function setQuickEntryList(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+    function renderQuickEntryBar(editMode = false) {
+      const bar = document.getElementById('quickEntryBar');
+      if (!bar) return;
+      const list = getQuickEntryList();
+      let html = '';
+      list.forEach((entry, idx) => {
+        html += `<div class="quick-entry-item${editMode ? ' editing' : ''}" data-type="${entry.type}" draggable="${editMode}" ondragstart="onQuickEntryDragStart(event,${idx})" ondragover="onQuickEntryDragOver(event,${idx})" ondrop="onQuickEntryDrop(event,${idx})" ondragend="onQuickEntryDragEnd(event)">
+          <div class="icon">${entry.icon}</div>
+          <div class="label">${entry.label}</div>
+          <button class="remove-btn" title="移除" onclick="removeQuickEntry('${entry.type}', event)">×</button>
+        </div>`;
+      });
+      bar.innerHTML = html;
+      // 绑定点击事件：点击快捷入口高亮并联动菜单
+      bar.querySelectorAll('.quick-entry-item').forEach(item => {
+        item.onclick = function() {
+          if (editMode) return;
+          const type = this.getAttribute('data-type');
+          document.querySelectorAll('.submenu-item').forEach(menu => {
+            if ((menu.dataset.itemId || menu.dataset.content || menu.textContent.trim()) === type) {
+              menu.classList.add('active');
+              menu.scrollIntoView({behavior:'smooth',block:'center'});
+              menu.click();
+            } else {
+              menu.classList.remove('active');
+            }
+          });
+        };
+      });
+    }
+    function removeQuickEntry(type, e) {
+      e.stopPropagation();
+      let list = getQuickEntryList();
+      list = list.filter(item => item.type !== type);
+      setQuickEntryList(list);
+      renderQuickEntryBar(true);
+    }
+    function openAddQuickEntry() {
+      // 清空localStorage缓存，确保新label生效
+      localStorage.removeItem('quickEntryList');
+      // 弹窗选择未添加的入口（与菜单联动）
+      const allEntries = getAllMenuEntries();
+      const list = getQuickEntryList();
+      const addedTypes = list.map(e => e.type);
+      const canAdd = allEntries.filter(e => !addedTypes.includes(e.type));
+      if (canAdd.length === 0) { alert('没有可添加的快捷入口'); return; }
+      let html = '<div id="quickEntryModalMask" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.18);z-index:3000;display:flex;align-items:center;justify-content:center;">';
+      html += '<div style="background:#fff;border-radius:12px;min-width:320px;max-width:90vw;padding:28px 32px;box-shadow:0 4px 24px rgba(33,118,199,0.13);">';
+      html += '<div style="font-size:18px;font-weight:600;color:#2176c7;margin-bottom:18px;">选择要添加的快捷入口</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:18px 18px;">';
+      canAdd.forEach(e => {
+        html += `<div class="quick-entry-item" style="width:80px;height:90px;" onclick="addQuickEntry('${e.type}')">
+          <div class="icon">${e.icon}</div>
+          <div class="label">${e.label}</div>
+        </div>`;
+      });
+      html += '</div>';
+      html += '<div style="text-align:right;margin-top:18px;"><button onclick="closeQuickEntryModal()" style="background:#eaf3fb;color:#2176c7;padding:6px 24px;border:none;border-radius:6px;font-size:15px;">取消</button></div>';
+      html += '</div></div>';
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+    function closeQuickEntryModal() {
+      const mask = document.getElementById('quickEntryModalMask');
+      if (mask) mask.remove();
+    }
+    function addQuickEntry(type) {
+      // 清空localStorage缓存，确保新label生效
+      localStorage.removeItem('quickEntryList');
+      const entry = getAllMenuEntries().find(e => e.type === type);
+      if (!entry) return;
+      let list = getQuickEntryList();
+      list.push(entry);
+      setQuickEntryList(list);
+      closeQuickEntryModal();
+      renderQuickEntryBar();
+    }
+    let quickEntryEditMode = false;
+    function toggleQuickEntryEdit() {
+      quickEntryEditMode = !quickEntryEditMode;
+      renderQuickEntryBar(quickEntryEditMode);
+    }
+    // 拖拽排序逻辑
+    let dragIdx = null;
+    function onQuickEntryDragStart(e, idx) {
+      dragIdx = idx;
+      e.currentTarget.classList.add('dragging');
+    }
+    function onQuickEntryDragOver(e, idx) {
+      e.preventDefault();
+      const items = document.querySelectorAll('.quick-entry-item');
+      items.forEach(i => i.classList.remove('drag-over'));
+      if (typeof idx === 'number') items[idx].classList.add('drag-over');
+    }
+    function onQuickEntryDrop(e, idx) {
+      e.preventDefault();
+      let list = getQuickEntryList();
+      if (dragIdx !== null && dragIdx !== idx) {
+        const moved = list.splice(dragIdx, 1)[0];
+        list.splice(idx, 0, moved);
+        setQuickEntryList(list);
+        renderQuickEntryBar(quickEntryEditMode);
+      }
+      dragIdx = null;
+      document.querySelectorAll('.quick-entry-item').forEach(i => i.classList.remove('drag-over','dragging'));
+    }
+    function onQuickEntryDragEnd(e) {
+      dragIdx = null;
+      document.querySelectorAll('.quick-entry-item').forEach(i => i.classList.remove('drag-over','dragging'));
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      renderQuickEntryBar();
+    });
+
+    // 获取所有可添加的快捷入口（自动从菜单提取）
+    function getAllMenuEntries() {
+      const icons = {
+        'data-model-apply': `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="url(#g1)"/><path d="M32 16H16v16l8-6 8 6V16z" fill="#fff"/><path d="M20 24l4 4 4-4" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><defs><linearGradient id="g1" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#6ee7b7"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs>`,
+        'notice': `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="url(#g2)"/><path d="M32 16H16v16l8-6 8 6V16z" fill="#fff"/><path d="M20 24l4 4 4-4" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><defs><linearGradient id="g2" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#c4b5fd"/><stop offset="1" stop-color="#a78bfa"/></linearGradient></defs>`,
+        'log': `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="url(#g3)"/><path d="M32 16H16v16l8-6 8 6V16z" fill="#fff"/><path d="M20 24l4 4 4-4" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><defs><linearGradient id="g3" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#fde68a"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>`,
+        'data-perm': `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="url(#g4)"/><path d="M32 16H16v16l8-6 8 6V16z" fill="#fff"/><path d="M20 24l4 4 4-4" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><defs><linearGradient id="g4" x1="8" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#93c5fd"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs>`,
+        'data-model-apply': '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="#e3f2fd"/><path d="M24 16v16M16 24h16" stroke="#2196f3" stroke-width="3" stroke-linecap="round"/></svg>',
+        'notice': '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="12" width="32" height="24" rx="8" fill="#fff3e0"/><rect x="16" y="20" width="16" height="8" rx="4" fill="#fb8c00"/></svg>',
+        'log': '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="12" width="32" height="24" rx="8" fill="#ede7f6"/><rect x="16" y="20" width="16" height="8" rx="4" fill="#7e57c2"/></svg>',
+        'data-perm': '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="#e8f5e9"/><path d="M24 16v16M16 24h16" stroke="#43a047" stroke-width="3" stroke-linecap="round"/></svg>',
+        'sys-dict': '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="#f3e5f5"/><rect x="16" y="20" width="16" height="8" rx="4" fill="#8e24aa"/></svg>',
+        // 其它类型可继续补充
+      };
+      const result = [];
+      document.querySelectorAll('.submenu-item').forEach(item => {
+        const type = item.getAttribute('data-item-id') || item.getAttribute('data-content') || item.textContent.trim();
+        let label = item.getAttribute('data-label');
+        if (!label) {
+          label = '';
+          for (const node of item.childNodes) {
+            if (node.nodeType === 3) {
+              label += node.textContent;
+            } else if (node.nodeType === 1 && node.classList && !node.classList.contains('favorite-btn')) {
+              label += node.textContent;
+            }
+          }
+          label = label.replace(/\s+/g, '').trim();
+        }
+        let icon = icons[type] || '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="12" fill="#f5f5f5"/><path d="M16 24h16" stroke="#bdbdbd" stroke-width="3"/></svg>';
+        result.push({ type, label, icon });
+      });
+      return result;
+    }
+
+    function showCockpitPage() {
+      document.getElementById('mainContent').innerHTML = `<iframe src='cockpit.html' style='width:100%;height:calc(100vh - 110px);border:none;border-radius:12px;box-shadow:0 2px 8px rgba(33,118,199,0.10);background:#0a1a2a;'></iframe>`;
+    }
+
+    // 1. 拦截友情链接表单提交，保存到localStorage
+    function handleNoticeAddFormSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const category = form.querySelector('#noticeFileCategory').value;
+      if (category === '友情链接') {
+        const title = form.querySelector('input[type="text"]').value.trim();
+        const link = form.querySelector('input[type="url"]').value.trim();
+        const iconInput = form.querySelector('#noticeLinkRow input[type="file"]');
+        if (!title || !link) {
+          alert('请填写完整标题和链接地址');
+          return;
+        }
+        // 读取图标文件为Base64
+        const file = iconInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            saveFriendLink({ title, link, icon: evt.target.result });
+            closeNoticeAddModal();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          saveFriendLink({ title, link, icon: '' });
+          closeNoticeAddModal();
+        }
+      } else {
+        // 其它分类原有逻辑...
+        closeNoticeAddModal();
+      }
+    }
+    function saveFriendLink(item) {
+      let list = [];
+      try { list = JSON.parse(localStorage.getItem('friendLinks')) || []; } catch { list = []; }
+      list.push(item);
+      localStorage.setItem('friendLinks', JSON.stringify(list));
+      renderFriendLinks();
+    }
+    function closeNoticeAddModal() {
+      document.getElementById('noticeAddModal').style.display = 'none';
+    }
+    // 2. 首页动态渲染友情链接
+    function renderFriendLinks() {
+      const list = JSON.parse(localStorage.getItem('friendLinks') || '[]');
+      const container = document.getElementById('friendLinksList');
+      if (!container) return;
+      if (list.length === 0) {
+        container.innerHTML = '<li style="color:#bbb;">暂无友情链接</li>';
+        return;
+      }
+      container.innerHTML = list.map(item =>
+        `<li style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          ${item.icon ? `<img src="${item.icon}" alt="icon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;box-shadow:0 1px 4px #e3eaf3;">` : '<span style="width:28px;height:28px;display:inline-block;background:#eaf3fb;border-radius:6px;"></span>'}
+          <a href="${item.link}" target="_blank" style="font-weight:500;color:#2176c7;text-decoration:none;">${item.title}</a>
+        </li>`
+      ).join('');
+    }
+    // 3. 首页区域插入渲染容器
+    (function patchHomeFriendLinks() {
+      const home = document.getElementById('homePage');
+      if (!home) return;
+      const rightCols = home.querySelectorAll('div[style*="flex:1;"]');
+      if (rightCols.length > 0) {
+        const lastCol = rightCols[rightCols.length-1];
+        const linkCard = lastCol.querySelector('div:has(svg+span:contains("网站链接"))');
+        if (linkCard) {
+          const ul = linkCard.querySelector('ul');
+          if (ul) {
+            ul.id = 'friendLinksList';
+            renderFriendLinks();
+          }
+        }
+      }
+    })();
+    // 4. 绑定表单事件（每次弹窗渲染后都需绑定）
+    function bindNoticeAddFormSubmit() {
+      const form = document.getElementById('noticeAddForm');
+      if (form) {
+        form.onsubmit = handleNoticeAddFormSubmit;
+      }
+    }
+    // 在showNoticeTable渲染后绑定
+    const oldShowNoticeTable = showNoticeTable;
+    showNoticeTable = function() {
+      oldShowNoticeTable();
+      setTimeout(bindNoticeAddFormSubmit, 0);
+    };
+    // 页面初始渲染时也绑定一次
+    if (document.getElementById('noticeAddForm')) {
+      bindNoticeAddFormSubmit();
+    }
+
+    function showConditionPage() {
+      document.getElementById('mainContent').innerHTML = `<iframe src='condition.html' style='width:100%;height:calc(100vh - 110px);border:none;border-radius:12px;box-shadow:0 2px 8px rgba(33,118,199,0.10);'></iframe>`;
+    }
+
+    function showDataCollectionConfigPage() {
+      document.getElementById('mainContent').innerHTML = `
+        <iframe src="数据采集配置.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
+      `;
+    }
+
+    function showPushLogPage() {
+      const mainContent = document.getElementById('mainContent');
+      // ... existing code ...
+    }
+
+    function showDataPushConfigPage() {
+      document.getElementById('mainContent').innerHTML = `
+        <iframe src="数据推送配置.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
+      `;
+    }
+
+    // 搜索弹窗逻辑
+    const searchBtn = document.getElementById('searchBtn');
+    const searchModalMask = document.getElementById('searchModalMask');
+    const searchInput = document.getElementById('searchInput');
+    const searchCloseBtn = document.getElementById('searchCloseBtn');
+    const searchSubmitBtn = document.getElementById('searchSubmitBtn');
+    // 打开弹窗
+    searchBtn.onclick = function() {
+      searchModalMask.style.display = 'flex';
+      setTimeout(()=>{ searchInput && searchInput.focus(); }, 100);
+    };
+    // 关闭弹窗
+    function closeSearchModal() {
+      searchModalMask.style.display = 'none';
+      if(searchInput) searchInput.value = '';
+    }
+    searchCloseBtn.onclick = closeSearchModal;
+    searchModalMask.onclick = function(e) {
+      if(e.target === this) closeSearchModal();
+    };
+    document.addEventListener('keydown', function(e) {
+      if(searchModalMask.style.display==='flex' && e.key==='Escape') closeSearchModal();
+      if(searchModalMask.style.display==='flex' && e.key==='Enter' && document.activeElement===searchInput) {
+        // 这里可处理搜索逻辑
+        closeSearchModal();
+      }
+    });
+    searchSubmitBtn.onclick = function() {
+      // 这里可处理搜索逻辑
+      closeSearchModal();
+    };
+  </script>
+</body>
+</html> 

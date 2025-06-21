@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数据采集配置</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            padding: 2rem;
+        }
+        .nav-tabs .nav-link {
+            border-top-left-radius: .5rem;
+            border-top-right-radius: .5rem;
+            font-weight: 500;
+        }
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-top: 0;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-bottom-left-radius: .5rem;
+            border-bottom-right-radius: .5rem;
+        }
+        .config-table-in-tab td {
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+        }
+        .config-table-in-tab td:first-child {
+            width: 25%;
+            font-weight: 500;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <h3 class="mb-4">数据接收接口配置</h3>
+
+    <!-- Tab navigation -->
+    <ul class="nav nav-tabs" id="configTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="basic-config-tab" data-bs-toggle="tab" data-bs-target="#basic-config" type="button" role="tab" aria-controls="basic-config" aria-selected="true">基本配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="exception-handling-tab" data-bs-toggle="tab" data-bs-target="#exception-handling" type="button" role="tab" aria-controls="exception-handling" aria-selected="false">异常处理</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="api-auth-tab" data-bs-toggle="tab" data-bs-target="#api-auth" type="button" role="tab" aria-controls="api-auth" aria-selected="false">接口授权</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="field-config-tab" data-bs-toggle="tab" data-bs-target="#field-config" type="button" role="tab" aria-controls="field-config" aria-selected="false">接口字段配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="format-preview-tab" data-bs-toggle="tab" data-bs-target="#format-preview" type="button" role="tab" aria-controls="format-preview" aria-selected="false">格式预览</button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="configTabContent">
+        <!-- 基本配置 Tab -->
+        <div class="tab-pane fade show active" id="basic-config" role="tabpanel" aria-labelledby="basic-config-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>业务系统</td>
+                        <td><select class="form-select"><option>OA系统</option><option>ERP系统</option><option>CRM系统</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>接口服务编码</td>
+                        <td><input type="text" class="form-control" value="API_00123"></td>
+                    </tr>
+                    <tr>
+                        <td>接口服务名称</td>
+                        <td><input type="text" class="form-control" value="客户主数据接收接口"></td>
+                    </tr>
+                    <tr>
+                        <td>接口类型</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="apiType" id="json" checked>
+                                <label class="form-check-label" for="json">JSON</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="apiType" id="xml">
+                                <label class="form-check-label" for="xml">XML</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>同步方式</td>
+                        <td>
+                             <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="syncMode" id="sync" checked>
+                                <label class="form-check-label" for="sync">同步</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="syncMode" id="async">
+                                <label class="form-check-label" for="async">异步</label>
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>是否审批</td>
+                        <td>
+                             <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="needsApproval" checked>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                         <td>校验方式</td>
+                         <td>
+                            <select class="form-select">
+                                <option>不校验</option>
+                                <option>新增不校验</option>
+                                <option>更新不校验</option>
+                                <option selected>校验</option>
+                            </select>
+                         </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 异常处理 Tab -->
+        <div class="tab-pane fade" id="exception-handling" role="tabpanel" aria-labelledby="exception-handling-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>消息提醒</td>
+                        <td>
+                            <select class="form-select"><option>指定用户</option></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>邮件提醒</td>
+                        <td>
+                            <select class="form-select"><option>指定用户</option></select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 接口授权 Tab -->
+        <div class="tab-pane fade" id="api-auth" role="tabpanel" aria-labelledby="api-auth-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>系统用户名</td>
+                        <td><input type="text" class="form-control" value="api_user"></td>
+                    </tr>
+                    <tr>
+                        <td>密码</td>
+                        <td><input type="password" class="form-control" value="************"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 接口字段配置 Tab -->
+        <div class="tab-pane fade" id="field-config" role="tabpanel" aria-labelledby="field-config-tab">
+             <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>模型所有属性</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" value="" id="childTableSelectable" checked>
+                                <label class="form-check-label" for="childTableSelectable">
+                                    包含子表
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td colspan="2" class="p-0">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light"><tr><th>字段名</th><th>中文名</th><th>类型</th><th>是否选择</th></tr></thead>
+                                <tbody>
+                                    <tr><td>CUST_ID</td><td>客户编码</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>CUST_NAME</td><td>客户名称</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>ADDRESS</td><td>地址</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>CONTACT</td><td>联系人</td><td>String</td><td><input type="checkbox" class="form-check-input"></td></tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 格式预览 Tab -->
+        <div class="tab-pane fade" id="format-preview" role="tabpanel" aria-labelledby="format-preview-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                 <tbody>
+                    <tr>
+                        <td>接收数据格式</td>
+                        <td>
+<pre class="bg-light p-3 rounded"><code>{
+  "CUST_ID": "C001",
+  "CUST_NAME": "示例客户",
+  "ADDRESS": "示例地址",
+  "ITEMS": [
+    {
+      "ITEM_ID": "I001",
+      "ITEM_NAME": "子表项1",
+      "QTY": 10
+    },
+    {
+      "ITEM_ID": "I002",
+      "ITEM_NAME": "子表项2",
+      "QTY": 5
+    }
+  ]
+}</code></pre>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td>返回数据格式</td>
+                        <td>
+<pre class="bg-light p-3 rounded"><code>{
+  "success": true,
+  "message": "处理成功"
+}</code></pre>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#fff;border-top:1px solid #e9ecef;padding:8px 24px;display:flex;justify-content:flex-end;gap:16px;">
+        <button class="btn btn-primary btn-sm">保存</button>
+        <button class="btn btn-success btn-sm">启用</button>
+    </div>
+
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

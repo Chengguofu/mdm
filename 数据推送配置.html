@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数据推送配置</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            padding: 2rem;
+        }
+        .nav-tabs .nav-link {
+            border-top-left-radius: .5rem;
+            border-top-right-radius: .5rem;
+            font-weight: 500;
+        }
+        .tab-content {
+            border: 1px solid #dee2e6;
+            border-top: 0;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-bottom-left-radius: .5rem;
+            border-bottom-right-radius: .5rem;
+        }
+        .config-table-in-tab td {
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+        }
+        .config-table-in-tab td:first-child {
+            width: 25%;
+            font-weight: 500;
+            background-color: #f8f9fa;
+        }
+        .form-label {
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+        }
+        .desc-text {
+            color: #888;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <h3 class="mb-4">数据推送接口配置</h3>
+    <ul class="nav nav-tabs" id="pushConfigTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="basic-config-tab" data-bs-toggle="tab" data-bs-target="#basic-config" type="button" role="tab" aria-controls="basic-config" aria-selected="true">基本配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="exception-handling-tab" data-bs-toggle="tab" data-bs-target="#exception-handling" type="button" role="tab" aria-controls="exception-handling" aria-selected="false">异常处理</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="verify-config-tab" data-bs-toggle="tab" data-bs-target="#verify-config" type="button" role="tab" aria-controls="verify-config" aria-selected="false">验证配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="field-config-tab" data-bs-toggle="tab" data-bs-target="#field-config" type="button" role="tab" aria-controls="field-config" aria-selected="false">发送接口字段</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="send-condition-tab" data-bs-toggle="tab" data-bs-target="#send-condition" type="button" role="tab" aria-controls="send-condition" aria-selected="false">发送条件</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="format-preview-tab" data-bs-toggle="tab" data-bs-target="#format-preview" type="button" role="tab" aria-controls="format-preview" aria-selected="false">数据格式预览</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="pushConfigTabContent">
+        <!-- 基本配置 Tab -->
+        <div class="tab-pane fade show active" id="basic-config" role="tabpanel" aria-labelledby="basic-config-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>业务系统（系统标识）</td>
+                        <td>
+                            <select class="form-select"><option>OA系统</option><option>ERP系统</option><option>CRM系统</option></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>接口编码</td>
+                        <td><input type="text" class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <td>接口名称</td>
+                        <td><input type="text" class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <td>接口地址</td>
+                        <td><input type="text" class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <td>接口类型</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="apiType" id="json" checked>
+                                <label class="form-check-label" for="json">JSON</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="apiType" id="xml">
+                                <label class="form-check-label" for="xml">XML</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>同步方式</td>
+                        <td>
+                             <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="syncMode" id="sync" checked>
+                                <label class="form-check-label" for="sync">同步</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="syncMode" id="async">
+                                <label class="form-check-label" for="async">异步</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>服务方式</td>
+                        <td>
+                            <select class="form-select">
+                                <option>手动同步</option>
+                                <option>定时同步</option>
+                                <option>实时同步</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>HTTP发送方式</td>
+                        <td>
+                            <select class="form-select">
+                                <option>POST</option>
+                                <option>PUT</option>
+                                <option>PATCH</option>
+                                <option>GET</option>
+                                <option>DELETE</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>定时配置</td>
+                        <td>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">开始执行时间</label>
+                                    <input type="time" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">执行时间间隔</label>
+                                    <input type="text" class="form-control" placeholder="分钟/小时/天">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">单次分发记录数</label>
+                                    <input type="number" class="form-control">
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>分发次数</td>
+                        <td><input type="number" class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <td>访问频率</td>
+                        <td>
+                            <input type="number" class="form-control mb-1" placeholder="每分钟最大访问次数">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- 异常处理 Tab -->
+        <div class="tab-pane fade" id="exception-handling" role="tabpanel" aria-labelledby="exception-handling-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>消息提醒</td>
+                        <td><input type="text" class="form-control" placeholder="用户"></td>
+                    </tr>
+                    <tr>
+                        <td>邮件提醒</td>
+                        <td><input type="text" class="form-control" placeholder="用户"></td>
+                    </tr>
+                    <tr>
+                        <td>失败是否自动重发</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="retry" id="retry-yes" value="yes" checked>
+                                <label class="form-check-label" for="retry-yes">是</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="retry" id="retry-no" value="no">
+                                <label class="form-check-label" for="retry-no">否</label>
+                            </div>
+                            <input id="retryCountInput" type="number" class="form-control mt-2" placeholder="重发失败数据次数">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- 验证配置 Tab -->
+        <div class="tab-pane fade" id="verify-config" role="tabpanel" aria-labelledby="verify-config-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>头信息配置</td>
+                        <td>
+                            <table class="table table-bordered table-sm mb-2" style="min-width:400px;">
+                                <thead class="table-light">
+                                    <tr><th style="width:35%">参数名</th><th style="width:45%">参数值</th><th style="width:20%">操作</th></tr>
+                                </thead>
+                                <tbody id="headerParams"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-link btn-sm" onclick="addParamRow('headerParams')">＋ 新增一行</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>获取TOKEN</td>
+                        <td>
+                            <table class="table table-bordered table-sm mb-2" style="min-width:400px;">
+                                <thead class="table-light">
+                                    <tr><th style="width:35%">参数名</th><th style="width:45%">参数值</th><th style="width:20%">操作</th></tr>
+                                </thead>
+                                <tbody id="tokenParams"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-link btn-sm" onclick="addParamRow('tokenParams')">＋ 新增一行</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- 发送接口字段 Tab -->
+        <div class="tab-pane fade" id="field-config" role="tabpanel" aria-labelledby="field-config-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>发送接口字段配置</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="allFieldsSelectable" checked>
+                                <label class="form-check-label" for="allFieldsSelectable">包含子表</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="p-0">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light"><tr><th>字段名</th><th>中文名</th><th>类型</th><th>是否选择</th></tr></thead>
+                                <tbody>
+                                    <tr><td>CUST_ID</td><td>客户编码</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>CUST_NAME</td><td>客户名称</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>ADDRESS</td><td>地址</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
+                                    <tr><td>CONTACT</td><td>联系人</td><td>String</td><td><input type="checkbox" class="form-check-input"></td></tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- 发送条件 Tab -->
+        <div class="tab-pane fade" id="send-condition" role="tabpanel" aria-labelledby="send-condition-tab">
+            <iframe src="condition.html" style="width:100%;min-height:600px;border:none;border-radius:8px;"></iframe>
+        </div>
+        <!-- 数据格式预览 Tab -->
+        <div class="tab-pane fade" id="format-preview" role="tabpanel" aria-labelledby="format-preview-tab">
+            <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>发送数据格式</td>
+                        <td>
+<pre class="bg-light p-3 rounded"><code>{
+  "CUST_ID": "C001",
+  "CUST_NAME": "示例客户",
+  "ADDRESS": "示例地址",
+  "ITEMS": [
+    {
+      "ITEM_ID": "I001",
+      "ITEM_NAME": "子表项1",
+      "QTY": 10
+    },
+    {
+      "ITEM_ID": "I002",
+      "ITEM_NAME": "子表项2",
+      "QTY": 5
+    }
+  ]
+}</code></pre>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>返回数据格式</td>
+                        <td>
+<pre class="bg-light p-3 rounded"><code>{
+  "success": true,
+  "message": "处理成功"
+}</code></pre>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#fff;border-top:1px solid #e9ecef;padding:8px 24px;display:flex;justify-content:flex-end;gap:16px;">
+        <button class="btn btn-primary btn-sm">保存</button>
+        <button class="btn btn-success btn-sm">启用</button>
+    </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+// 失败是否自动重发联动
+document.addEventListener('DOMContentLoaded', function() {
+  function toggleRetryCountInput() {
+    var yes = document.getElementById('retry-yes');
+    var input = document.getElementById('retryCountInput');
+    if (yes && input) {
+      input.style.display = yes.checked ? '' : 'none';
+    }
+  }
+  var yes = document.getElementById('retry-yes');
+  var no = document.getElementById('retry-no');
+  if (yes && no) {
+    yes.addEventListener('change', toggleRetryCountInput);
+    no.addEventListener('change', toggleRetryCountInput);
+    toggleRetryCountInput();
+  }
+});
+
+function addParamRow(containerId) {
+  var container = document.getElementById(containerId);
+  var tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="form-control form-control-sm" placeholder="参数名"></td>
+    <td><input type="text" class="form-control form-control-sm" placeholder="参数值"></td>
+    <td class="text-center">
+      <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('tr').remove()">删除</button>
+    </td>
+  `;
+  container.appendChild(tr);
+}
+
+// 初始化各加一行
+document.addEventListener('DOMContentLoaded', function() {
+  addParamRow('headerParams');
+  addParamRow('tokenParams');
+});
+</script>
+</body>
+</html> 

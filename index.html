@@ -1245,11 +1245,11 @@
           document.querySelectorAll('.menu-item, .submenu-item').forEach(i => i.classList.remove('active'));
           const homeMenu = document.getElementById('homeMenu');
           if(homeMenu) homeMenu.classList.add('active');
-          document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
+          document.getElementById('mainContent').innerHTML = `<iframe src="main.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
         };
       }
 
-      document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
+      document.getElementById('mainContent').innerHTML = `<iframe src="main.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
     });
 
     const menuItems = document.querySelectorAll('.menu-item');
@@ -1261,7 +1261,7 @@
           item.classList.add('active');
 
           if (item.id === 'homeMenu') {
-            document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
+            document.getElementById('mainContent').innerHTML = `<iframe src="main.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
             menuItems.forEach(i => {
               if (i.id !== 'homeMenu') i.classList.remove('open');
             });
@@ -2547,7 +2547,7 @@
 
     function showDataCollectionConfigPage() {
       document.getElementById('mainContent').innerHTML = `
-        <iframe src="数据采集配置.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
+        <iframe src="data_receive.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
       `;
     }
 
@@ -2558,7 +2558,7 @@
 
     function showDataPushConfigPage() {
       document.getElementById('mainContent').innerHTML = `
-        <iframe src="数据推送配置.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
+        <iframe src="data_send.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
       `;
     }
 

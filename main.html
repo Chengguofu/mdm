@@ -488,10 +488,455 @@
         .external-system-item span {
             font-size: 12px;
         }
+
+        /* 首页内容区右上角设置按钮 */
+        .home-settings-btn {
+            position: fixed;
+            top: 32px;
+            right: 32px;
+            z-index: 2000;
+            background: #fff;
+            padding: 10px 22px;
+            border-radius: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #e8e8e8;
+            cursor: pointer;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .home-settings-btn:hover {
+            color: #1890ff;
+            border-color: #1890ff;
+            background: #f0f7ff;
+        }
+
+        .home-settings-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* 优化弹窗内保存和关闭按钮 */
+        #homeSettingsSave, #homeSettingsClose {
+            padding: 8px 28px;
+            font-size: 16px;
+            border-radius: 6px;
+            margin-left: 8px;
+        }
+        #homeSettingsSave {
+            background: #1890ff;
+            color: #fff;
+            border: none;
+        }
+        #homeSettingsSave:hover {
+            background: #1765ad;
+        }
+        #homeSettingsClose {
+            background: #f0f2f5;
+            color: #333;
+            border: none;
+        }
+        #homeSettingsClose:hover {
+            background: #e6e6e6;
+        }
+
+        /* 现代响应式弹窗样式优化 */
+        .home-settings-modal-mask {
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.18);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .home-settings-modal {
+            z-index: 10000;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+            width: 96vw;
+            max-width: 1200px;
+            min-width: 320px;
+            min-height: 320px;
+            max-height: 96vh;
+            padding: 0;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .home-settings-modal-header {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 28px 32px 12px 32px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-bottom: 1px solid #f0f1f3;
+            margin-bottom: 0;
+        }
+        .home-settings-modal-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2px;
+        }
+        .home-settings-modal-header-icon {
+            width: 26px;
+            height: 26px;
+            color: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .home-settings-modal-header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #222;
+        }
+        .home-settings-modal-header-desc {
+            font-size: 15px;
+            color: #888;
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
+        .home-settings-modal-header-actions {
+            position: absolute;
+            right: 32px;
+            top: 28px;
+            display: flex;
+            align-items: center;
+        }
+        .home-settings-modal-body {
+            flex: 1;
+            overflow: visible;
+            height: auto;
+            max-height: none;
+            padding: 0 32px 32px 32px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: row;
+            gap: 32px;
+            align-items: flex-start;
+        }
+        @media (max-width: 600px) {
+          .home-settings-modal {
+            width: 99vw;
+            min-width: 0;
+            padding: 0;
+            border-radius: 10px;
+          }
+          .home-settings-modal-header, .home-settings-modal-body {
+            padding-left: 8px;
+            padding-right: 8px;
+          }
+        }
+        .home-settings-modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            color: #2176c7;
+            letter-spacing: 1px;
+        }
+        .home-settings-close {
+            position: absolute;
+            right: 24px;
+            top: 24px;
+            font-size: 22px;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .home-settings-close:hover { color: #2176c7; }
+        .home-settings-modules {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .home-settings-module-card {
+            background: #f7faff;
+            border: 1.5px solid #e3eaf3;
+            border-radius: 10px;
+            width: 200px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            transition: box-shadow 0.2s, border 0.2s;
+            position: relative;
+        }
+        .home-settings-module-card.selected {
+            border: 2px solid #2176c7;
+            box-shadow: 0 2px 8px #e3eaf3;
+        }
+        .home-settings-module-card .module-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 8px;
+            color: #185a99;
+        }
+        .home-settings-save-btn {
+            align-self: flex-end;
+            background: #2176c7;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #e3eaf3;
+            transition: background 0.2s;
+        }
+        .home-settings-save-btn:hover {
+            background: #185a99;
+        }
+        .home-settings-canvas {
+            width: 100%;
+            min-height: 420px;
+            background: #f7faff;
+            border: 2px dashed #e3eaf3;
+            border-radius: 12px;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 80px;
+            gap: 16px;
+            padding: 18px;
+            box-sizing: border-box;
+        }
+        .home-canvas-module {
+            position: absolute;
+            background: #fff;
+            border: 2px solid #2176c7;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #e3eaf3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            user-select: none;
+            overflow: hidden;
+        }
+        .home-canvas-module .resize-handle {
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+            width: 18px;
+            height: 18px;
+            background: rgba(33,118,199,0.08);
+            border-radius: 4px;
+            cursor: se-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .home-canvas-module .resize-handle svg {
+            width: 14px; height: 14px;
+            stroke: #2176c7;
+        }
+        .home-settings-module-item {
+            background: #fff;
+            border: 1.5px solid #e3eaf3;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 15px;
+            color: #185a99;
+            cursor: grab;
+            transition: box-shadow 0.2s, border 0.2s;
+            user-select: none;
+        }
+        .home-settings-module-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        #homeSettingsCanvas {
+            flex: 1 1 0%;
+            min-width: 480px;
+            max-width: 700px;
+            order: 1;
+            margin-top: 38px;
+            overflow: auto;
+            max-height: 60vh;
+        }
+        #homeSettingsModuleList {
+            width: 220px;
+            min-width: 140px;
+            max-width: 240px;
+            margin: 0;
+            padding: 0;
+            background: #fafbfc;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: auto;
+            order: 2;
+            overflow: visible;
+            position: relative;
+        }
+        .home-settings-modal-header button {
+            padding: 0 18px;
+            height: 36px;
+            font-size: 15px;
+            border-radius: 18px;
+            border: none;
+            margin-left: 8px;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+            box-shadow: none;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #homeSettingsSave {
+            background: #1890ff;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #homeSettingsSave:hover {
+            background: #1765ad;
+        }
+        #homeSettingsClose {
+            background: #f4f6fa;
+            color: #333;
+        }
+        #homeSettingsClose:hover {
+            background: #e6e6e6;
+            color: #1890ff;
+        }
+        /* 现代风格可添加模块卡片（参考附件） */
+        .add-module-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: 8px;
+        }
+        .add-module-card {
+          display: flex;
+          align-items: center;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          padding: 10px 14px;
+          transition: box-shadow 0.2s, border 0.2s;
+          border: 1.5px solid #f0f1f3;
+          cursor: pointer;
+          position: relative;
+          min-width: 120px;
+          max-width: 180px;
+          width: 100%;
+        }
+        .add-module-card:hover {
+          box-shadow: 0 4px 16px rgba(24,144,255,0.10);
+          border-color: #1890ff;
+        }
+        .add-module-icon {
+          width: 36px;
+          height: 36px;
+          margin-right: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .add-module-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .add-module-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #222;
+        }
+        .add-module-desc {
+          font-size: 13px;
+          color: #888;
+          margin-top: 2px;
+        }
+        .add-module-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: #f4f6fa;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #1890ff;
+          font-size: 22px;
+          margin-left: 14px;
+          transition: background 0.2s, color 0.2s;
+          cursor: pointer;
+        }
+        .add-module-btn:hover {
+          background: #1890ff;
+          color: #fff;
+        }
+        .add-module-title, .add-module-desc {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
 <main class="main-content">
+    <!-- 首页内容区顶部工具栏 -->
+    <div class="home-toolbar" style="width:100%;display:flex;justify-content:flex-end;align-items:center;margin-bottom:18px;padding:8px 0 0 0;">
+        <button id="homeSettingsBtn" class="home-settings-btn" title="自定义首页布局" style="position:static;padding:6px 18px;font-size:15px;border-radius:20px;background:#fff;border:1px solid #e8e8e8;box-shadow:0 1px 4px rgba(0,0,0,0.04);color:#333;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            布局设置
+        </button>
+    </div>
+    <div id="homeSettingsMask" class="home-settings-modal-mask">
+        <div class="home-settings-modal">
+            <div class="home-settings-modal-header">
+                <div class="home-settings-modal-header-row">
+                    <span class="home-settings-modal-header-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1890ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+                    </span>
+                    <span class="home-settings-modal-header-title">首页布局设置</span>
+                </div>
+                <div class="home-settings-modal-header-desc">自定义首页模块的显示和布局</div>
+                <div class="home-settings-modal-header-actions">
+                    <button id="homeSettingsSave">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        保存设置
+                    </button>
+                    <button id="homeSettingsClose">关闭</button>
+                </div>
+            </div>
+            <div class="home-settings-modal-body">
+                <div id="homeSettingsModuleList" style="margin-bottom:16px;"></div>
+                <div id="homeSettingsCanvas" style="flex:1;min-height:400px;margin-top:0;position:relative;background:repeating-linear-gradient(0deg,#f5f5f5, #f5f5f5 24px, #fff 24px, #fff 48px),repeating-linear-gradient(90deg,#f5f5f5, #f5f5f5 24px, #fff 24px, #fff 48px);"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Stat Cards -->
     <div class="stat-card-grid">
         <div class="stat-card">
@@ -856,10 +1301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const isAdded = currentActionIds.includes(action.id);
             const actionDiv = document.createElement('div');
-            actionDiv.className = 'available-action-item';
-            if (isAdded) {
-                actionDiv.classList.add('disabled');
-            }
+            actionDiv.className = 'available-action-item' + (isAdded ? ' disabled' : '');
             actionDiv.dataset.id = action.id;
             actionDiv.textContent = action.name;
             availableActionsGrid.appendChild(actionDiv);
@@ -899,6 +1341,209 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadUserActions();
 });
+
+// 可自定义的首页模块
+const HOME_MODULES = [
+    { key: 'stat', title: '统计卡片' },
+    { key: 'todo', title: '待办任务' },
+    { key: 'notice', title: '通知公告' },
+    { key: 'standard', title: '标准及运维细则' },
+    { key: 'rule', title: '规章制度' },
+    { key: 'quick', title: '快捷操作' },
+    { key: 'external', title: '外部系统' }
+];
+const GRID_COLS = 4;
+const GRID_CELL_W = 160, GRID_CELL_H = 90, GRID_GAP = 12; // 缩小卡片尺寸
+function getHomeCanvasConfig() {
+    let config = localStorage.getItem('homeCanvasConfig');
+    if (config) return JSON.parse(config);
+    // 默认初始布局
+    return [
+        { key: 'stat', x:0, y:0, w:2, h:1 },
+        { key: 'todo', x:2, y:0, w:2, h:1 },
+        { key: 'notice', x:0, y:1, w:2, h:1 },
+        { key: 'standard', x:2, y:1, w:1, h:1 },
+        { key: 'rule', x:3, y:1, w:1, h:1 },
+        { key: 'quick', x:0, y:2, w:4, h:1 },
+        { key: 'external', x:0, y:3, w:4, h:1 }
+    ];
+}
+function setHomeCanvasConfig(cfg) {
+    localStorage.setItem('homeCanvasConfig', JSON.stringify(cfg));
+}
+function renderHomeSettingsModuleList() {
+    const config = getHomeCanvasConfig();
+    const usedKeys = config.map(m=>m.key);
+    const list = document.getElementById('homeSettingsModuleList');
+    list.innerHTML = '<div style="font-weight:600;font-size:15px;margin-bottom:8px;">可添加模块</div>';
+    const addList = document.createElement('div');
+    addList.className = 'add-module-list';
+    HOME_MODULES.forEach(m => {
+        if (!usedKeys.includes(m.key)) {
+            const card = document.createElement('div');
+            card.className = 'add-module-card';
+            card.draggable = true;
+            card.ondragstart = e => {
+                e.dataTransfer.setData('module-key', m.key);
+            };
+            // 图标
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'add-module-icon';
+            iconDiv.innerHTML = HOME_MODULE_ICONS[m.key] || '';
+            // 信息
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'add-module-info';
+            infoDiv.innerHTML = `<div class='add-module-title'>${m.title}</div><div class='add-module-desc'>${m.desc||''}</div>`;
+            // 按钮
+            const btn = document.createElement('button');
+            btn.className = 'add-module-btn';
+            btn.innerHTML = '<span>+</span>';
+            btn.onclick = e => {
+                e.stopPropagation();
+                e.preventDefault();
+                // 默认放在最下方第一列
+                const config = getHomeCanvasConfig();
+                if(config.find(x=>x.key===m.key)) return;
+                config.push({key:m.key,x:0,y:config.length,w:2,h:1});
+                setHomeCanvasConfig(config);
+                renderHomeSettingsModuleList();
+                renderHomeSettingsCanvas();
+            };
+            card.appendChild(iconDiv);
+            card.appendChild(infoDiv);
+            card.appendChild(btn);
+            addList.appendChild(card);
+        }
+    });
+    list.appendChild(addList);
+}
+// 现代风格图标映射
+const HOME_MODULE_ICONS = {
+  stat: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1890ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8"/><rect x="9" y="8" width="4" height="12"/><rect x="15" y="4" width="4" height="16"/></svg>',
+  todo: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#faad14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 9h8M8 13h6"/></svg>',
+  notice: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#722ed1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  standard: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>',
+  rule: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1890ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  quick: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fa8c16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+  external: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#13c2c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'
+};
+function renderHomeSettingsCanvas() {
+    const config = getHomeCanvasConfig();
+    const canvas = document.getElementById('homeSettingsCanvas');
+    // 设置画布宽度和高度
+    canvas.style.width = (GRID_COLS * GRID_CELL_W + (GRID_COLS-1)*GRID_GAP) + 'px';
+    canvas.style.minWidth = canvas.style.width;
+    // 计算最大y+h，设置画布高度
+    let maxY = 0;
+    config.forEach(m => { maxY = Math.max(maxY, m.y + m.h); });
+    canvas.style.height = (maxY * GRID_CELL_H + (maxY-1)*GRID_GAP) + 'px';
+    canvas.innerHTML = '';
+    config.forEach((m, idx) => {
+        const module = HOME_MODULES.find(x=>x.key===m.key);
+        const icon = HOME_MODULE_ICONS[m.key] || '';
+        const div = document.createElement('div');
+        div.className = 'home-canvas-module';
+        div.style.position = 'absolute';
+        div.style.left = (m.x * (GRID_CELL_W+GRID_GAP))+'px';
+        div.style.top = (m.y * (GRID_CELL_H+GRID_GAP))+'px';
+        div.style.width = (m.w * GRID_CELL_W + (m.w-1)*GRID_GAP)+'px';
+        div.style.height = (m.h * GRID_CELL_H + (m.h-1)*GRID_GAP)+'px';
+        div.style.background = '#f7faff';
+        div.style.border = '2px solid #e3eaf3';
+        div.style.borderRadius = '10px';
+        div.style.boxSizing = 'border-box';
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'center';
+        div.style.userSelect = 'none';
+        div.style.cursor = 'move';
+        div.innerHTML = `<div style='margin-bottom:8px;'>${icon}</div><div class='module-title' style='font-weight:600;margin-bottom:8px;'>${module.title}</div>
+            <div class='resize-handle' style='position:absolute;right:6px;bottom:6px;cursor:nwse-resize;width:18px;height:18px;opacity:0.7;'>
+                <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2h-4" stroke="#888" stroke-width="2.2"/></svg>
+            </div>
+            <div style='position:absolute;top:6px;right:8px;cursor:pointer;font-size:18px;color:#aaa;' class='remove-btn' title='移除'>×</div>`;
+        // 拖拽移动
+        let dragOffsetX=0,dragOffsetY=0,isDragging=false;
+        div.onmousedown = e => {
+            if(e.target.classList.contains('resize-handle')||e.target.classList.contains('remove-btn')) return;
+            isDragging=true;
+            dragOffsetX = e.offsetX;
+            dragOffsetY = e.offsetY;
+            document.onmousemove = ev => {
+                if(!isDragging) return;
+                let nx = Math.round((ev.clientX-canvas.getBoundingClientRect().left-dragOffsetX)/(GRID_CELL_W+GRID_GAP));
+                let ny = Math.round((ev.clientY-canvas.getBoundingClientRect().top-dragOffsetY)/(GRID_CELL_H+GRID_GAP));
+                nx = Math.max(0,Math.min(GRID_COLS-m.w,nx));
+                ny = Math.max(0,ny);
+                m.x=nx;m.y=ny;
+                setHomeCanvasConfig(config);
+                renderHomeSettingsCanvas();
+            };
+            document.onmouseup = ()=>{isDragging=false;document.onmousemove=null;};
+        };
+        // 拉伸宽高，限制不超出画布
+        div.querySelector('.resize-handle').onmousedown = e => {
+            e.stopPropagation();
+            let startX = e.clientX, startY = e.clientY, startW = m.w, startH = m.h;
+            document.onmousemove = ev => {
+                let dw = Math.round((ev.clientX-startX)/(GRID_CELL_W+GRID_GAP));
+                let dh = Math.round((ev.clientY-startY)/(GRID_CELL_H+GRID_GAP));
+                let nw = Math.max(1,Math.min(GRID_COLS-m.x,startW+dw));
+                let nh = Math.max(1,startH+dh);
+                m.w=nw;m.h=nh;
+                setHomeCanvasConfig(config);
+                renderHomeSettingsCanvas();
+            };
+            document.onmouseup = ()=>{document.onmousemove=null;};
+        };
+        // 移除模块
+        div.querySelector('.remove-btn').onclick = ()=>{
+            config.splice(idx,1);
+            setHomeCanvasConfig(config);
+            renderHomeSettingsModuleList();
+            renderHomeSettingsCanvas();
+        };
+        canvas.appendChild(div);
+    });
+    // 画布支持拖入
+    canvas.ondragover = e => {e.preventDefault();};
+    canvas.ondrop = e => {
+        const key = e.dataTransfer.getData('module-key');
+        if(!key) return;
+        if(config.find(x=>x.key===key)) return;
+        // 默认放在最下方第一列
+        config.push({key,x:0,y:config.length,w:2,h:1});
+        setHomeCanvasConfig(config);
+        renderHomeSettingsModuleList();
+        renderHomeSettingsCanvas();
+    };
+}
+let isSettingsMode = false;
+const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+const homeSettingsMask = document.getElementById('homeSettingsMask');
+const homeSettingsSave = document.getElementById('homeSettingsSave');
+const homeSettingsClose = document.getElementById('homeSettingsClose');
+
+homeSettingsBtn.onclick = function() {
+    isSettingsMode = true;
+    homeSettingsMask.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // 禁止主页面滚动
+    renderHomeSettingsModuleList();
+    renderHomeSettingsCanvas();
+};
+homeSettingsSave.onclick = function() {
+    isSettingsMode = false;
+    homeSettingsMask.style.display = 'none';
+    document.body.style.overflow = '';
+    if(window.renderHomeByConfig) window.renderHomeByConfig();
+    else location.reload();
+};
+homeSettingsClose.onclick = function() {
+    isSettingsMode = false;
+    homeSettingsMask.style.display = 'none';
+    document.body.style.overflow = '';
+};
 </script>
 </body>
 </html>

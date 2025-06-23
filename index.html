@@ -631,171 +631,101 @@
       .user-avatar { width: 24px; height: 24px; font-size: 13px; }
       .drawer { width: 98vw; }
     }
-    /* 快捷入口九宫格样式 */
-    .quick-access {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 280px;
+    .quick-actions-card {
       background: #fff;
-      box-shadow: 0 2px 8px rgba(33,118,199,0.10);
-      border-radius: 8px;
-      padding: 18px 16px 10px 16px;
-      margin: 0;
-      border: 1px solid var(--theme-table-border);
-      z-index: 10;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(33,118,199,0.08);
+      padding: 32px 24px 24px 24px;
+      margin-bottom: 24px;
+      max-width: 420px;
     }
-    .quick-access-header {
+    .quick-actions-title {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 6px;
     }
-    .quick-access-title {
+    .quick-actions-title svg {
+      color: #2176c7;
+      margin-right: 10px;
+    }
+    .quick-actions-desc {
+      color: #888;
       font-size: 15px;
-      color: #185a99;
-      font-weight: 600;
+      margin-bottom: 28px;
     }
-    .add-quick-access {
-      width: 26px;
-      height: 26px;
-      border-radius: 4px;
-      background: rgba(33, 118, 199, 0.08);
-      color: #2176c7;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-      transition: all 0.2s;
-    }
-    .add-quick-access:hover {
-      background: rgba(33, 118, 199, 0.18);
-    }
-    .quick-access-items {
+    .quick-actions-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px 22px;
     }
-    .quick-access-item {
-      background: #f8fbff;
-      border: 1px solid #e3eaf3;
-      border-radius: 6px;
-      font-size: 14px;
-      color: #2176c7;
-      cursor: pointer;
-      padding: 12px 0 8px 0;
-      text-align: center;
-      position: relative;
-      transition: all 0.2s;
-      min-height: 40px;
+    .quick-action-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
-    .quick-access-item:hover {
-      background: #eaf3fb;
-      border-color: #2176c7;
-      color: #185a99;
-    }
-    .quick-access-item .remove-btn {
-      position: absolute;
-      top: 4px;
-      right: 6px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.05);
-      color: #999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      opacity: 0;
-      transition: all 0.2s;
-    }
-    .quick-access-item:hover .remove-btn {
-      opacity: 1;
-    }
-    .quick-access-item .remove-btn:hover {
-      background: rgba(255,0,0,0.1);
-      color: #ff4d4f;
-    }
-    .quick-entry-bar {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .quick-entry-item {
-      width: 80px;
-      height: 90px;
-      background: #fff;
-      border: 1.5px solid #f0f0f0;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      height: 110px;
       cursor: pointer;
-      transition: box-shadow 0.18s, border 0.18s;
+      box-shadow: 0 2px 8px rgba(33,118,199,0.08);
       position: relative;
+      transition: transform 0.12s, box-shadow 0.12s;
       user-select: none;
     }
-    .quick-entry-item.dragging {
-      opacity: 0.5;
-      border: 1.5px dashed #26b3a0;
+    .quick-action-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 18px rgba(33,118,199,0.13);
+      opacity: 0.95;
     }
-    .quick-entry-item.drag-over {
-      border: 1.5px solid #26b3a0;
-      background: #eaf3fb;
+    .quick-action-btn .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
     }
-    .quick-entry-item .icon {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
+    .quick-action-btn .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(255,255,255,0.85);
+      color: #e74c3c;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .quick-entry-item .label {
-      font-size: 15px;
-      color: #666;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .quick-entry-item.add-btn .icon,
-    .quick-entry-item.edit-btn .icon {
-      color: #bbb;
-    }
-    .quick-entry-item.editing .remove-btn {
-      display: block;
-    }
-    .remove-btn {
-      display: none;
-      position: absolute;
-      top: 6px;
-      right: 8px;
-      background: #fff;
-      border: none;
-      color: #e57373;
-      font-size: 16px;
-      border-radius: 50%;
       cursor: pointer;
+      z-index: 2;
+      opacity: 0.8;
+      transition: background 0.15s;
     }
-    .quick-entry-item.editing .remove-btn {
-      display: block;
+    .quick-action-btn .remove-btn:hover {
+      background: #ffeaea;
+      opacity: 1;
     }
-    .quick-entry-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(33,118,199,0.08);
-      padding: 18px 18px 10px 18px;
-      margin-bottom: 16px;
+    .quick-actions-add {
+      margin-top: 18px;
+      text-align: right;
+    }
+    .quick-actions-add button {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.18s;
+    }
+    .quick-actions-add button:hover {
+      background: #185a99;
     }
     .quick-entry-header {
       display: flex;
@@ -902,6 +832,29 @@
     .quick-entry-item.editing .remove-btn {
       display: block;
     }
+    .home-page { padding: 0; }
+    .home-layout { display: flex; gap: 16px; }
+    .home-main { flex: 2; display: flex; flex-direction: column; gap: 16px; }
+    .home-side { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .home-section { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33,118,199,0.06); overflow: hidden; }
+    .section-header { display: flex; align-items: center; font-size: 18px; font-weight: 500; padding: 12px 20px; }
+    .section-header svg { margin-right: 8px; }
+    .section-list { margin: 0; padding: 12px 20px 12px 38px; font-size: 15px; color: #185a99; list-style: disc; }
+    .section-date { margin-left: auto; font-size: 15px; color: var(--theme-topbar-font); font-weight: 400; }
+    .quick-actions-add button {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.18s;
+    }
+    .quick-actions-add button:hover {
+      background: #185a99;
+    }
   </style>
 </head>
 <body>
@@ -936,7 +889,7 @@
         <button class="icon-btn" title="设置" id="settingBtn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 6.2 18.82l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.38 5.2l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9.2 4.6V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 6.2 18.82l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.38 5.2l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9.2 4.6V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
           </svg>
         </button>
         <div class="theme-dropdown" id="themeDropdown">
@@ -955,20 +908,19 @@
     </div>
     <div class="main">
       <nav class="sidebar">
-        <!-- 侧边栏内容（不再包含快捷入口） -->
+        <!-- 侧边栏内容 -->
         <ul class="menu" id="mainMenu">
-          <li class="menu-item active" id="favoriteMenu">
+          <!-- 将常用菜单改为首页，并去掉收藏相关内容 -->
+          <li class="menu-item active" id="homeMenu">
             <div class="menu-item-header">
-              <span class="favorite-arrow"></span>
               <span class="menu-item-icon">
-                <!-- Icon for Common Menu -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 20.72c-.89-.52-1.79-1.07-2.69-1.64C4.91 17.48 2 15 2 10.5 2 7.17 4.18 4.29 7.5 4.03 10.82 3.77 14 5.37 16 8h-4"></path><circle cx="17.5" cy="15.5" r="4.5"></circle><path d="M21 21l-1.5-1.5"></path></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12L12 3l9 9"/>
+                  <path d="M9 21V9h6v12"/>
+                </svg>
               </span>
-              <span>常用菜单</span>
+              <span>工作台</span>
             </div>
-            <ul class="submenu" id="favoritedItemsList">
-              <!-- Favorited items will be dynamically loaded here -->
-            </ul>
           </li>
           <li class="menu-item" data-menu-id="data-standard-management">
             <div class="menu-item-header">
@@ -1096,87 +1048,6 @@
       <div class="content" id="mainContent">
         <!-- 主页内容等原有内容 -->
         <div id="homePage">
-          <div style="display: flex; gap: 16px;">
-            <div style="flex:2; display:flex; flex-direction:column; gap:16px;">
-              <!-- 快捷入口卡片区域 -->
-              <div class="quick-entry-card">
-                <div class="quick-entry-header">
-                  <span>快捷入口</span>
-                  <span class="right-btns">
-                    <button class="quick-entry-add-btn" onclick="openAddQuickEntry()" title="添加快捷入口">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#2176c7" stroke-width="2" fill="#eaf3fb"/><line x1="12" y1="8" x2="12" y2="16" stroke="#2176c7" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="#2176c7" stroke-width="2"/></svg>
-                    </button>
-                    <button class="quick-entry-edit-btn" onclick="toggleQuickEntryEdit()" title="编辑快捷入口">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="#bbb" stroke-width="2" fill="#fff"/><path d="M8 16l8-8M9 7h6v6" stroke="#bbb" stroke-width="2"/></svg>
-                    </button>
-                  </span>
-                </div>
-                <div class="quick-entry-bar" id="quickEntryBar"></div>
-              </div>
-              <!-- 通知公告区域（下移） -->
-              <div style="background:var(--theme-sidebar); border-radius:8px; box-shadow:0 2px 8px var(--theme-shadow-color); overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:var(--theme-topbar-font); font-size:20px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
-                  <svg width="24" height="24" fill="none" style="margin-right:8px;"><rect x="3" y="6" width="18" height="12" rx="3" stroke="var(--theme-topbar-font)" stroke-width="2"/><path d="M7 10h6M7 14h10" stroke="var(--theme-topbar-font)" stroke-width="2" stroke-linecap="round"/></svg>
-                  通知公告
-                  <span style="margin-left:auto; font-size:15px; color:var(--theme-topbar-font); font-weight:400;">2025-06-11</span>
-                </div>
-                <div style="padding:14px 20px; font-size:15px; color:var(--theme-content-text); border-bottom:1px solid var(--theme-table-border);">
-                  <ul style="margin:0; padding-left:18px;">
-                    <li>关于主数据平台升级维护的通知</li>
-                  </ul>
-                </div>
-              </div>
-              <div style="background:var(--theme-sidebar); border-radius:8px; box-shadow:0 2px 8px var(--theme-shadow-color); overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#f46b45 0%,#eea849 100%); color:var(--theme-topbar-font); font-size:20px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
-                  <svg width="24" height="24" fill="none" style="margin-right:8px;"><rect x="3" y="6" width="18" height="12" rx="3" stroke="var(--theme-topbar-font)" stroke-width="2"/><path d="M7 10h10M7 14h6" stroke="var(--theme-topbar-font)" stroke-width="2" stroke-linecap="round"/></svg>
-                  待办任务
-                </div>
-                <div style="padding:14px 20px; font-size:15px; color:var(--theme-content-text);">
-                  <ul style="margin:0; padding-left:18px;">
-                    <li>【项目审批】项目启动申请 - 王经理</li>
-                    <li>【费用报销】2024年差旅费报销 - 李会计</li>
-                    <li>【合同签署】新供应商合同审批 - 张总</li>
-                    <li>【数据修改】重要数据变更请求 - 陈工程师</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div style="flex:1; display:flex; flex-direction:column; gap:16px;">
-              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
-                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/><path d="M7 10h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-                  标准及运维细则
-                </div>
-                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
-                  <ul style="margin:0; padding-left:18px;">
-                    <li>2025新发布标准</li>
-                  </ul>
-                </div>
-              </div>
-              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
-                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/><path d="M7 10h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-                  规章制度
-                </div>
-                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
-                  <ul style="margin:0; padding-left:18px;">
-                    <li>2025年度公司考勤管理制度</li>
-                  </ul>
-                </div>
-              </div>
-              <div style="background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(33,118,199,0.06); overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#1565c0 60%,#039be5 100%); color:#fff; font-size:18px; font-weight:500; padding:12px 20px; display:flex; align-items:center;">
-                  <svg width="22" height="22" fill="none" style="margin-right:8px;"><path d="M5 11h12M5 15h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="4" y="6" width="14" height="10" rx="2" stroke="#fff" stroke-width="2"/></svg>
-                  网站链接
-                </div>
-                <div style="padding:12px 20px; font-size:15px; color:#185a99;">
-                  <ul style="margin:0; padding-left:18px;">
-                    <li><a href="https://www.example.com" target="_blank" style="color:#2176c7; text-decoration:underline;">外部链接</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -1279,8 +1150,9 @@
 
     function loadFavorites() {
       const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
-      const favoritedList = document.getElementById('favoritedItemsList');
-      favoritedList.innerHTML = ''; // Clear existing items
+      if (favoritedItemsList) {
+          favoritedItemsList.innerHTML = ''; // Clear existing items
+      }
 
       document.querySelectorAll('.menu-item').forEach(item => {
         const menuId = item.dataset.menuId;
@@ -1298,62 +1170,41 @@
 
       favoritedItems.forEach(menuId => {
         const originalMenuItem = document.querySelector(`.menu-item[data-menu-id="${menuId}"]`);
-        if (originalMenuItem) {
+        if (originalMenuItem && favoritedItemsList) {
           const submenuItems = originalMenuItem.querySelectorAll('.submenu-item');
           submenuItems.forEach(subItem => {
             const clonedSubItem = subItem.cloneNode(true);
-
-            // Create a container for the submenu item text and the favorite icon
             const wrapperDiv = document.createElement('div');
-            wrapperDiv.style.display = 'flex';
-            wrapperDiv.style.alignItems = 'center';
-            wrapperDiv.style.justifyContent = 'space-between';
-            wrapperDiv.style.width = '100%';
-
+            wrapperDiv.style.cssText = 'display:flex; align-items:center; justify-content:space-between; width:100%;';
             const spanText = document.createElement('span');
-            spanText.textContent = clonedSubItem.textContent; // Get the text content
-            spanText.style.flexGrow = '1'; // Allow text to take available space
-
+            spanText.textContent = clonedSubItem.textContent;
+            spanText.style.flexGrow = '1';
             const clonedFavoriteIcon = document.createElement('span');
-            clonedFavoriteIcon.classList.add('favorite-icon'); // Removed 'favorited' class here, it's styled by #favoritedItemsList .favorite-icon
-            clonedFavoriteIcon.textContent = '★'; // Always show star in favorited list
-            clonedFavoriteIcon.setAttribute('data-menu-id', menuId); // Keep the parent menu ID
-
-            // Append text and icon to the wrapper
+            clonedFavoriteIcon.className = 'favorite-icon';
+            clonedFavoriteIcon.textContent = '★';
+            clonedFavoriteIcon.setAttribute('data-menu-id', menuId);
             wrapperDiv.appendChild(spanText);
             wrapperDiv.appendChild(clonedFavoriteIcon);
-
-            // Clear the original content and append the wrapper
             clonedSubItem.innerHTML = '';
             clonedSubItem.appendChild(wrapperDiv);
-
-            // Add data-url to the cloned item for navigation
             clonedSubItem.dataset.url = subItem.dataset.url;
-
-            // Rebind the click event for the cloned favorite icon
             clonedFavoriteIcon.onclick = (event) => {
-              event.stopPropagation(); // Prevent submenu item click
+              event.stopPropagation();
               toggleFavorite(menuId);
             };
-
-            // Rebind the click event for the cloned submenu item to navigate
             clonedSubItem.onclick = () => {
               const url = clonedSubItem.dataset.url;
               if (url) {
                 document.getElementById('contentFrame').src = url;
-                // Remove 'active' from all menu items
                 document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
-                // Add 'active' to the cloned submenu item
                 clonedSubItem.classList.add('active');
-                // Expand its parent menu if it's collapsed (optional, but good UX)
                 const parentMenuItem = clonedSubItem.closest('.menu-item');
                 if (parentMenuItem && !parentMenuItem.classList.contains('expanded')) {
                   parentMenuItem.classList.add('expanded');
                 }
               }
             };
-
-            favoritedList.appendChild(clonedSubItem);
+            favoritedItemsList.appendChild(clonedSubItem);
           });
         }
       });
@@ -1365,94 +1216,94 @@
       const favoriteIconMain = menuItem ? menuItem.querySelector('.favorite-icon') : null;
 
       if (favoritedItems.includes(menuId)) {
-        // Remove from favorites
         favoritedItems = favoritedItems.filter(id => id !== menuId);
-        if (menuItem) {
-          menuItem.classList.remove('is-favorited-and-hidden');
-        }
-        if (favoriteIconMain) {
-          favoriteIconMain.classList.remove('favorited');
-        }
+        if (menuItem) menuItem.classList.remove('is-favorited-and-hidden');
+        if (favoriteIconMain) favoriteIconMain.classList.remove('favorited');
       } else {
-        // Add to favorites
         favoritedItems.push(menuId);
-        if (menuItem) {
-          menuItem.classList.add('is-favorited-and-hidden');
-        }
-        if (favoriteIconMain) {
-          favoriteIconMain.classList.add('favorited');
-        }
+        if (menuItem) menuItem.classList.add('is-favorited-and-hidden');
+        if (favoriteIconMain) favoriteIconMain.classList.add('favorited');
       }
       localStorage.setItem('favoritedItems', JSON.stringify(favoritedItems));
-      loadFavorites(); // Reload favorites to update both lists
+      loadFavorites();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // ... existing code ...
-
-      // Adjust arrow position for all collapsible menu items to the left
       document.querySelectorAll('.menu-item-header').forEach(header => {
         const arrow = header.querySelector('.favorite-arrow');
-        if (arrow && header.firstChild !== arrow) { // Only move if not already first
+        if (arrow && header.firstChild !== arrow) {
           header.insertBefore(arrow, header.firstChild);
         }
       });
 
       loadFavorites();
+
+      const logo = document.querySelector('.logo');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.onclick = function() {
+          document.querySelectorAll('.menu-item, .submenu-item').forEach(i => i.classList.remove('active'));
+          const homeMenu = document.getElementById('homeMenu');
+          if(homeMenu) homeMenu.classList.add('active');
+          document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
+        };
+      }
+
+      document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
     });
 
-    // 菜单展开收起逻辑
     const menuItems = document.querySelectorAll('.menu-item');
     menuItems.forEach(item => {
       const header = item.querySelector('.menu-item-header');
       if (header) {
         header.onclick = function(e) {
-          // 如果点击的是收藏图标，不处理展开/收起
-          if (e.target.classList.contains('favorite-icon')) return;
+          document.querySelectorAll('.menu-item, .submenu-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
 
-          // 切换当前菜单项的展开状态
-          const isOpen = item.classList.contains('open');
-          
-          // 关闭所有其他菜单项
+          if (item.id === 'homeMenu') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="首页.html" style="width:100%; height:calc(100% - 5px); border:none; background: #fdfdfd;"></iframe>`;
             menuItems.forEach(i => {
-            if (i !== item) {
-              i.classList.remove('open');
-            }
-          });
+              if (i.id !== 'homeMenu') i.classList.remove('open');
+            });
+            return;
+          }
 
-          // 切换当前菜单项的展开状态
+          if (e.target.classList.contains('favorite-icon')) {
+             item.classList.add('active');
+             return;
+          }
+
+          const isOpen = item.classList.contains('open');
+          menuItems.forEach(i => {
+            if (i !== item) i.classList.remove('open');
+          });
           item.classList.toggle('open');
         };
       }
     });
 
-    // 二级菜单高亮及内容切换
     const submenuItems = document.querySelectorAll('.submenu-item');
     submenuItems.forEach(item => {
       item.onclick = function(e) {
         if (e.target.classList.contains('favorite-icon')) return;
+
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        item.closest('.menu-item').classList.add('active');
+        
         submenuItems.forEach(i => i.classList.remove('active'));
         this.classList.add('active');
         e.stopPropagation();
-        if (this.dataset.itemId === 'cockpit') {
-          showCockpitPage();
-        } else if (this.dataset.itemId === 'notice') {
-          showNoticeTable();
-        } else if (this.dataset.itemId === 'filter-config') {
-          showConditionPage();
-        } else if (this.dataset.itemId === 'receive-config') {
-          showDataCollectionConfigPage();
-        } else if (this.dataset.itemId === 'push-config') {
-          showDataPushConfigPage();
-        } else if (this.dataset.itemId === 'push-log') {
-          showPushLogTabs();
-        } else {
+
+        if (this.dataset.itemId === 'cockpit') showCockpitPage();
+        else if (this.dataset.itemId === 'notice') showNoticeTable();
+        else if (this.dataset.itemId === 'filter-config') showConditionPage();
+        else if (this.dataset.itemId === 'receive-config') showDataCollectionConfigPage();
+        else if (this.dataset.itemId === 'push-config') showDataPushConfigPage();
+        else if (this.dataset.itemId === 'push-log') showPushLogTabs();
+        else {
           const content = this.dataset.content;
-          if (content === 'model-query') {
-          showModelQueryTable();
-        } else {
-            document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
-          }
+          if (content === 'model-query') showModelQueryTable();
+          else document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
         }
       };
     });
@@ -1982,8 +1833,8 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      `;
+            </div>
+          `;
     }
     function renderModelApplyTab() {
       return `
@@ -2392,40 +2243,39 @@
 
       // 用户消息
       const userMessageDiv = document.createElement('div');
-      userMessageDiv.style.cssText = 'display:flex; justify-content:flex-end; margin-bottom:10px;';
+      userMessageDiv.style.cssText = `
+        display: flex;
+        justify-content: flex-end;
+      `;
       userMessageDiv.innerHTML = `
-        <div style="background:#dcf8c6; padding:10px 15px; border-radius:15px; max-width:70%; word-wrap:break-word; text-align:right;">
+        <div style="background: #2176c7; color: white; padding: 12px 18px; border-radius: 18px 18px 4px 18px; max-width: 80%;">
           ${messageText}
         </div>
       `;
       chatMessages.appendChild(userMessageDiv);
 
       // 模拟AI回复
-      const aiReplyText = "您好，我是首自信智能AI助手，很高兴为您服务！"; // 模拟AI回复内容
-      const aiMessageDiv = document.createElement('div');
-      aiMessageDiv.style.cssText = 'display:flex; justify-content:flex-start; margin-bottom:10px;';
-      aiMessageDiv.innerHTML = `
-        <div style="background:#f1f0f0; padding:10px 15px; border-radius:15px; max-width:70%; word-wrap:break-word; text-align:left;">
-          ${aiReplyText}
-        </div>
-      `;
-      chatMessages.appendChild(aiMessageDiv);
+      setTimeout(() => {
+        const aiMessageDiv = document.createElement('div');
+        aiMessageDiv.style.cssText = `
+          display: flex;
+          justify-content: flex-start;
+        `;
+        aiMessageDiv.innerHTML = `
+          <div style="background: #eaf3fb; color: #333; padding: 12px 18px; border-radius: 18px 18px 18px 4px; max-width: 80%;">
+            你好，我已收到你的消息："${messageText}"。我正在思考...
+          </div>
+        `;
+        chatMessages.appendChild(aiMessageDiv);
+        // 滚动到底部
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 1000);
 
-      aiInput.value = ''; // 清空输入框
-      chatMessages.scrollTop = chatMessages.scrollHeight; // 滚动到底部
+      aiInput.value = '';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 附件上传处理 (如果需要保留)
-    function handleFileUpload(event) {
-      const files = event.target.files;
-      if (files.length > 0) {
-        console.log('Files selected:', files);
-        // 这里可以添加文件上传的实际处理逻辑
-        alert(`已选择文件：${Array.from(files).map(f => f.name).join(', ')}`);
-      }
-    }
-
-    // 用户下拉菜单逻辑
+    // 用户信息下拉菜单
     const userInfo = document.getElementById('userInfo');
     const userDropdown = document.getElementById('userDropdown');
     let userDropdownOpen = false;
@@ -2435,160 +2285,61 @@
       e.stopPropagation();
     };
 
-    // 初始化收藏功能
-    function initializeFavorites() {
-      // 为所有子菜单项添加收藏按钮
-      document.querySelectorAll('.submenu-item').forEach(item => {
-        if (!item.querySelector('.favorite-btn')) {
-          const favoriteBtn = document.createElement('span');
-          favoriteBtn.className = 'favorite-btn';
-          favoriteBtn.innerHTML = '★';
-          favoriteBtn.title = '添加到常用菜单';
-          
-          // 检查是否已收藏
-          const itemId = item.getAttribute('data-item-id');
-          const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
-          if (favoritedItems.includes(itemId)) {
-            favoriteBtn.classList.add('favorited');
-          }
-          
-          favoriteBtn.onclick = (e) => {
-            e.stopPropagation(); // 阻止事件冒泡
-            toggleFavorite(item);
-          };
-          
-          item.appendChild(favoriteBtn);
-        }
-      });
-      
-      // 加载收藏的菜单项
-      loadFavoritedItems();
-    }
-
-    // 切换收藏状态
-    function toggleFavorite(item) {
-      const itemId = item.getAttribute('data-item-id');
-      const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
-      const favoriteBtn = item.querySelector('.favorite-btn');
-      
-      if (favoritedItems.includes(itemId)) {
-        // 取消收藏
-        const index = favoritedItems.indexOf(itemId);
-        favoritedItems.splice(index, 1);
-        favoriteBtn.classList.remove('favorited');
-      } else {
-        // 添加收藏
-        favoritedItems.push(itemId);
-        favoriteBtn.classList.add('favorited');
-      }
-      
-      localStorage.setItem('favoritedItems', JSON.stringify(favoritedItems));
-      loadFavoritedItems();
-    }
-
-    // 加载收藏的菜单项到常用菜单
-    function loadFavoritedItems() {
-      const favoritedItems = JSON.parse(localStorage.getItem('favoritedItems') || '[]');
-      const favoritedList = document.getElementById('favoritedItemsList');
-      favoritedList.innerHTML = '';
-      
-      favoritedItems.forEach(itemId => {
-        const originalItem = document.querySelector(`.submenu-item[data-item-id="${itemId}"]`);
-        if (originalItem) {
-          const clonedItem = originalItem.cloneNode(true);
-          const favoriteBtn = clonedItem.querySelector('.favorite-btn');
-          
-          // 修改收藏按钮样式和行为
-          favoriteBtn.classList.add('favorited');
-          favoriteBtn.title = '取消收藏';
-          favoriteBtn.onclick = (e) => {
-            e.stopPropagation();
-            toggleFavorite(originalItem);
-          };
-          
-          // 保持原有的点击事件
-          clonedItem.onclick = originalItem.onclick;
-          
-          favoritedList.appendChild(clonedItem);
-        }
-      });
-    }
-
-    // 在页面加载完成后初始化收藏功能
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeFavorites();
-      // LOGO点击显示首页
-      const logo = document.querySelector('.logo');
-      if (logo) {
-        logo.style.cursor = 'pointer';
-        logo.onclick = function() {
-          document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
-        };
-      }
-    });
-
-    // 快捷入口数据示例
-    const ALL_ENTRIES = [
-      {type: 'user', label: '用户', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#ff7b7b"/><path d="M4 20c0-2.5 3-4 8-4s8 1.5 8 4" stroke="#ff7b7b" stroke-width="2" fill="none"/><circle cx="16" cy="10" r="2" fill="#ffb6b6"/></svg>'},
-      {type: 'group', label: '社团', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="4" fill="#b388ff"/><circle cx="16" cy="12" r="4" fill="#b388ff"/></svg>'},
-      {type: 'image', label: '图片', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="#d4f574"/><circle cx="8" cy="10" r="2" fill="#b2d235"/><path d="M3 19l5-5a2 2 0 0 1 3 0l5 5" stroke="#b2d235" stroke-width="2" fill="none"/></svg>'},
-      {type: 'content', label: '内容', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" fill="#4fc3f7"/><rect x="7" y="8" width="10" height="2" rx="1" fill="#fff"/><rect x="7" y="12" width="7" height="2" rx="1" fill="#fff"/></svg>'},
-      {type: 'goods', label: '商品', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="13" rx="3" fill="#ffb980"/><path d="M4 7l8-5 8 5" stroke="#ff9800" stroke-width="2" fill="none"/></svg>'},
-      {type: 'video', label: '视频', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" fill="#4fc3f7"/><polygon points="10,9 16,12 10,15" fill="#fff"/></svg>'},
-      {type: 'live', label: '直播', icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="10" rx="3" fill="#ffb6b6"/><rect x="8" y="10" width="8" height="4" rx="2" fill="#fff"/></svg>'}
-    ];
-    const STORAGE_KEY = 'quickEntryList';
+    // 快捷入口数据持久化与渲染
     function getQuickEntryList() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch { return []; }
+        const stored = localStorage.getItem('quickEntryList');
+        // V2版本：如果本地没有，则使用默认值
+        if (!stored) {
+          const defaultEntries = getAllMenuEntries().slice(0, 4); // 默认前4个
+          setQuickEntryList(defaultEntries);
+          return defaultEntries;
+        }
+        return JSON.parse(stored);
+      } catch {
+        return [];
+      }
     }
     function setQuickEntryList(list) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      localStorage.setItem('quickEntryList', JSON.stringify(list));
     }
-    function renderQuickEntryBar(editMode = false) {
+    function renderQuickEntryBar(isEditing = false) {
+      const list = getQuickEntryList();
       const bar = document.getElementById('quickEntryBar');
       if (!bar) return;
-      const list = getQuickEntryList();
-      let html = '';
+      bar.innerHTML = '';
       list.forEach((entry, idx) => {
-        html += `<div class="quick-entry-item${editMode ? ' editing' : ''}" data-type="${entry.type}" draggable="${editMode}" ondragstart="onQuickEntryDragStart(event,${idx})" ondragover="onQuickEntryDragOver(event,${idx})" ondrop="onQuickEntryDrop(event,${idx})" ondragend="onQuickEntryDragEnd(event)">
-          <div class="icon">${entry.icon}</div>
-          <div class="label">${entry.label}</div>
-          <button class="remove-btn" title="移除" onclick="removeQuickEntry('${entry.type}', event)">×</button>
-        </div>`;
+        const item = document.createElement('div');
+        item.className = 'quick-entry-item';
+        if (isEditing) item.classList.add('editing');
+        item.draggable = isEditing;
+        item.innerHTML = `<div class="icon">${entry.icon}</div><div class="label">${entry.label}</div><button class="remove-btn" onclick="removeQuickEntry(${idx})">&times;</button>`;
+        if (isEditing) {
+          item.ondragstart = (e) => onQuickEntryDragStart(e, idx);
+          item.ondragover = (e) => onQuickEntryDragOver(e, idx);
+          item.ondrop = (e) => onQuickEntryDrop(e, idx);
+          item.ondragend = onQuickEntryDragEnd;
+        } else {
+          item.onclick = () => {
+             const menuItem = document.querySelector(`.submenu-item[data-item-id='${entry.type}']`) || document.querySelector(`.submenu-item[data-content='${entry.type}']`);
+             if (menuItem) menuItem.click();
+          };
+        }
+        bar.appendChild(item);
       });
-      bar.innerHTML = html;
-      // 绑定点击事件：点击快捷入口高亮并联动菜单
-      bar.querySelectorAll('.quick-entry-item').forEach(item => {
-        item.onclick = function() {
-          if (editMode) return;
-          const type = this.getAttribute('data-type');
-          document.querySelectorAll('.submenu-item').forEach(menu => {
-            if ((menu.dataset.itemId || menu.dataset.content || menu.textContent.trim()) === type) {
-              menu.classList.add('active');
-              menu.scrollIntoView({behavior:'smooth',block:'center'});
-              menu.click();
-            } else {
-              menu.classList.remove('active');
-            }
-          });
-        };
-      });
+      // 拖拽容器事件
+      bar.ondragover = (e) => onQuickEntryDragOver(e, null);
+      bar.ondrop = (e) => onQuickEntryDrop(e, list.length);
     }
-    function removeQuickEntry(type, e) {
-      e.stopPropagation();
+    function removeQuickEntry(idx) {
       let list = getQuickEntryList();
-      list = list.filter(item => item.type !== type);
+      list.splice(idx, 1);
       setQuickEntryList(list);
-      renderQuickEntryBar(true);
+      renderQuickEntryBar(true); // 保持编辑模式
     }
-    function openAddQuickEntry() {
-      // 清空localStorage缓存，确保新label生效
-      localStorage.removeItem('quickEntryList');
-      // 弹窗选择未添加的入口（与菜单联动）
-      const allEntries = getAllMenuEntries();
+    function openQuickEntryModal() {
       const list = getQuickEntryList();
+      const allEntries = getAllMenuEntries();
       const addedTypes = list.map(e => e.type);
       const canAdd = allEntries.filter(e => !addedTypes.includes(e.type));
       if (canAdd.length === 0) { alert('没有可添加的快捷入口'); return; }
@@ -2840,6 +2591,7 @@
     });
     searchSubmitBtn.onclick = function() {
       // 这里可处理搜索逻辑
+      console.log('Searching for:', searchInput.value);
       closeSearchModal();
     };
   </script>

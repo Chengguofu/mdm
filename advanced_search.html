@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>高级查询示例</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <style>
+    :root {
+      --primary-color: #1890ff;
+      --primary-color-hover: #40a9ff;
+      --dark-blue-header: #002140;
+      --border-color: #d9d9d9;
+      --background-color: #f0f2f5;
+      --component-background: #fff;
+      --focus-shadow: rgba(24, 144, 255, .2);
+    }
+    body {
+      background-color: var(--background-color);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .modal-mask {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, .45);
+      z-index: 1000;
+    }
+    /* Main Advanced Search Modal */
+    .advanced-search-modal {
+      position: relative;
+      z-index: 1001;
+      width: 900px;
+      max-width: 95vw;
+      background-color: var(--component-background);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      background-color: var(--dark-blue-header);
+      color: white;
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 18px;
+      font-weight: 500;
+      border-radius: 4px 4px 0 0;
+    }
+    .modal-body {
+      padding: 24px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .query-builder {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .query-row {
+      display: grid;
+      grid-template-columns: 150px 150px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .query-row label {
+      font-weight: 500;
+      text-align: right;
+      padding-right: 8px;
+    }
+    .query-value-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .query-value-container .form-control { width: 100%; box-sizing: border-box; }
+    .form-control {
+      height: 32px;
+      padding: 4px 11px;
+      font-size: 14px;
+      color: rgba(0,0,0,.85);
+      background-color: var(--component-background);
+      border: 1px solid var(--border-color);
+      border-radius: 2px;
+      transition: all .3s;
+    }
+    .form-control:focus {
+      border-color: var(--primary-color-hover);
+      outline: 0;
+      box-shadow: 0 0 0 2px var(--focus-shadow);
+    }
+    .form-control[disabled] { background-color: #f5f5f5; cursor: not-allowed; }
+    .modal-footer {
+      padding: 10px 16px;
+      text-align: right;
+      border-top: 1px solid #f0f0f0;
+    }
+    .btn {
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 2px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .btn-primary { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .btn-default { background-color: var(--component-background); color: rgba(0,0,0,.85); border-color: var(--border-color); }
+
+    /* Choices.js Customizations */
+    .choices {
+      width: 100%; margin: 0;
+    }
+    .choices.is-disabled .choices__inner,
+    .choices.is-disabled .choices__input {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
+    .choices__inner {
+      min-height: 32px;
+      height: 100%;
+      background-color: var(--component-background);
+      border: 1px solid var(--border-color);
+      border-radius: 2px;
+      font-size: 14px;
+      padding: 1px 7px 0;
+    }
+    .is-focused .choices__inner {
+      border-color: var(--primary-color-hover) !important;
+      box-shadow: 0 0 0 2px var(--focus-shadow) !important;
+    }
+    .choices__list--multiple .choices__item {
+      background-color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: 4px;
+      color: white;
+    }
+    .choices[data-type*="select-multiple"] .choices__button, .choices[data-type*="text"] .choices__button {
+      border-left: 1px solid rgba(255,255,255,0.5);
+      margin-left: 5px;
+    }
+    .choices__input {
+        font-size: 14px;
+        margin-bottom: 0;
+        background-color: transparent !important;
+    }
+
+    /* Creator Input Styles (from common.html) */
+    .creator-input-wrap {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--component-background);
+      height: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .creator-input-wrap:hover { border-color: var(--primary-color-hover); }
+    .creator-input {
+      border: none; outline: none; flex: 1; font-size: 14px;
+      background: transparent; height: 100%; padding: 0 12px; min-width: 0;
+    }
+    .creator-search-btn {
+      background: var(--primary-color); border: none; cursor: pointer; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; width: 40px; transition: background-color 0.2s;
+    }
+    .creator-search-btn:hover { background-color: var(--primary-color-hover); }
+    .creator-search-btn svg { width: 16px; height: 16px; color: white; }
+
+    /* User Select Modal Styles */
+    #creatorModal { z-index: 1050; }
+    #creatorModal .modal-dialog {
+      background: #fff; border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      width: 800px; max-width: 90vw;
+      display: flex; flex-direction: column;
+    }
+    #creatorModal .modal-header { cursor: move; }
+    #creatorModal .modal-body { max-height: 50vh; overflow-y: auto; }
+    .column-filter {
+      width: 95%; padding: 4px 6px; border: 1px solid var(--border-color);
+      border-radius: 4px; font-size: 14px;
+    }
+    .user-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .user-table th, .user-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+    .user-table thead th { background-color: #fafafa; font-weight: 500; }
+    .user-table .filter-row th { padding: 8px 0; background-color: #fafafa; }
+    .user-table tr:hover td { background: #e6f7ff; }
+  </style>
+</head>
+<body>
+
+  <!-- Main Modal -->
+  <div class="modal-mask"></div>
+  <div class="advanced-search-modal">
+    <div class="modal-header">高级查询</div>
+    <div class="modal-body">
+      <div class="query-builder" id="queryBuilder"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="searchBtn">高级查询</button>
+      <button class="btn btn-default" id="closeBtn">关闭</button>
+    </div>
+  </div>
+
+  <!-- Creator Selection Modal -->
+  <div class="modal-mask" id="creatorModal" style="display:none;">
+    <div class="modal-dialog" id="creatorModalDialog">
+      <div class="modal-header" id="creatorModalHeader">
+        <div class="modal-title">选择创建人</div>
+      </div>
+      <div class="modal-body">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th style="width:50px;"><input type="checkbox" id="selectAllUsers"></th>
+              <th>用户编码</th><th>用户名</th><th>单位名称</th>
+            </tr>
+            <tr class="filter-row">
+              <th></th>
+              <th><input type="text" class="column-filter" data-column="code" placeholder="筛选编码"></th>
+              <th><input type="text" class="column-filter" data-column="name" placeholder="筛选名称"></th>
+              <th><input type="text" class="column-filter" data-column="company" placeholder="筛选单位"></th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" id="cancelUserSelect">取消</button>
+        <button class="btn btn-primary" id="confirmUserSelect">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    // --- Data Definitions ---
+    const queryFields = {
+      status: {
+        label: '状态', type: 'dropdown',
+        operators: ['等于', '不等于', '包含', '不包含', '空', '非空'],
+        options: ['草稿', '启用', '停用']
+      },
+      code: {
+        label: '代码', type: 'text',
+        operators: ['等于', '不等于', '包含', '结束', '不包含', '起始', '空', '非空']
+      },
+      creator: {
+        label: '创建人', type: 'creator',
+        operators: ['等于', '不等于', '包含', '不包含']
+      },
+      employeeCount: {
+        label: '员工人数', type: 'number',
+        operators: ['等于', '不等于', '区间', '包含', '起始', '结束', '空', '非空']
+      },
+      creationDate: {
+        label: '创建时间', type: 'date',
+        operators: ['等于', '不等于', '区间', '空', '非空']
+      }
+    };
+    const allUsers = Array.from({length: 8}, (_, i) => ({
+        id: i + 1, code: `user${String(i+1).padStart(2,'0')}`, 
+        name: `用户${i+1}`, company: '首自信'
+    }));
+
+    // --- DOM Elements ---
+    const queryBuilderContainer = document.getElementById('queryBuilder');
+    const creatorModal = document.getElementById('creatorModal');
+    let activeCreatorInput = null; // To track which creator input triggered the modal
+
+    // --- UI Rendering ---
+    function createValueInput(field, operator, row) {
+      const valueContainer = document.createElement('div');
+      valueContainer.className = 'query-value-container';
+      const isDisabled = ['空', '非空'].includes(operator);
+
+      const createInput = (type, placeholder = '') => {
+        const input = document.createElement('input');
+        input.className = 'form-control';
+        input.type = type;
+        input.placeholder = placeholder;
+        input.disabled = isDisabled;
+        return input;
+      };
+
+      if (field.type === 'creator') {
+        const wrap = document.createElement('div');
+        wrap.className = 'creator-input-wrap';
+        const input = document.createElement('input');
+        input.className = 'creator-input';
+        input.placeholder = '请选择创建人';
+        input.readOnly = true;
+        input.disabled = isDisabled;
+        const button = document.createElement('button');
+        button.className = 'creator-search-btn';
+        button.disabled = isDisabled;
+        button.innerHTML = `<svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M944.5 880.3L739.8 675.6c58.5-70.7 93.8-161.1 93.8-259.6C833.6 186.2 647.4 0 416.8 0S0 186.2 0 416.8s186.2 416.8 416.8 416.8c98.5 0 188.9-35.3 259.6-93.8l204.7 204.7c10.6 10.6 27.8 10.6 38.4 0l25.1-25.1c10.6-10.6 10.6-27.8 0-38.4zM416.8 736c-176.3 0-319.2-142.9-319.2-319.2S240.5 97.6 416.8 97.6 736 240.5 736 416.8 593.1 736 416.8 736z"></path></svg>`;
+        button.onclick = () => {
+          activeCreatorInput = input;
+          creatorModal.style.display = 'flex';
+          openCreatorModal();
+        };
+        wrap.appendChild(input);
+        wrap.appendChild(button);
+        valueContainer.appendChild(wrap);
+      } else if (field.type === 'dropdown') {
+        const select = document.createElement('select');
+        select.multiple = true;
+        select.disabled = isDisabled;
+        field.options.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          select.appendChild(option);
+        });
+        valueContainer.appendChild(select);
+        // Choices.js is initialized in renderQueryRow after element is in DOM
+      } else if (field.type === 'date') {
+        if (operator === '区间') {
+          valueContainer.appendChild(createInput('text', '开始时间'));
+          valueContainer.appendChild(createInput('text', '结束时间'));
+        } else {
+          valueContainer.appendChild(createInput('text', '请选择时间'));
+        }
+        flatpickr(valueContainer.querySelectorAll('input'), {
+            enableTime: true, dateFormat: "Y-m-d H:i", locale: "zh"
+        });
+      } else if (field.type === 'number' && operator === '区间') {
+        valueContainer.appendChild(createInput('number', '开始值'));
+        valueContainer.appendChild(createInput('number', '结束值'));
+      } else {
+        const inputType = field.type === 'number' ? 'number' : 'text';
+        let placeholder = '请输入值';
+        if (['包含', '等于'].includes(operator) && field.type === 'text') {
+            placeholder = '多值用空格分隔';
+        }
+        valueContainer.appendChild(createInput(inputType, placeholder));
+      }
+      return valueContainer;
+    }
+
+    function renderQueryRow(fieldKey, field) {
+      const row = document.createElement('div');
+      row.className = 'query-row';
+      row.dataset.field = fieldKey;
+
+      const label = document.createElement('label');
+      label.textContent = field.label;
+      
+      const operatorSelect = document.createElement('select');
+      operatorSelect.className = 'form-control operator-select';
+      field.operators.forEach(op => {
+        const option = document.createElement('option');
+        option.value = op;
+        option.textContent = op;
+        operatorSelect.appendChild(option);
+      });
+
+      let valueCell = createValueInput(field, field.operators[0], row);
+      
+      operatorSelect.addEventListener('change', (e) => {
+        const newOperator = e.target.value;
+        const newValueCell = createValueInput(field, newOperator, row);
+        row.replaceChild(newValueCell, valueCell);
+        valueCell = newValueCell;
+        // Re-initialize choices if it's a dropdown
+        if (field.type === 'dropdown') {
+            const newSelect = newValueCell.querySelector('select');
+            if (newSelect) new Choices(newSelect, {
+                removeItemButton: true,
+                noResultsText: '无结果',
+                itemSelectText: '点击选择',
+            });
+        }
+      });
+      
+      row.appendChild(label);
+      row.appendChild(operatorSelect);
+      row.appendChild(valueCell);
+      queryBuilderContainer.appendChild(row);
+
+      if (field.type === 'dropdown') {
+        const select = valueCell.querySelector('select');
+        if (select) new Choices(select, {
+            removeItemButton: true,
+            noResultsText: '无结果',
+            itemSelectText: '点击选择',
+        });
+      }
+    }
+
+    // --- Creator Modal Logic (from common.html) ---
+    let selectedUsers = [];
+    let displayedUsers = [...allUsers];
+    
+    function openCreatorModal() {
+        document.querySelectorAll('#creatorModal .column-filter').forEach(input => input.value = '');
+        displayedUsers = [...allUsers];
+        renderUserTable();
+        updateSelectAllCheckbox();
+    }
+
+    function renderUserTable() {
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = displayedUsers.map(user => `
+            <tr>
+                <td><input type="checkbox" class="user-checkbox" value="${user.id}" ${selectedUsers.find(u => u.id === user.id) ? 'checked' : ''}></td>
+                <td>${user.code}</td><td>${user.name}</td><td>${user.company}</td>
+            </tr>
+        `).join('');
+        bindTableEvents();
+    }
+    function bindTableEvents() {
+        document.querySelectorAll('#creatorModal .user-checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const userId = parseInt(this.value, 10);
+                const user = allUsers.find(u => u.id === userId);
+                if (this.checked) {
+                    if (!selectedUsers.find(u => u.id === userId)) selectedUsers.push(user);
+                } else {
+                    selectedUsers = selectedUsers.filter(u => u.id !== userId);
+                }
+                updateSelectAllCheckbox();
+            });
+        });
+    }
+    function updateSelectAllCheckbox() {
+        const selectAll = document.getElementById('selectAllUsers');
+        const allVisibleChecked = displayedUsers.length > 0 && displayedUsers.every(user => selectedUsers.find(u => u.id === user.id));
+        selectAll.checked = allVisibleChecked;
+    }
+    document.getElementById('selectAllUsers').addEventListener('change', function() {
+        if (this.checked) {
+            displayedUsers.forEach(user => {
+                if (!selectedUsers.find(u => u.id === user.id)) selectedUsers.push(user);
+            });
+        } else {
+            const displayedIds = displayedUsers.map(u => u.id);
+            selectedUsers = selectedUsers.filter(u => !displayedIds.includes(u.id));
+        }
+        renderUserTable();
+    });
+    function applyFilters() {
+        const filters = { code: '', name: '', company: '' };
+        document.querySelectorAll('#creatorModal .column-filter').forEach(input => {
+            filters[input.dataset.column] = input.value.toLowerCase();
+        });
+        displayedUsers = allUsers.filter(user => 
+            user.code.toLowerCase().includes(filters.code) &&
+            user.name.toLowerCase().includes(filters.name) &&
+            user.company.toLowerCase().includes(filters.company)
+        );
+        renderUserTable();
+        updateSelectAllCheckbox();
+    }
+    document.querySelectorAll('#creatorModal .column-filter').forEach(input => input.addEventListener('input', applyFilters));
+    document.getElementById('cancelUserSelect').onclick = () => { creatorModal.style.display = 'none'; };
+    document.getElementById('confirmUserSelect').onclick = () => {
+      if(activeCreatorInput) {
+        activeCreatorInput.value = selectedUsers.map(u => u.name).join(', ');
+      }
+      creatorModal.style.display = 'none';
+    };
+    // Draggable Modal Logic
+    const modalDialog = document.getElementById('creatorModalDialog');
+    const modalHeader = document.getElementById('creatorModalHeader');
+    let isDragging = false, offset = { x: 0, y: 0 };
+    modalHeader.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.classList.contains('modal-title')) return;
+        isDragging = true;
+        offset = { x: e.clientX - modalDialog.offsetLeft, y: e.clientY - modalDialog.offsetTop };
+        modalDialog.style.position = 'absolute';
+        document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        modalDialog.style.left = `${e.clientX - offset.x}px`;
+        modalDialog.style.top = `${e.clientY - offset.y}px`;
+    });
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        modalDialog.style.position = '';
+        document.body.style.userSelect = '';
+    });
+
+    // --- Initial Render ---
+    Object.keys(queryFields).forEach(key => {
+      renderQueryRow(key, queryFields[key]);
+    });
+  </script>
+</body>
+</html> 

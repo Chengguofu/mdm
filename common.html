@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>创建人选择示例</title>
+  <style>
+    body { background: #f7fbff; font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; }
+    .creator-input-wrap {
+      display: inline-flex; /* To allow centering */
+      align-items: center;
+      width: 220px; /* Adjusted width */
+      border: 1.5px solid #d9d9d9;
+      border-radius: 8px;
+      background: #fff;
+      height: 42px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .creator-input-wrap:hover {
+      border-color: #40a9ff;
+    }
+    .creator-input-wrap:focus-within {
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+    .creator-input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 14px; /* a bit smaller to fit */
+      background: transparent;
+      height: 100%;
+      padding: 0 12px;
+      min-width: 0;
+    }
+    .search-btn {
+      background: #1890ff;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 40px; /* smaller button */
+      transition: background-color 0.2s;
+    }
+    .search-btn:hover {
+      background-color: #40a9ff;
+    }
+    .search-btn svg {
+      width: 18px; /* smaller icon */
+      height: 18px;
+      color: white;
+    }
+    /* Modal styles */
+    .modal-mask {
+      position: fixed;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.18);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      width: 800px; /* Wider modal */
+      max-width: 90vw;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+        padding: 16px 24px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: move;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .modal-body {
+        padding: 24px;
+        max-height: 50vh;
+        overflow-y: auto;
+    }
+    .modal-footer {
+        padding: 10px 16px;
+        text-align: right;
+        border-top: 1px solid #f0f0f0;
+    }
+    .column-filter {
+        width: 95%;
+        padding: 4px 6px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .column-filter:focus {
+        border-color: #40a9ff;
+        outline: 0;
+        box-shadow: 0 0 0 2px rgba(24,144,255,.2);
+    }
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .user-table th, .user-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .user-table thead th {
+        background-color: #fafafa;
+        font-weight: 500;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+    .user-table .filter-row th {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        background-color: #fafafa;
+    }
+    .user-table tr:hover td {
+        background: #e6f7ff;
+    }
+    .modal-btn {
+      background: #1890ff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .modal-btn.cancel {
+      background: #fff;
+      color: #000;
+      border: 1px solid #d9d9d9;
+    }
+  </style>
+</head>
+<body>
+  <div style="margin: 60px auto; text-align:center;">
+    <div style="font-size:20px;font-weight:600;margin-bottom:18px;letter-spacing:2px;">创建人</div>
+    <div class="creator-input-wrap">
+      <input class="creator-input" id="creatorInput" placeholder="请选择创建人" readonly/>
+      <button class="search-btn" id="openUserModal" tabindex="-1" title="选择创建人">
+        <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M944.5 880.3L739.8 675.6c58.5-70.7 93.8-161.1 93.8-259.6C833.6 186.2 647.4 0 416.8 0S0 186.2 0 416.8s186.2 416.8 416.8 416.8c98.5 0 188.9-35.3 259.6-93.8l204.7 204.7c10.6 10.6 27.8 10.6 38.4 0l25.1-25.1c10.6-10.6 10.6-27.8 0-38.4zM416.8 736c-176.3 0-319.2-142.9-319.2-319.2S240.5 97.6 416.8 97.6 736 240.5 736 416.8 593.1 736 416.8 736z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-mask" id="userModal" style="display:none;">
+    <div class="modal" id="userModalDialog">
+      <div class="modal-header" id="userModalHeader">
+        <div class="modal-title">选择创建人</div>
+      </div>
+      <div class="modal-body">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th style="width:50px;"><input type="checkbox" id="selectAllUsers"></th>
+                    <th>用户编码</th>
+                    <th>用户名</th>
+                    <th>单位名称</th>
+                </tr>
+                <tr class="filter-row">
+                    <th></th>
+                    <th><input type="text" class="column-filter" data-column="code" placeholder="筛选编码"></th>
+                    <th><input type="text" class="column-filter" data-column="name" placeholder="筛选名称"></th>
+                    <th><input type="text" class="column-filter" data-column="company" placeholder="筛选单位"></th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- User rows will be rendered here -->
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="cancelUserSelect">取消</button>
+        <button class="modal-btn" id="confirmUserSelect">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const allUsers = [
+        { id: 1, code: 'user01', name: '用户1', company: '首自信' },
+        { id: 2, code: 'user02', name: '用户2', company: '首自信' },
+        { id: 3, code: 'user03', name: '用户3', company: '首自信' },
+        { id: 4, code: 'user04', name: '用户4', company: '首自信' },
+        { id: 5, code: 'user05', name: '用户5', company: '首自信' },
+        { id: 6, code: 'user06', name: '用户6', company: '首自信' },
+        { id: 7, code: 'user07', name: '用户7', company: '首自信' },
+        { id: 8, code: 'user08', name: '用户8', company: '首自信' },
+    ];
+    let selectedUsers = [];
+    let displayedUsers = [...allUsers];
+
+    const creatorInput = document.getElementById('creatorInput');
+    const userModal = document.getElementById('userModal');
+
+    function renderUserTable() {
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = displayedUsers.map(user => `
+            <tr>
+                <td><input type="checkbox" class="user-checkbox" value="${user.id}" ${selectedUsers.find(u => u.id === user.id) ? 'checked' : ''}></td>
+                <td>${user.code}</td>
+                <td>${user.name}</td>
+                <td>${user.company}</td>
+            </tr>
+        `).join('');
+        bindTableEvents();
+    }
+    
+    function bindTableEvents() {
+        document.querySelectorAll('.user-checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const userId = parseInt(this.value, 10);
+                const user = allUsers.find(u => u.id === userId);
+                if (this.checked) {
+                    if (!selectedUsers.find(u => u.id === userId)) {
+                        selectedUsers.push(user);
+                    }
+                } else {
+                    selectedUsers = selectedUsers.filter(u => u.id !== userId);
+                }
+                updateSelectAllCheckbox();
+            });
+        });
+    }
+    
+    function updateSelectAllCheckbox() {
+        const selectAll = document.getElementById('selectAllUsers');
+        const allVisibleChecked = displayedUsers.length > 0 && displayedUsers.every(user => selectedUsers.find(u => u.id === user.id));
+        selectAll.checked = allVisibleChecked;
+    }
+
+    document.getElementById('selectAllUsers').addEventListener('change', function() {
+        if (this.checked) {
+            displayedUsers.forEach(user => {
+                if (!selectedUsers.find(u => u.id === user.id)) {
+                    selectedUsers.push(user);
+                }
+            });
+        } else {
+            const displayedIds = displayedUsers.map(u => u.id);
+            selectedUsers = selectedUsers.filter(u => !displayedIds.includes(u.id));
+        }
+        renderUserTable();
+    });
+
+    function applyFilters() {
+        const filters = { code: '', name: '', company: '' };
+        document.querySelectorAll('.column-filter').forEach(input => {
+            filters[input.dataset.column] = input.value.toLowerCase();
+        });
+
+        displayedUsers = allUsers.filter(user => 
+            user.code.toLowerCase().includes(filters.code) &&
+            user.name.toLowerCase().includes(filters.name) &&
+            user.company.toLowerCase().includes(filters.company)
+        );
+
+        renderUserTable();
+        updateSelectAllCheckbox();
+    }
+
+    document.querySelectorAll('.column-filter').forEach(input => {
+        input.addEventListener('input', applyFilters);
+    });
+
+    document.getElementById('openUserModal').onclick = function() {
+      userModal.style.display = 'flex';
+      document.querySelectorAll('.column-filter').forEach(input => input.value = '');
+      displayedUsers = [...allUsers];
+      renderUserTable();
+      updateSelectAllCheckbox();
+    };
+    document.getElementById('cancelUserSelect').onclick = function() {
+      userModal.style.display = 'none';
+    };
+    document.getElementById('confirmUserSelect').onclick = function() {
+      creatorInput.value = selectedUsers.map(u => u.name).join(', ');
+      userModal.style.display = 'none';
+    };
+
+    // Make modal draggable
+    const modalDialog = document.getElementById('userModalDialog');
+    const modalHeader = document.getElementById('userModalHeader');
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    modalHeader.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+        isDragging = true;
+        offset.x = e.clientX - modalDialog.offsetLeft;
+        offset.y = e.clientY - modalDialog.offsetTop;
+        modalDialog.style.position = 'absolute';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        modalDialog.style.left = `${e.clientX - offset.x}px`;
+        modalDialog.style.top = `${e.clientY - offset.y}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+  </script>
+</body>
+</html> 

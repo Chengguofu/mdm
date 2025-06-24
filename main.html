@@ -901,6 +901,104 @@
           overflow: hidden;
           text-overflow: ellipsis;
         }
+        .degree-tab {padding:0 18px;height:40px;line-height:40px;border-radius:8px;font-size:16px;font-weight:500;color:#333;cursor:pointer;transition:background 0.2s;}
+        .degree-tab.active {background:#1890ff;color:#fff;}
+        .degree-tab:hover:not(.active) {background:#f0f7ff;}
+        .table-wrap {
+          background: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
+          padding: 18px 0 0 0;
+          overflow-x: auto;
+        }
+        table.model-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          font-size: 15px;
+          background: #fff;
+          min-width: 1100px;
+        }
+        .model-table th, .model-table td {
+          padding: 10px 12px;
+          border-bottom: 1px solid #e3eaf3;
+          text-align: left;
+          white-space: nowrap;
+        }
+        .model-table th {
+          background: #f4f8fb;
+          color: #2176c7;
+          font-weight: 600;
+        }
+        .model-table tr:last-child td {
+          border-bottom: none;
+        }
+        .model-table tr:hover td {
+          background: #f0f6fd;
+        }
+        .model-table td a {
+          color: #185a99;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        .model-table td a:hover {
+          color: #2176c7;
+        }
+        .model-table td {
+          color: #222;
+        }
+        .model-table td.center {
+          text-align: center;
+        }
+        .model-table td.checkbox-cell, .model-table th.checkbox-cell {
+          width: 36px;
+          text-align: center;
+        }
+        .query-bar {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 18px 24px;
+          align-items: center;
+          margin-bottom: 18px;
+          padding: 0 0 0 6px;
+        }
+        .btn-main {
+          background: #4db6ac;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          padding: 0 18px;
+          height: 36px;
+          font-size: 15px;
+          display: flex;
+          align-items: center;
+          font-weight: 500;
+          transition: background 0.18s;
+        }
+        .btn-main:hover {
+          background: #399488;
+        }
+        .btn-line {
+          background: #fff;
+          color: #444;
+          border: 1px solid #d0d7de;
+          border-radius: 4px;
+          padding: 0 14px;
+          height: 36px;
+          font-size: 15px;
+          display: flex;
+          align-items: center;
+          transition: background 0.18s, border 0.18s;
+        }
+        .btn-line:hover {
+          background: #f5f7fa;
+          border-color: #b0b8c1;
+        }
+        .action-bar .icon {
+          margin-right: 6px;
+          display: flex;
+          align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -999,8 +1097,8 @@
             <div class="card-title">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fa8c16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <div>
-                    <div>待办任务</div>
-                    <div class="card-subtitle">需要处理的待办事项</div>
+                    <div>待审批任务</div>
+                    <div class="card-subtitle">需要处理的待审批事项</div>
                 </div>
             </div>
         </div>
@@ -1340,6 +1438,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     loadUserActions();
+
+    if (location.hash === '#degree') {
+        if (window.showDegreeList) showDegreeList();
+    }
 });
 
 // 可自定义的首页模块
@@ -1544,6 +1646,141 @@ homeSettingsClose.onclick = function() {
     homeSettingsMask.style.display = 'none';
     document.body.style.overflow = '';
 };
+
+// 学位菜单点击显示列表页
+function showDegreeList() {
+  // 直接填充内容区
+  var mainContent = document.getElementById('mainContent');
+  if(mainContent) {
+    mainContent.innerHTML = '';
+    var page = document.getElementById('degreeListPage');
+    if(page) {
+      page.style.display = 'block';
+      page.style.height = '100%';
+      mainContent.appendChild(page);
+    }
+  }
+  renderDegreeTable();
+  renderDegreeActionBtns && renderDegreeActionBtns('query');
+}
+window.showDegreeList = showDegreeList;
+// 页签切换
+Array.from(document.querySelectorAll('.degree-tab')).forEach(tab => {
+  tab.onclick = function() {
+    document.querySelectorAll('.degree-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+    renderDegreeActionBtns(this.dataset.tab);
+  };
+});
+// 操作按钮随页签变化
+function renderDegreeActionBtns(tab) {
+  const btns = {
+    query: ['快速查询','高级查询','导出','版本查看','查看详情'],
+    apply: ['新建申请','导出'],
+    edit: ['批量修改','导出'],
+    freeze: ['冻结','导出'],
+    unfreeze: ['解冻','导出'],
+    audit: ['审核','导出'],
+    archive: ['归档','导出'],
+    search: ['检索','导出']
+  };
+  const btnArea = document.getElementById('degreeActionBtns');
+  btnArea.innerHTML = '';
+  (btns[tab]||[]).forEach(txt=>{
+    const btn = document.createElement('button');
+    btn.textContent = txt;
+    btn.style.cssText = 'background:#f4f6fa;color:#2176c7;border:none;border-radius:6px;padding:0 18px;height:36px;font-size:15px;font-weight:500;cursor:pointer;margin-left:0;transition:background 0.2s;';
+    btn.onmouseover = ()=>btn.style.background='#e6f0ff';
+    btn.onmouseout = ()=>btn.style.background='#f4f6fa';
+    btn.onclick = ()=>alert('点击了"'+txt+'"');
+    btnArea.appendChild(btn);
+  });
+}
+// 表格数据渲染（示例数据）
+function renderDegreeTable() {
+  const data = [
+    {status:'正常',code:'444',desc:'建筑学学士',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'},
+    {status:'正常',code:'445',desc:'艺术学学士',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'},
+    {status:'正常',code:'490',desc:'政治经济学...',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'},
+    {status:'正常',code:'491',desc:'中医学学士',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'},
+    {status:'正常',code:'492',desc:'药学学士',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'},
+    {status:'正常',code:'409',desc:'农学学士',err:'',user:'李春阳',unit:'北京化学...',ctime:'2025-06-12',audit:'李春阳',pubunit:'北京化学...',pubtime:'2025-06-12'}
+  ];
+  const tbody = document.getElementById('degreeTableBody');
+  tbody.innerHTML = '';
+  data.forEach(row=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class='checkbox-cell'><input type='checkbox'></td>
+      <td><span style='display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;'>${row.status}</span></td>
+      <td style='font-weight:600;'>${row.code}</td>
+      <td>${row.desc}</td>
+      <td>${row.err||''}</td>
+      <td>${row.user}</td>
+      <td>${row.unit}</td>
+      <td>${row.ctime}</td>
+      <td>${row.audit}</td>
+      <td>${row.pubunit}</td>
+      <td>${row.pubtime}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 </script>
+
+<!-- 学位列表页内容区（全屏填充右栏，非弹窗） -->
+<div id="degreeListPage" style="display:none;width:100%;height:100%;background:transparent;position:relative;align-items:stretch;justify-content:stretch;">
+  <div style="background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(33,118,199,0.10);width:100%;min-width:1100px;min-height:600px;padding:0;display:flex;flex-direction:column;height:100%;">
+    <!-- 页签区 -->
+    <div style="display:flex;align-items:center;border-bottom:1.5px solid #e3eaf3;padding:0 32px 0 32px;margin-top:24px;">
+      <div id="degreeTabs" style="display:flex;gap:2px;">
+        <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">查询</div>
+        <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">申请</div>
+        <div class="model-tab" data-tab="edit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">修改</div>
+        <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">冻结</div>
+        <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">解冻</div>
+        <div class="model-tab" data-tab="audit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">审核</div>
+        <div class="model-tab" data-tab="archive" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">归档</div>
+        <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">检索</div>
+      </div>
+      <div style="flex:1;"></div>
+    </div>
+    <!-- 查询区和按钮区 -->
+    <div class="query-bar" style="margin:24px 32px 0 32px;">
+      <button class="btn-main"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>快速查询</button>
+      <button class="btn-line"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>高级查询</button>
+      <button class="btn-line"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>版本查看</button>
+      <button class="btn-line"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></span>查看详情</button>
+      <button class="btn-line"><span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg></span>复制数据</button>
+    </div>
+    <!-- 表格区 -->
+    <div class="table-wrap" style="margin:0 32px 32px 32px;flex:1;">
+      <table class="model-table" id="degreeTable">
+        <thead>
+          <tr>
+            <th class="checkbox-cell"><input type="checkbox"></th>
+            <th>状态</th>
+            <th>代码</th>
+            <th>学位描述</th>
+            <th>错误提示</th>
+            <th>创建人</th>
+            <th>创建人单位</th>
+            <th>创建时间</th>
+            <th>审核人</th>
+            <th>发布人单位</th>
+            <th>发布时间</th>
+          </tr>
+        </thead>
+        <tbody id="degreeTableBody">
+          <!-- 数据行由JS渲染 -->
+        </tbody>
+      </table>
+      <!-- 分页区 -->
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;">
+        <button class="btn-line">上一页</button>
+        <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+        <button class="btn-main">下一页</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

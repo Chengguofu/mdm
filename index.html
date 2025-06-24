@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>主数据管理平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     :root {
-      --theme-bg: #f4f8fb;
+      --theme-bg: #f7faff;
       --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
       --theme-sidebar: #fff;
       --theme-content: #f4f8fb;
@@ -24,6 +25,55 @@
       --theme-content-text: #185a99;
       --theme-shadow-color: rgba(33, 118, 199, 0.06);
     }
+
+    /* Toggle Switch for Advanced Mode */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+    }
+    input:checked + .slider {
+      background-color: var(--theme-menu-active, #2176c7);
+    }
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--theme-menu-active, #2176c7);
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .slider.round {
+      border-radius: 24px;
+    }
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
@@ -855,6 +905,109 @@
     .quick-actions-add button:hover {
       background: #185a99;
     }
+
+    /* Custom Multi-select Dropdown */
+    .custom-multi-select {
+        position: relative;
+    }
+    .custom-multi-select .select-box {
+        display: flex;
+        align-items: center;
+        border: 1.2px solid #c0d3eb;
+        border-radius: 4px;
+        padding: 2px 8px;
+        background: #f9fbfd;
+        cursor: text;
+        flex-wrap: wrap;
+        min-height: 36px; /* Match input height */
+    }
+    .custom-multi-select .selected-options {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .custom-multi-select .selected-option-tag {
+        background-color: #e9ecef;
+        color: #495057;
+        border-radius: 4px;
+        padding: 3px 8px;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .custom-multi-select .remove-tag {
+        margin-left: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .custom-multi-select .search-box {
+        flex-grow: 1;
+    }
+    .custom-multi-select .search-box input {
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 6px 0;
+        width: 100%;
+        min-width: 60px;
+        font-size:15px;
+    }
+    .custom-multi-select .dropdown-icon {
+        color: #6c757d;
+        margin-left: 5px;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+    .custom-multi-select.open .dropdown-icon {
+        transform: rotate(180deg);
+    }
+    .custom-multi-select .search-icon {
+        display: none;
+    }
+    .custom-multi-select .options-container {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #c0d3eb;
+        border-radius: 4px;
+        margin-top: 4px;
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .custom-multi-select.open .options-container {
+        display: block;
+    }
+    .custom-multi-select .option {
+        padding: 10px 12px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+    }
+    .custom-multi-select .option:hover {
+        background-color: #f0f5fa;
+    }
+    .custom-multi-select .option.selected {
+        background-color: #e3f2fd;
+        font-weight: 500;
+        color: #185a99;
+    }
+    .custom-multi-select .option .checkmark {
+        visibility: hidden;
+        color: #2176c7;
+        font-size: 16px;
+    }
+    .custom-multi-select .option.selected .checkmark {
+        visibility: visible;
+    }
   </style>
 </head>
 <body>
@@ -889,7 +1042,7 @@
         <button class="icon-btn" title="设置" id="settingBtn">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 6.2 18.82l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.38 5.2l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9.2 4.6V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0-1.51 1H21a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 6.2 18.82l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.38 5.2l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9.2 4.6V3a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
           </svg>
         </button>
         <div class="theme-dropdown" id="themeDropdown">
@@ -948,6 +1101,7 @@
               <span class="favorite-icon" data-menu-id="data-info-management">★</span>
             </div>
             <ul class="submenu">
+              <li class="submenu-item" data-item-id="degree">学位</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="data-flow-management">
@@ -1129,6 +1283,200 @@
       </div>
     </div>
   </div>
+  <!-- 新增弹窗（完整表单） -->
+  <div id="noticeAddModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:900px;width:90vw;max-height:90vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#185a99;color:#fff;font-size:20px;font-weight:500;padding:16px 24px;border-radius:8px 8px 0 0;">文件添加 <span style='position:absolute;right:24px;top:16px;cursor:pointer;font-size:24px;' id="noticeAddClose">×</span></div>
+      <form id="noticeAddForm" style="padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="width:100px;">文件标题<span style="color:red">*</span>：</label>
+          <input type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;" required />
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <label style="width:100px;">文件分类<span style="color:red">*</span>：</label>
+          <select id="noticeFileCategory" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;">
+            <option>规章制度</option>
+            <option>标准及运维细则</option>
+            <option>通知公告</option>
+            <option>友情链接</option>
+          </select>
+        </div>
+        <div id="noticeFileUploadRow" style="display:flex;align-items:center;gap:12px;">
+          <label style="width:100px;">上传文件<span style="color:red">*</span>：</label>
+          <input type="file" style="flex:1;" />
+        </div>
+        <div id="noticeLinkRow" style="display:none;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="width:100px;">链接地址<span style='color:red'>*</span>：</label>
+            <input type="url" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;" placeholder="请输入链接地址" />
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <label style="width:100px;">链接图标：</label>
+            <input type="file" accept="image/*" style="flex:1;" />
+          </div>
+        </div>
+        <!-- SSO Advanced Config -->
+        <div id="ssoConfigSection" style="display:none; flex-direction:column; gap:12px; border-top: 1px solid #f0f0f0; padding-top: 18px; margin-top: 6px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 500; color: #333;">单点登录配置</div>
+                    <div style="font-size: 14px; color: #888; margin-top: 4px;">为外部链接配置SSO认证</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="ssoAdvancedToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div id="ssoAdvancedPanel" style="display:none; border:1px solid #e3eaf3; border-radius:4px; padding:16px;">
+                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;">
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">认证URL</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="https://auth.example.com/oauth/authorize">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Token URL</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="https://auth.example.com/oauth/token">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Client ID</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="your_client_id">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Client Secret</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="your_client_secret">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Scope</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., openid profile email">
+                    </div>
+                     <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Redirect URI</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., https://yourapp.com/callback">
+                    </div>
+                 </div>
+                 <div style="margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px;">
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">高级代码配置 (JSON)</label>
+                    <textarea id="ssoAdvancedCode" style="width:100%; box-sizing: border-box; min-height: 120px; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: 'Courier New', Courier, monospace;" placeholder="请输入JSON格式的扩展配置..."></textarea>
+                    <div id="ssoCodeValidator" style="margin-top: 5px; font-size: 13px; height: 16px;"></div>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <label style="width:100px;">权限范围：</label>
+          <input id="noticePermInput" type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;background:#f8fbff;cursor:pointer;" placeholder="点击选择权限范围" readonly />
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <label style="width:100px;">发布内容：</label>
+          <div style="flex:1;">
+            <div style="background:#f8fbff;border:1px solid #e3eaf3;border-radius:4px;padding:8px 0 0 8px;min-height:120px;">
+              <div style="margin-bottom:8px;">
+                <button type="button" style="font-weight:bold;">B</button>
+                <button type="button" style="font-style:italic;">I</button>
+                <button type="button" style="text-decoration:underline;">U</button>
+              </div>
+              <textarea style="width:100%;min-height:80px;border:none;outline:none;background:transparent;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+          <button type="button" style="background:#185a99;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">发布</button>
+          <button type="button" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">保存</button>
+          <button type="button" id="noticeAddClose2" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- 权限范围选择弹窗 -->
+  <div id="permSelectModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2100;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">选择权限范围 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="permSelectClose">×</span></div>
+      <div style="padding:20px;">
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <button type="button" class="perm-tab active" data-tab="user">人员</button>
+          <button type="button" class="perm-tab" data-tab="org">组织架构</button>
+          <button type="button" class="perm-tab" data-tab="post">岗位</button>
+        </div>
+        <div id="permTabContent">
+          <div class="perm-list" data-tab="user">
+            <label><input type="checkbox" value="张三"> 张三</label><br/>
+            <label><input type="checkbox" value="李四"> 李四</label><br/>
+            <label><input type="checkbox" value="王五"> 王五</label><br/>
+          </div>
+          <div class="perm-list" data-tab="org" style="display:none;">
+            <label><input type="checkbox" value="市场部"> 市场部</label><br/>
+            <label><input type="checkbox" value="财务部"> 财务部</label><br/>
+            <label><input type="checkbox" value="研发部"> 研发部</label><br/>
+          </div>
+          <div class="perm-list" data-tab="post" style="display:none;">
+            <label><input type="checkbox" value="经理"> 经理</label><br/>
+            <label><input type="checkbox" value="专员"> 专员</label><br/>
+            <label><input type="checkbox" value="实习生"> 实习生</label><br/>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+          <button type="button" id="permSelectOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
+          <button type="button" id="permSelectCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 详情弹窗 -->
+  <div id="noticeDetailModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">公告详情 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeDetailClose">×</span></div>
+      <div id="noticeDetailContent" style="padding:24px;font-size:16px;color:#222;">这里显示公告详情内容</div>
+    </div>
+  </div>
+  <!-- 编辑弹窗 -->
+  <div id="noticeEditModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">编辑公告 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeEditClose">×</span></div>
+      <div style="padding:24px;">（此处为编辑表单，静态展示）</div>
+    </div>
+  </div>
+  <!-- 删除确认弹窗 -->
+  <div id="noticeDelModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:400px;width:90vw;max-height:60vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#f5222d;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">删除确认 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeDelClose">×</span></div>
+      <div style="padding:24px;">确定要删除该公告吗？</div>
+      <div style="display:flex;justify-content:flex-end;gap:18px;margin:18px 0 0 0;">
+        <button class="btn-main" id="noticeDelOk">确定</button>
+        <button class="btn-line" id="noticeDelCancel">取消</button>
+      </div>
+    </div>
+  </div>
+  <!-- 人员选择弹窗（表格风格） -->
+  <div id="userSelectModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:8px;max-width:900px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">选择人员 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="userSelectClose">×</span></div>
+      <div style="padding:20px;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+          <input type="text" id="userSearchInput" placeholder="用户名称/编码" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;">
+          <button id="userSearchBtn" style="background:#2176c7;color:#fff;padding:6px 18px;border:none;border-radius:4px;font-size:15px;">查询</button>
+        </div>
+        <div style="overflow:auto;max-height:340px;">
+          <table class="model-table" style="min-width:700px;">
+            <thead>
+              <tr>
+                <th style="width:40px;"><input type="checkbox" id="userSelectAll"></th>
+                <th>用户编码</th>
+                <th>用户名</th>
+                <th>单位名称</th>
+                <th>创建人编码</th>
+                <th style="min-width:133px;width:133px;">创建人名称</th>
+                <th>创建时间</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+          <button type="button" id="userSelectOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
+          <button type="button" id="userSelectCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     // 顶部时间显示
     function updateTopbarTime() {
@@ -1301,44 +1649,136 @@
         else if (this.dataset.itemId === 'receive-config') showDataCollectionConfigPage();
         else if (this.dataset.itemId === 'push-config') showDataPushConfigPage();
         else if (this.dataset.itemId === 'push-log') showPushLogTabs();
+        else if (this.dataset.itemId === 'degree') {
+          showDegreeListTable();
+        }
         else {
           const content = this.dataset.content;
-          if (content === 'model-query') showModelQueryTable();
-          else document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
+          if (content === 'model-query') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="datamoudual.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else {
+            document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
+          }
         }
       };
     });
 
     function showNoticeTable() {
       document.getElementById('mainContent').innerHTML = `
-        <div class="notice-action-bar" style="display:flex;gap:8px;margin-bottom:12px;">
-          <button id="noticeQuickSearch"><span style='font-size:18px;'>🔍</span> 快速查询</button>
-          <button id="noticeAddBtn"><span style='font-size:18px;'>＋</span> 添加</button>
-          <button><span style='font-size:18px;'>📝</span> 编辑</button>
-          <button><span style='font-size:18px;'>📢</span> 发布</button>
-          <button><span style='font-size:18px;'>⛔</span> 禁止</button>
-          <button><span style='font-size:18px;'>🗑️</span> 删除</button>
+        <div class="notice-section">
+          <!-- 查询区 -->
+          <div class="query-bar" style="margin-bottom:0;display:flex;flex-direction:column;gap:0;align-items:flex-start;">
+            <div style="display:flex;align-items:center;gap:18px 12px;flex-wrap:wrap;">
+              <label>文件标题：</label>
+              <input type="text" placeholder="请输入文件标题" style="width:120px;" />
+              <label>文件分类：</label>
+              <select style="width:110px;">
+                <option value="">全部</option>
+                <option>规章制度</option>
+                <option>标准及运维细则</option>
+                <option>通知公告</option>
+                <option>友情链接</option>
+              </select>
+              <label>是否发布：</label>
+              <select style="width:80px;">
+                <option value="">全部</option>
+                <option>是</option>
+                <option>否</option>
+              </select>
         </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+              <label>创建时间：</label>
+              <input type="date" style="width:120px;" />
+              <span style="margin:0 4px;">至</span>
+              <input type="date" style="width:120px;" />
+            </div>
+            <div style="display:flex;justify-content:flex-end;width:100%;margin-top:10px;">
+              <button class="btn-main" style="min-width:72px;">查询</button>
+              <button class="btn-line" style="min-width:72px;margin-left:10px;">重置</button>
+            </div>
+          </div>
+          <!-- 操作区 -->
+          <div class="action-bar" style="margin-bottom:10px;display:flex;gap:10px;">
+            <button class="btn-main" id="noticeAddBtn"><span class="icon">＋</span> 新增</button>
+            <button class="btn-line" id="noticePublishBtn">发布</button>
+            <button class="btn-line" id="noticeForbidBtn">禁止</button>
+            <button class="btn-line" id="noticeDeleteBtn">删除</button>
+          </div>
+          <!-- 列表区 -->
         <div class="table-wrap">
-          <table class="model-table">
+            <table class="model-table" style="min-width:800px;">
             <thead>
               <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>文件标题</th>
-                <th>文件分类</th>
-                <th>是否发布</th>
-                <th>创建时间</th>
-                <th>创建人</th>
+                  <th class="checkbox-cell" style="width:36px;"><input type="checkbox"></th>
+                  <th style="width:180px;">文件标题</th>
+                  <th style="width:120px;">文件分类</th>
+                  <th style="width:80px;">是否发布</th>
+                  <th style="width:170px;">创建时间</th>
+                  <th style="width:90px;">创建人</th>
+                  <th style="width:120px;text-align:center;">操作</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>外部链接</td><td>友情链接</td><td>是</td><td>2025-06-11 13:32:01</td><td>admin</td></tr>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>2025年度公司考勤管理制度</td><td>规章制度</td><td>是</td><td>2025-06-11 13:30:34</td><td>admin</td></tr>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>2025新发布标准</td><td>标准及运维细则</td><td>是</td><td>2025-06-11 13:27:42</td><td>admin</td></tr>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>通知</td><td>通知公告</td><td>是</td><td>2025-06-11 13:20:17</td><td>admin</td></tr>
+                <tr>
+                  <td class="checkbox-cell"><input type="checkbox"></td>
+                  <td><a href="#" class="notice-title-link" data-title="外部链接">外部链接</a></td>
+                  <td>友情链接</td>
+                  <td>是</td>
+                  <td>2025-06-11 13:32:01</td>
+                  <td>admin</td>
+                  <td class="center">
+                    <div style="display:inline-flex;gap:16px;">
+                      <button class="notice-edit-btn" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0;">编辑</button>
+                      <button class="notice-del-btn" style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:15px;padding:0;">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="checkbox-cell"><input type="checkbox"></td>
+                  <td><a href="#" class="notice-title-link" data-title="2025年度公司考勤管理制度">2025年度公司考勤管理制度</a></td>
+                  <td>规章制度</td>
+                  <td>是</td>
+                  <td>2025-06-11 13:30:34</td>
+                  <td>admin</td>
+                  <td class="center">
+                    <div style="display:inline-flex;gap:16px;">
+                      <button class="notice-edit-btn" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0;">编辑</button>
+                      <button class="notice-del-btn" style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:15px;padding:0;">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="checkbox-cell"><input type="checkbox"></td>
+                  <td><a href="#" class="notice-title-link" data-title="2025新发布标准">2025新发布标准</a></td>
+                  <td>标准及运维细则</td>
+                  <td>是</td>
+                  <td>2025-06-11 13:27:42</td>
+                  <td>admin</td>
+                  <td class="center">
+                    <div style="display:inline-flex;gap:16px;">
+                      <button class="notice-edit-btn" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0;">编辑</button>
+                      <button class="notice-del-btn" style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:15px;padding:0;">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="checkbox-cell"><input type="checkbox"></td>
+                  <td><a href="#" class="notice-title-link" data-title="通知">通知</a></td>
+                  <td>通知公告</td>
+                  <td>是</td>
+                  <td>2025-06-11 13:20:17</td>
+                  <td>admin</td>
+                  <td class="center">
+                    <div style="display:inline-flex;gap:16px;">
+                      <button class="notice-edit-btn" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0;">编辑</button>
+                      <button class="notice-del-btn" style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:15px;padding:0;">删除</button>
+                    </div>
+                  </td>
+                </tr>
             </tbody>
           </table>
         </div>
+          <!-- 新增弹窗（完整表单） -->
         <div id="noticeAddModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2000;align-items:center;justify-content:center;">
           <div class="modal-content" style="background:#fff;border-radius:8px;max-width:900px;width:90vw;max-height:90vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
             <div style="background:#185a99;color:#fff;font-size:20px;font-weight:500;padding:16px 24px;border-radius:8px 8px 0 0;">文件添加 <span style='position:absolute;right:24px;top:16px;cursor:pointer;font-size:24px;' id="noticeAddClose">×</span></div>
@@ -1368,12 +1808,57 @@
                 <div style="display:flex;align-items:center;gap:12px;">
                   <label style="width:100px;">链接图标：</label>
                   <input type="file" accept="image/*" style="flex:1;" />
+                  </div>
+                </div>
+                <!-- SSO Advanced Config -->
+                <div id="ssoConfigSection" style="display:none; flex-direction:column; gap:12px; border-top: 1px solid #f0f0f0; padding-top: 18px; margin-top: 6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size: 16px; font-weight: 500; color: #333;">单点登录配置</div>
+                            <div style="font-size: 14px; color: #888; margin-top: 4px;">为外部链接配置SSO认证</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="ssoAdvancedToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div id="ssoAdvancedPanel" style="display:none; border:1px solid #e3eaf3; border-radius:4px; padding:16px;">
+                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;">
+                            <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">认证URL</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="https://auth.example.com/oauth/authorize">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">Token URL</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="https://auth.example.com/oauth/token">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">Client ID</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="your_client_id">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">Client Secret</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="your_client_secret">
+                            </div>
+                            <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">Scope</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., openid profile email">
+                            </div>
+                             <div>
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">Redirect URI</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., https://yourapp.com/callback">
+                            </div>
+                         </div>
+                         <div style="margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px;">
+                            <label style="display:block; margin-bottom:6px; font-weight:500;">高级代码配置 (JSON)</label>
+                            <textarea id="ssoAdvancedCode" style="width:100%; box-sizing: border-box; min-height: 120px; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: 'Courier New', Courier, monospace;" placeholder="请输入JSON格式的扩展配置..."></textarea>
+                            <div id="ssoCodeValidator" style="margin-top: 5px; font-size: 13px; height: 16px;"></div>
+                        </div>
                 </div>
               </div>
               <div style="display:flex;align-items:flex-start;gap:12px;">
                 <label style="width:100px;">权限范围：</label>
                 <input id="noticePermInput" type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;background:#f8fbff;cursor:pointer;" placeholder="点击选择权限范围" readonly />
-                <button type="button" id="noticePermBtn" style="margin-left:6px;">选择</button>
               </div>
               <div style="display:flex;align-items:flex-start;gap:12px;">
                 <label style="width:100px;">发布内容：</label>
@@ -1383,65 +1868,81 @@
                       <button type="button" style="font-weight:bold;">B</button>
                       <button type="button" style="font-style:italic;">I</button>
                       <button type="button" style="text-decoration:underline;">U</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
-                      <button type="button">T</button>
                     </div>
                     <textarea style="width:100%;min-height:80px;border:none;outline:none;background:transparent;"></textarea>
                   </div>
                 </div>
               </div>
               <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
-                <button type="submit" style="background:#185a99;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">提交</button>
-                <button type="button" id="noticeAddClose2" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">关闭</button>
+                  <button type="button" style="background:#185a99;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">发布</button>
+                  <button type="button" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">保存</button>
+                  <button type="button" id="noticeAddClose2" style="background:#e3eaf3;color:#185a99;padding:8px 32px;border:none;border-radius:4px;font-size:16px;">取消</button>
               </div>
             </form>
           </div>
         </div>
-        <!-- 权限范围选择弹窗 -->
-        <div id="permSelectModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:2100;align-items:center;justify-content:center;">
+        </div>
+        <!-- 详情弹窗 -->
+        <div id="noticeDetailModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
           <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
-            <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">选择权限范围 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="permSelectClose">×</span></div>
-            <div style="padding:20px;">
-              <div style="display:flex;gap:12px;margin-bottom:16px;">
-                <button type="button" class="perm-tab active" data-tab="user">人员</button>
-                <button type="button" class="perm-tab" data-tab="org">组织架构</button>
-                <button type="button" class="perm-tab" data-tab="post">岗位</button>
+            <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">公告详情 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeDetailClose">×</span></div>
+            <div id="noticeDetailContent" style="padding:24px;font-size:16px;color:#222;">这里显示公告详情内容</div>
               </div>
-              <div id="permTabContent">
-                <!-- 默认显示人员多选 -->
-                <div class="perm-list" data-tab="user">
-                  <label><input type="checkbox" value="张三"> 张三</label><br/>
-                  <label><input type="checkbox" value="李四"> 李四</label><br/>
-                  <label><input type="checkbox" value="王五"> 王五</label><br/>
                 </div>
-                <div class="perm-list" data-tab="org" style="display:none;">
-                  <label><input type="checkbox" value="市场部"> 市场部</label><br/>
-                  <label><input type="checkbox" value="财务部"> 财务部</label><br/>
-                  <label><input type="checkbox" value="研发部"> 研发部</label><br/>
+        <!-- 编辑弹窗 -->
+        <div id="noticeEditModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+          <div class="modal-content" style="background:#fff;border-radius:8px;max-width:600px;width:90vw;max-height:80vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+            <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">编辑公告 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeEditClose">×</span></div>
+            <div style="padding:24px;">（此处为编辑表单，静态展示）</div>
                 </div>
-                <div class="perm-list" data-tab="post" style="display:none;">
-                  <label><input type="checkbox" value="经理"> 经理</label><br/>
-                  <label><input type="checkbox" value="专员"> 专员</label><br/>
-                  <label><input type="checkbox" value="实习生"> 实习生</label><br/>
                 </div>
-              </div>
-              <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
-                <button type="button" id="permSelectOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
-                <button type="button" id="permSelectCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
-              </div>
+        <!-- 删除确认弹窗 -->
+        <div id="noticeDelModal" class="modal-mask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.3);z-index:3000;align-items:center;justify-content:center;">
+          <div class="modal-content" style="background:#fff;border-radius:8px;max-width:400px;width:90vw;max-height:60vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+            <div style="background:#f5222d;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">删除确认 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="noticeDelClose">×</span></div>
+            <div style="padding:24px;">确定要删除该公告吗？</div>
+            <div style="display:flex;justify-content:flex-end;gap:18px;margin:18px 0 0 0;">
+              <button class="btn-main" id="noticeDelOk">确定</button>
+              <button class="btn-line" id="noticeDelCancel">取消</button>
             </div>
           </div>
         </div>
       `;
-      // 绑定添加按钮事件
+      // 绑定弹窗关闭事件
+      document.getElementById('noticeDetailClose').onclick = function() {
+        document.getElementById('noticeDetailModal').style.display = 'none';
+      };
+      document.querySelectorAll('.notice-title-link').forEach(link => {
+        link.onclick = function(e) {
+          e.preventDefault();
+          document.getElementById('noticeDetailContent').textContent = '这里显示公告详情内容：' + this.dataset.title;
+          document.getElementById('noticeDetailModal').style.display = 'flex';
+        };
+      });
+      document.querySelectorAll('.notice-edit-btn').forEach(btn => {
+        btn.onclick = function() {
+          document.getElementById('noticeEditModal').style.display = 'flex';
+        };
+      });
+      document.getElementById('noticeEditClose').onclick = function() {
+        document.getElementById('noticeEditModal').style.display = 'none';
+      };
+      document.querySelectorAll('.notice-del-btn').forEach(btn => {
+        btn.onclick = function() {
+          document.getElementById('noticeDelModal').style.display = 'flex';
+        };
+      });
+      document.getElementById('noticeDelClose').onclick = function() {
+        document.getElementById('noticeDelModal').style.display = 'none';
+      };
+      document.getElementById('noticeDelCancel').onclick = function() {
+        document.getElementById('noticeDelModal').style.display = 'none';
+      };
+      document.getElementById('noticeDelOk').onclick = function() {
+        document.getElementById('noticeDelModal').style.display = 'none';
+        // 静态页面，无实际删除逻辑
+      };
+      // 新增按钮弹窗
       document.getElementById('noticeAddBtn').onclick = function() {
         document.getElementById('noticeAddModal').style.display = 'flex';
       };
@@ -1451,55 +1952,99 @@
       document.getElementById('noticeAddClose2').onclick = function() {
         document.getElementById('noticeAddModal').style.display = 'none';
       };
-      // 分类切换联动
-      var categorySelect = document.getElementById('noticeFileCategory');
-      var fileRow = document.getElementById('noticeFileUploadRow');
-      var linkRow = document.getElementById('noticeLinkRow');
-      categorySelect.onchange = function() {
-        if (categorySelect.value === '友情链接') {
-          fileRow.style.display = 'none';
-          linkRow.style.display = 'flex';
-          linkRow.querySelector('input[type=url]').setAttribute('required', 'required');
-        } else {
-          fileRow.style.display = 'flex';
-          linkRow.style.display = 'none';
-          linkRow.querySelector('input[type=url]').removeAttribute('required');
-        }
-      };
-      // 权限范围弹窗相关
-      document.getElementById('noticePermInput').onclick = openPermModal;
-      document.getElementById('noticePermBtn').onclick = openPermModal;
-      function openPermModal() {
-        document.getElementById('permSelectModal').style.display = 'flex';
-      }
-      document.getElementById('permSelectClose').onclick = function() {
-        document.getElementById('permSelectModal').style.display = 'none';
-      };
-      document.getElementById('permSelectCancel').onclick = function() {
-        document.getElementById('permSelectModal').style.display = 'none';
-      };
-      // tab切换
-      document.querySelectorAll('.perm-tab').forEach(tab => {
-        tab.onclick = function() {
-          document.querySelectorAll('.perm-tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          const tabName = this.getAttribute('data-tab');
-          document.querySelectorAll('.perm-list').forEach(list => {
-            list.style.display = list.getAttribute('data-tab') === tabName ? '' : 'none';
-          });
-        };
-      });
-      // 确定选择
-      document.getElementById('permSelectOk').onclick = function() {
+      // 权限范围弹窗相关JS
+      const permInput = document.getElementById('noticePermInput');
+      const permModal = document.getElementById('permSelectModal');
+      const permClose = document.getElementById('permSelectClose');
+      const permCancel = document.getElementById('permSelectCancel');
+      const permOk = document.getElementById('permSelectOk');
+      const permTabs = permModal.querySelectorAll('.perm-tab');
+      const permLists = permModal.querySelectorAll('.perm-list');
+      function openPermModal() { permModal.style.display = 'flex'; }
+      function closePermModal() { permModal.style.display = 'none'; }
+      permInput.onclick = openPermModal;
+      permClose.onclick = closePermModal;
+      permCancel.onclick = closePermModal;
+      permOk.onclick = function() {
         let selected = [];
-        document.querySelectorAll('.perm-list').forEach(list => {
+        permLists.forEach(list => {
           list.querySelectorAll('input[type=checkbox]:checked').forEach(cb => {
             selected.push(cb.value);
           });
         });
-        document.getElementById('noticePermInput').value = selected.join(', ');
-        document.getElementById('permSelectModal').style.display = 'none';
+        permInput.value = selected.join(', ');
+        closePermModal();
       };
+      permTabs.forEach(tab => {
+        tab.onclick = function() {
+          permTabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          permLists.forEach(list => {
+            list.style.display = list.getAttribute('data-tab') === tabName ? '' : 'none';
+          });
+        };
+      });
+      // 分类切换联动
+      var categorySelect = document.getElementById('noticeFileCategory');
+      var fileRow = document.getElementById('noticeFileUploadRow');
+      var linkRow = document.getElementById('noticeLinkRow');
+      var ssoConfigSection = document.getElementById('ssoConfigSection');
+      var ssoAdvancedToggle = document.getElementById('ssoAdvancedToggle');
+      var ssoAdvancedPanel = document.getElementById('ssoAdvancedPanel');
+
+      if (categorySelect) {
+      categorySelect.onchange = function() {
+        if (categorySelect.value === '友情链接') {
+          fileRow.style.display = 'none';
+          linkRow.style.display = 'flex';
+            ssoConfigSection.style.display = 'flex';
+            if (linkRow.querySelector('input[type=url]')) {
+          linkRow.querySelector('input[type=url]').setAttribute('required', 'required');
+            }
+        } else {
+          fileRow.style.display = 'flex';
+          linkRow.style.display = 'none';
+            ssoConfigSection.style.display = 'none';
+            ssoAdvancedPanel.style.display = 'none';
+            if(ssoAdvancedToggle) ssoAdvancedToggle.checked = false;
+            if (linkRow.querySelector('input[type=url]')) {
+          linkRow.querySelector('input[type=url]').removeAttribute('required');
+        }
+          }
+        };
+      }
+      
+      if (ssoAdvancedToggle) {
+        ssoAdvancedToggle.onchange = function() {
+          ssoAdvancedPanel.style.display = this.checked ? 'block' : 'none';
+      }
+      }
+
+      const ssoAdvancedCode = document.getElementById('ssoAdvancedCode');
+      const ssoCodeValidator = document.getElementById('ssoCodeValidator');
+
+      if (ssoAdvancedCode && ssoCodeValidator) {
+          ssoAdvancedCode.addEventListener('input', function() {
+              const code = this.value.trim();
+              if (!code) {
+                  ssoCodeValidator.textContent = '';
+                  this.style.borderColor = '#ccc';
+                  return;
+              }
+
+              try {
+                  JSON.parse(code);
+                  ssoCodeValidator.textContent = 'JSON 语法正确';
+                  ssoCodeValidator.style.color = 'green';
+                  this.style.borderColor = 'green';
+              } catch (e) {
+                  ssoCodeValidator.textContent = `语法错误: ${e.message}`;
+                  ssoCodeValidator.style.color = 'red';
+                  this.style.borderColor = 'red';
+              }
+          });
+      }
     }
 
     function showPushLogTabs() {
@@ -1669,22 +2214,56 @@
       });
     }
 
-    function showModelQueryTable() {
-      document.getElementById('mainContent').innerHTML = `
-        <div class="model-tabs-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
-          <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">模型查询</div>
-          <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型申请</div>
-          <div class="model-tab" data-tab="modify" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型修改</div>
-          <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型冻结</div>
-          <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型解冻</div>
-          <div class="model-tab" data-tab="review" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型审核</div>
-          <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型检索</div>
-        </div>
-        <div class="model-tab-content" id="modelTabContent">
-          ${renderModelQueryTab()}
-        </div>
-      `;
-      bindModelTabEvents();
+    // 全局变量保存快速查询显示状态
+    let modelQueryShowQueryBar = false;
+    function renderAndBindModelQueryTab() {
+      const tabContent = document.getElementById('modelTabContent');
+      tabContent.innerHTML = renderModelQueryTab(modelQueryShowQueryBar);
+      // 绑定事件和初始化控件
+      bindModelQueryQuickSearch();
+      initCustomMultiSelect('#model-type-select');
+      initDatePicker('#creation-time-picker', { mode: 'range' });
+      initDatePicker('#last-modified-time-picker', { mode: 'range' });
+      const creatorBtn = document.getElementById('creator-picker-btn');
+      if(creatorBtn) creatorBtn.onclick = openUserSelectModal;
+    }
+    function bindModelTabEvents() {
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.model-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.color = '#185a99';
+          });
+          this.classList.add('active');
+          this.style.color = '#2176c7';
+          const tabName = this.getAttribute('data-tab');
+          if (tabName === 'query') {
+            modelQueryShowQueryBar = false;
+            renderAndBindModelQueryTab();
+          } else if (tabName === 'apply') {
+            document.getElementById('modelTabContent').innerHTML = renderModelApplyTab();
+          } else if (tabName === 'modify') {
+            document.getElementById('modelTabContent').innerHTML = renderModelModifyTab();
+          } else if (tabName === 'freeze') {
+            document.getElementById('modelTabContent').innerHTML = renderModelFreezeTab();
+          } else if (tabName === 'unfreeze') {
+            document.getElementById('modelTabContent').innerHTML = renderModelUnfreezeTab();
+          } else if (tabName === 'search') {
+            document.getElementById('modelTabContent').innerHTML = renderModelSearchTab();
+          } else if (tabName === 'review') {
+            document.getElementById('modelTabContent').innerHTML = renderModelQueryTab();
+          }
+        };
+      });
+      renderAndBindModelQueryTab();
+    }
+    function bindModelQueryQuickSearch() {
+      const btn = document.getElementById('modelQuickSearchBtn');
+      if (!btn) return;
+      btn.onclick = function() {
+        modelQueryShowQueryBar = !modelQueryShowQueryBar;
+        renderAndBindModelQueryTab();
+      };
     }
     function renderModelQueryTab(showQueryBar = false) {
       return `
@@ -1702,334 +2281,190 @@
               <tr>
                 <th class="checkbox-cell"><input type="checkbox"></th>
                 <th>模型名称</th>
+                <th>模型编码</th>
                 <th>类型</th>
                 <th>层级展示</th>
-                <th>参数</th>
                 <th>创建人</th>
                 <th>创建时间</th>
                 <th>当前修改人</th>
                 <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
               </tr>
             </thead>
             ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
               <td class='checkbox-cell'></td>
               <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
-              <td><input type='text' placeholder='类型' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
               <td><input type='text' placeholder='层级展示' style='width:98%;'></td>
-              <td><input type='text' placeholder='参数' style='width:98%;'></td>
-              <td><input type='text' placeholder='创建人' style='width:98%;'></td>
-              <td><input type='text' placeholder='创建时间' style='width:98%;'></td>
+              <td style="min-width:133px;width:133px;">
+                <div style="position:relative;display:flex;align-items:center;">
+                  <input type='text' id='creator-picker' placeholder='请输入或选择创建人' style='width:100%;padding-right:32px;' />
+                  <span id="creator-picker-btn" style="position:absolute;right:8px;cursor:pointer;display:flex;align-items:center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2176c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </td>
+              <td><input type='text' id='creation-time-picker' placeholder='创建时间' style='width:98%;'></td>
               <td><input type='text' placeholder='当前修改人' style='width:98%;'></td>
               <td><input type='text' placeholder='最后修改人' style='width:98%;'></td>
+              <td><input type='text' id='last-modified-time-picker' placeholder='最后修改时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='版本' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='语言' style='width:98%;'></td>
             </tr>` : ''}
             <tbody>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">元数据</a></td>
+                <td>mdm_meta</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>admin</td>
                 <td>admin</td>
+                <td>2022-03-25</td>
+                <td>2</td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">模型类型</a></td>
+                <td>mdm_model_type</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>hefanqi</td>
                 <td>admin</td>
+                <td>2022-03-25</td>
+                <td>4</td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>admin</td>
                 <td>admin</td>
+                <td>2022-03-25</td>
+                <td>2</td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">字段类型</a></td>
+                <td>mdm_field_type</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>lichunyang</td>
                 <td>admin</td>
+                <td>2025-04-17</td>
+                <td>2</td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">是否</a></td>
+                <td>mdm_sys_if</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
-                <td>lichunyang</td>
                 <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>3</td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
                 <td><a href="#">操作类型</a></td>
+                <td>mdm_op_type</td>
                 <td>系统字典表</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>admin</td>
                 <td>admin</td>
+                <td>2025-06-11</td>
+                <td>4</td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">数据状态</a></td>
-                <td>系统字典表</td>
+                <td><a href="#">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>主数据</td>
                 <td>否</td>
-                <td></td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>admin</td>
                 <td>admin</td>
+                <td>2025-06-11</td>
+                <td>5</td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">大小写转换</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
+                <td><a href="#">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>主数据</td>
+                <td>是</td>
                 <td>admin</td>
                 <td>2019-01-01</td>
                 <td>admin</td>
                 <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">模型的分类</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">全半角转换</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>6</td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
               </tr>
             </tbody>
           </table>
             </div>
           `;
     }
-    function renderModelApplyTab() {
-      return `
-        <div class="action-bar">
-          <button class="btn-main"><span class="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          </span>快速查询</button>
-          <button class="btn-line"><span class="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
-          </span>高级查询</button>
-          <button class="btn-line"><span class="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          </span>新增</button>
-          <button class="btn-line"><span class="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/><path d="M12 20h9"/></svg>
-          </span>编辑</button>
-          <button class="btn-line"><span class="icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
-          </span>删除</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>模型名称</th>
-                <th>类型</th>
-                <th>层级展示</th>
-                <th>参数</th>
-                <th>创建人</th>
-                <th>创建时间</th>
-                <th>当前修改人</th>
-                <th>最后修改人</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">元数据</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">模型类型</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>hefanqi</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">文件类型</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">字段类型</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>lichunyang</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">是否</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>lichunyang</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">操作类型</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">数据状态</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">大小写转换</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">模型的分类</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">全半角转换</a></td>
-                <td>系统字典表</td>
-                <td>否</td>
-                <td></td>
-                <td>admin</td>
-                <td>2019-01-01</td>
-                <td>admin</td>
-                <td>admin</td>
-              </tr>
-            </tbody>
-          </table>
-            </div>
-          `;
-    }
-    function renderModelModifyTab() { return renderModelQueryTab(); }
-    function renderModelFreezeTab() { return renderModelQueryTab(); }
-    function renderModelUnfreezeTab() { return renderModelQueryTab(); }
-    function renderModelSearchTab() { return renderModelQueryTab(); }
-    function bindModelTabEvents() {
-      document.querySelectorAll('.model-tab').forEach(tab => {
-        tab.onclick = function() {
-          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          const tabName = this.getAttribute('data-tab');
-          const tabContent = document.getElementById('modelTabContent');
-          if (tabName === 'query') {
-            tabContent.innerHTML = renderModelQueryTab();
-            bindModelQueryQuickSearch();
-          } else if (tabName === 'apply') {
-            tabContent.innerHTML = renderModelApplyTab();
-          } else if (tabName === 'modify') {
-            tabContent.innerHTML = renderModelModifyTab();
-          } else if (tabName === 'freeze') {
-            tabContent.innerHTML = renderModelFreezeTab();
-          } else if (tabName === 'unfreeze') {
-            tabContent.innerHTML = renderModelUnfreezeTab();
-          } else if (tabName === 'search') {
-            tabContent.innerHTML = renderModelSearchTab();
-          } else if (tabName === 'review') {
-            tabContent.innerHTML = renderModelQueryTab();
-          }
-        };
-      });
-      bindModelQueryQuickSearch();
-    }
-    function bindModelQueryQuickSearch() {
-      const btn = document.getElementById('modelQuickSearchBtn');
-      if (!btn) return;
-      let show = false;
-      btn.onclick = function() {
-        show = !show;
-        const tabContent = document.getElementById('modelTabContent');
-        tabContent.innerHTML = renderModelQueryTab(show);
-        bindModelQueryQuickSearch();
-      };
-    }
+    function renderModelApplyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型申请功能暂未实现</div>`; }
+    function renderModelModifyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型修改功能暂未实现</div>`; }
+    function renderModelFreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型冻结功能暂未实现</div>`; }
+    function renderModelUnfreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型解冻功能暂未实现</div>`; }
+    function renderModelSearchTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型检索功能暂未实现</div>`; }
+
     // 主题设置下拉菜单逻辑
     const settingBtn = document.getElementById('settingBtn');
     const themeDropdown = document.getElementById('themeDropdown');
@@ -2598,6 +3033,180 @@
       console.log('Searching for:', searchInput.value);
       closeSearchModal();
     };
+
+    function showDegreeListTable() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="model-tabs-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
+          <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">查询</div>
+          <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">申请</div>
+          <div class="model-tab" data-tab="edit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">修改</div>
+          <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">冻结</div>
+          <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">解冻</div>
+          <div class="model-tab" data-tab="audit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">审核</div>
+          <div class="model-tab" data-tab="archive" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">归档</div>
+          <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">检索</div>
+        </div>
+        <div class="model-tab-content" id="degreeTabContent">
+          ${renderDegreeQueryTab()}
+        </div>
+      `;
+      bindDegreeTabEvents();
+    }
+    function renderDegreeQueryTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeQuickSearchBtn"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-line"><span class="icon">🕒</span>版本查看</button>
+          <button class="btn-line"><span class="icon">📋</span>查看详情</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+    }
+    function bindDegreeTabEvents() {
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          const tabContent = document.getElementById('degreeTabContent');
+          if (tabName === 'query') {
+            tabContent.innerHTML = renderDegreeQueryTab();
+          } else {
+            tabContent.innerHTML = `<div style='padding:32px;font-size:18px;color:#888;'>暂未实现</div>`;
+          }
+        };
+      });
+      // 可选：绑定快速查询等按钮事件
+    }
+    // JS联动逻辑
+    // 权限范围弹窗相关
+    document.getElementById('noticePermInput').onclick = openPermModal;
+    document.getElementById('noticePermBtn').onclick = openPermModal;
+    function openPermModal() {
+      document.getElementById('permSelectModal').style.display = 'flex';
+    }
+    document.getElementById('permSelectClose').onclick = function() {
+      document.getElementById('permSelectModal').style.display = 'none';
+    };
+    document.getElementById('permSelectCancel').onclick = function() {
+      document.getElementById('permSelectModal').style.display = 'none';
+    };
+    document.querySelectorAll('.perm-tab').forEach(tab => {
+      tab.onclick = function() {
+        document.querySelectorAll('.perm-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const tabName = this.getAttribute('data-tab');
+        document.querySelectorAll('.perm-list').forEach(list => {
+          list.style.display = list.getAttribute('data-tab') === tabName ? '' : 'none';
+        });
+      };
+    });
+    document.getElementById('permSelectOk').onclick = function() {
+      let selected = [];
+      document.querySelectorAll('.perm-list').forEach(list => {
+        list.querySelectorAll('input[type=checkbox]:checked').forEach(cb => {
+          selected.push(cb.value);
+        });
+      });
+      document.getElementById('noticePermInput').value = selected.join(', ');
+      document.getElementById('permSelectModal').style.display = 'none';
+    };
+
+    function initCustomMultiSelect(containerSelector) {
+        // 已移除多选功能，改为标准下拉框
+    }
+
+    function initDatePicker(selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+            flatpickr(el, {
+                locale: "zh",
+                dateFormat: "Y-m-d",
+            });
+        }
+    }
+
+    function renderModelTabPage() {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="model-tabs-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
+          <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">模型查询</div>
+          <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型申请</div>
+          <div class="model-tab" data-tab="modify" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型修改</div>
+          <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型冻结</div>
+          <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型解冻</div>
+          <div class="model-tab" data-tab="review" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型审核</div>
+          <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">模型检索</div>
+        </div>
+        <div class="model-tab-content" id="modelTabContent"></div>
+      `;
+    }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
 </body>
 </html> 

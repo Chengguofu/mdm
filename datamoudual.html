@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据模型管理</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <style>
+    :root {
+      --theme-bg: #f7faff;
+      --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+      --theme-sidebar: #fff;
+      --theme-content: #f4f8fb;
+      --theme-topbar-font: #fff;
+      --theme-menu-active: #2176c7;
+      --theme-menu-hover: #185a99;
+      --theme-table-header: #f4f8fb;
+      --theme-table-header-font: #2176c7;
+      --theme-table-row-hover: #f0f6fd;
+      --theme-table-border: #e3eaf3;
+      --theme-btn: #2176c7;
+      --theme-btn-hover: #185a99;
+      --theme-avatar-bg: #eaf3fb;
+      --theme-avatar-font: #2176c7;
+      --theme-content-text: #185a99;
+      --theme-shadow-color: rgba(33, 118, 199, 0.06);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+      background: var(--theme-content);
+      color: #222;
+      padding: 24px;
+    }
+    .model-tabs-bar {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1.5px solid var(--theme-table-border);
+      margin-bottom: 18px;
+    }
+    .model-tab {
+      padding: 12px 28px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: #185a99;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .model-tab.active {
+      color: var(--theme-menu-active);
+      border-bottom-color: var(--theme-menu-active);
+    }
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .btn-main {
+      background: #4db6ac;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0 18px;
+      height: 36px;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 500;
+      transition: background 0.18s;
+      cursor: pointer;
+    }
+    .btn-main:hover {
+      background: #399488;
+    }
+    .btn-line {
+      background: #fff;
+      color: #444;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 0 14px;
+      height: 36px;
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.18s, border 0.18s;
+      cursor: pointer;
+    }
+    .btn-line:hover {
+      background: #f5f7fa;
+      border-color: #b0b8c1;
+    }
+    .action-bar .icon {
+      margin-right: 6px;
+      display: flex;
+      align-items: center;
+    }
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px var(--theme-shadow-color);
+      padding: 18px 0 0 0;
+      overflow-x: auto;
+    }
+    table.model-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 15px;
+      background: #fff;
+      min-width: 1100px;
+    }
+    .model-table th, .model-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--theme-table-border);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .model-table th {
+      background: var(--theme-table-header);
+      color: var(--theme-table-header-font);
+      font-weight: 600;
+    }
+    .model-table tr:last-child td {
+      border-bottom: none;
+    }
+    .model-table tr:hover td {
+      background: var(--theme-table-row-hover);
+    }
+    .model-table td a {
+      color: #185a99;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .model-table td a:hover {
+      color: var(--theme-menu-active);
+    }
+    .model-table td {
+      color: #222;
+    }
+    .model-table td.center {
+      text-align: center;
+    }
+    .model-table td.checkbox-cell, .model-table th.checkbox-cell {
+      width: 36px;
+      text-align: center;
+    }
+    .query-bar-row input, .query-bar-row select {
+        padding: 4px 8px;
+        border: 1.2px solid #c0d3eb;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fdfdff;
+    }
+    .modal-mask {
+        position: fixed;
+        left: 0; top: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.15);
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-mask.show { display: flex; }
+    .modal-content {
+        background: #fff;
+        border-radius: 8px;
+        max-width: 900px;
+        width: 90vw;
+        max-height: 80vh;
+        overflow: auto;
+        box-shadow: 0 4px 24px rgba(33,118,199,0.13);
+        position: relative;
+    }
+    #advancedSearchModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, .45);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    #advancedSearchModal .modal-content-wrapper {
+        width: 900px;
+        max-width: 95vw;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    #advancedSearchModal .modal-header {
+      background-color: #002140;
+      color: white;
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 18px;
+      font-weight: 500;
+      border-radius: 4px 4px 0 0;
+      cursor: move;
+    }
+    #advancedSearchModal .modal-body {
+      padding: 24px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    #advancedSearchModal .modal-footer {
+      padding: 10px 16px;
+      text-align: right;
+      border-top: 1px solid #f0f0f0;
+    }
+    #advancedSearchModal .btn {
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 2px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    #advancedSearchModal .btn-primary { background-color: #1890ff; color: #fff; border-color: #1890ff; }
+    #advancedSearchModal .btn-default { background-color: #fff; color: rgba(0,0,0,.85); border-color: #d9d9d9; }
+    .query-builder { display: flex; flex-direction: column; gap: 16px; }
+    .query-row { display: grid; grid-template-columns: 150px 150px 1fr; gap: 8px; align-items: center; }
+    .query-row label { font-weight: 500; text-align: right; padding-right: 8px; }
+    .query-value-container { display: flex; gap: 8px; align-items: center; }
+    .query-value-container .form-control { width: 100%; box-sizing: border-box; }
+    #advancedSearchModal .form-control {
+      height: 32px; padding: 4px 11px; font-size: 14px;
+      color: rgba(0,0,0,.85); background-color: #fff;
+      border: 1px solid #d9d9d9; border-radius: 2px; transition: all .3s;
+    }
+    #advancedSearchModal .form-control:focus {
+      border-color: #40a9ff; outline: 0; box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+    }
+    #creatorModal { z-index: 1050; }
+    #creatorModal .modal-dialog {
+      background: #fff; border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      width: 800px; max-width: 90vw;
+      display: flex; flex-direction: column;
+    }
+    .column-filter { width: 95%; padding: 4px 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+    .user-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .user-table th, .user-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+    .user-table thead th { background-color: #fafafa; font-weight: 500; }
+    .user-table .filter-row th { padding: 8px 0; background-color: #fafafa; }
+
+    /* Choices.js Customizations */
+    #advancedSearchModal .choices { width: 100%; margin: 0; }
+    #advancedSearchModal .choices.is-disabled .choices__inner,
+    #advancedSearchModal .choices.is-disabled .choices__input { background-color: #f5f5f5; cursor: not-allowed; }
+    #advancedSearchModal .choices__inner { min-height: 32px; height: 100%; background-color: #fff; border: 1px solid #d9d9d9; border-radius: 2px; font-size: 14px; padding: 1px 7px 0; }
+    #advancedSearchModal .is-focused .choices__inner { border-color: #40a9ff !important; box-shadow: 0 0 0 2px rgba(24, 144, 255, .2) !important; }
+    #advancedSearchModal .choices__list--multiple .choices__item { background-color: #1890ff; border: 1px solid #1890ff; border-radius: 4px; color: white; }
+    #advancedSearchModal .choices[data-type*="select-multiple"] .choices__button, 
+    #advancedSearchModal .choices[data-type*="text"] .choices__button { border-left: 1px solid rgba(255,255,255,0.5); margin-left: 5px; }
+    #advancedSearchModal .choices__input { font-size: 14px; margin-bottom: 0; background-color: transparent !important; }
+    .modal-mask-version {
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(30,40,60,0.10);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-mask-version.show { display: flex; }
+    #versionModal .modal-dialog {
+      margin: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      border-radius: 20px;
+      background: #fff;
+      width: 98vw;
+      max-width: 1500px;
+      min-height: 70vh;
+      overflow: hidden;
+    }
+    #versionModal .modal-header {
+      background: #f6f7fa;
+      color: #222;
+      padding: 18px 32px 12px 32px;
+      display: flex;
+      align-items: center;
+      border-radius: 20px 20px 0 0;
+      border-bottom: 1px solid #e6eaf0;
+    }
+    #versionModal .modal-title {
+      font-size: 1.18rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin: 0;
+      flex: 1;
+      text-align: left;
+    }
+    #closeVersionModal {
+      background: none;
+      border: none;
+      color: #f44336;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.18s;
+    }
+    #closeVersionModal:hover {
+      background: #ffeaea;
+    }
+    .version-modal-btns {
+      display: flex;
+      gap: 16px;
+      padding: 0 32px 0 32px;
+      margin-top: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .version-modal-btns .btn {
+      background: #2176c7;
+      border: none;
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 8px 22px;
+      display: flex; align-items: center; gap: 8px;
+      transition: background 0.18s;
+      box-shadow: none;
+      min-width: 120px;
+      cursor: pointer;
+    }
+    .version-modal-btns .btn svg {
+      stroke: #fff;
+    }
+    .version-modal-btns .btn:hover {
+      background: #125ea7;
+    }
+    #versionModalCloseBtn {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      padding: 8px 32px;
+      font-weight: 500;
+      transition: background 0.18s;
+      box-shadow: none;
+      margin-left: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #versionModalCloseBtn svg {
+      stroke: #fff;
+    }
+    #versionModalCloseBtn:hover {
+      background: #125ea7;
+    }
+    #versionModal .model-table {
+      margin: 18px 0 0 0;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 15px;
+      background: #fff;
+      box-shadow: none;
+    }
+    #versionModal .model-table thead tr {
+      background: #fff;
+    }
+    #versionModal .model-table th {
+      color: #2176c7;
+      font-weight: 600;
+      padding: 10px 0 6px 0;
+      border-bottom: 1.5px solid #e6eaf0;
+      text-align: left;
+      font-size: 15px;
+    }
+    #versionModal .model-table td {
+      padding: 13px 0;
+      text-align: left;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 15px;
+      background: #fff;
+    }
+    #versionModal .model-table tr:hover td {
+      background: #f8fafc;
+    }
+    #versionModal .model-table a {
+      color: #2176c7;
+      text-decoration: underline;
+      transition: color 0.18s;
+    }
+    #versionModal .model-table a:hover {
+      color: #125ea7;
+    }
+    #versionModal .model-table input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: #2176c7;
+    }
+    #versionModal .model-table .filter-row input {
+      width: 90%;
+      border: 1px solid #e6eaf0;
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-size: 14px;
+      background: #f6f7fa;
+      margin-bottom: 2px;
+    }
+    #versionModal .model-table .filter-row td {
+      padding: 4px 0 4px 0;
+      background: #f6f7fa;
+      border-bottom: 1.5px solid #e6eaf0;
+    }
+    .version-modal-footer-bar {
+      padding: 10px 32px 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      color: #888;
+    }
+    .version-modal-pagination {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .version-modal-pagination .btn {
+      border-radius: 6px;
+      border: none;
+      background: #2176c7;
+      color: #fff;
+      font-size: 15px;
+      padding: 2px 10px;
+      min-width: 32px;
+      transition: background 0.18s, color 0.18s;
+    }
+    .version-modal-pagination .btn:disabled {
+      color: #bbb;
+      background: #e6eaf0;
+    }
+    .version-modal-pagination select, .version-modal-pagination input[type="text"] {
+      border: 1px solid #e6eaf0;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 15px;
+      width: 48px;
+      text-align: center;
+      background: #fff;
+    }
+    #versionModal .modal-footer {
+      padding: 16px 32px 16px 32px;
+      display: flex;
+      justify-content: flex-end;
+      background: #fff;
+      border-radius: 0 0 20px 20px;
+      border-top: 1px solid #e6eaf0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="model-tabs-bar">
+    <div class="model-tab active" data-tab="query">模型查询</div>
+    <div class="model-tab" data-tab="apply">模型申请</div>
+    <div class="model-tab" data-tab="modify">模型修改</div>
+    <div class="model-tab" data-tab="freeze">模型冻结</div>
+    <div class="model-tab" data-tab="unfreeze">模型解冻</div>
+    <div class="model-tab" data-tab="review">模型审核</div>
+    <div class="model-tab" data-tab="search">模型检索</div>
+  </div>
+  <div class="model-tab-content" id="modelTabContent"></div>
+
+  <div id="advancedSearchModal">
+    <div class="modal-content-wrapper" id="advancedSearchModalContent">
+        <div class="modal-header">高级查询</div>
+        <div class="modal-body">
+          <div class="query-builder" id="queryBuilder">
+            <div class="query-row">
+                <label>状态</label>
+                <select class="form-control operator-select" style="width:120px;"><option>包含</option></select>
+                <div class="query-value-container">
+                    <select id="adv-status-select" multiple></select>
+                </div>
+            </div>
+            <div class="query-row">
+                <label>代码</label>
+                <select class="form-control operator-select" style="width:120px;"><option>等于</option></select>
+                <div class="query-value-container">
+                    <input type="text" class="form-control" placeholder="多值用空格分隔">
+                </div>
+            </div>
+            <div class="query-row">
+                <label>创建人</label>
+                <select class="form-control operator-select" style="width:120px;"><option>等于</option></select>
+                <div class="query-value-container">
+                    <input type="text" class="form-control" id="adv-creator-input" readonly placeholder="请选择创建人">
+                    <button class="btn btn-primary" id="adv-creator-btn" style="padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="query-row">
+                <label>员工人数</label>
+                <select class="form-control operator-select" style="width:120px;"><option>等于</option></select>
+                <div class="query-value-container">
+                    <input type="number" class="form-control" placeholder="请输入员工人数">
+                </div>
+            </div>
+            <div class="query-row">
+                <label>创建时间</label>
+                <select class="form-control operator-select" style="width:120px;"><option>等于</option></select>
+                <div class="query-value-container">
+                    <input type="text" class="form-control" id="adv-creation-time" placeholder="请选择时间">
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="advSearchSubmitBtn">高级查询</button>
+          <button class="btn btn-default" id="advSearchCloseBtn">关闭</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Creator Selection Modal -->
+  <div class="modal-mask" id="creatorMask">
+    <div id="creatorSelectionModal" class="modal" style="display:block;position:static;background:none;box-shadow:none;">
+      <div class="modal-dialog" style="width: 600px; margin: 0 auto;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">选择创建人</h5>
+            <button type="button" class="close-btn" id="closeCreatorModal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <table class="table" id="creator-table">
+              <thead>
+                <tr>
+                  <th style="width: 10%;"><input type="checkbox" disabled></th>
+                  <th style="width: 25%;">用户编码</th>
+                  <th style="width: 30%;">用户名</th>
+                  <th style="width: 35%;">单位名称</th>
+                </tr>
+                <tr class="filter-row">
+                  <td></td>
+                  <td><input type="text" class="form-control" placeholder="筛选编码" data-column="1"></td>
+                  <td><input type="text" class="form-control" placeholder="筛选名称" data-column="2"></td>
+                  <td><input type="text" class="form-control" placeholder="筛选单位" data-column="3"></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="radio" name="creator-select" value="admin"></td>
+                  <td>admin</td>
+                  <td>管理员</td>
+                  <td>总部</td>
+                </tr>
+                <tr>
+                  <td><input type="radio" name="creator-select" value="hefanqi"></td>
+                  <td>hefanqi</td>
+                  <td>何凡奇</td>
+                  <td>研发部</td>
+                </tr>
+                <tr>
+                  <td><input type="radio" name="creator-select" value="lichunyang"></td>
+                  <td>lichunyang</td>
+                  <td>李春阳</td>
+                  <td>产品部</td>
+                </tr>
+                <tr>
+                  <td><input type="radio" name="creator-select" value="zhangsan"></td>
+                  <td>zhangsan</td>
+                  <td>张三</td>
+                  <td>市场部</td>
+                </tr>
+                <tr>
+                  <td><input type="radio" name="creator-select" value="lisi"></td>
+                  <td>lisi</td>
+                  <td>李四</td>
+                  <td>测试部</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" id="cancelCreatorSelection">取消</button>
+            <button type="button" class="btn btn-primary" id="confirmCreatorSelection">确定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 人员选择弹窗（表格风格） -->
+  <div id="userSelectModal" class="modal-mask">
+    <div class="modal-content">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">选择人员 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="userSelectClose">×</span></div>
+      <div style="padding:20px;">
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+          <input type="text" id="userSearchInput" placeholder="用户名称/编码" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;">
+          <button id="userSearchBtn" style="background:#2176c7;color:#fff;padding:6px 18px;border:none;border-radius:4px;font-size:15px;">查询</button>
+        </div>
+        <div style="overflow:auto;max-height:340px;">
+          <table class="model-table" style="min-width:700px;">
+            <thead>
+              <tr>
+                <th style="width:40px;"><input type="checkbox" id="userSelectAll"></th>
+                <th>用户编码</th>
+                <th>用户名</th>
+                <th>单位名称</th>
+                <th>创建人编码</th>
+                <th style="min-width:133px;width:133px;">创建人名称</th>
+                <th>创建时间</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr><td><input type="checkbox"></td><td>user001</td><td>张三</td><td>研发部</td><td>admin</td><td>管理员</td><td>2023-01-15</td></tr>
+                <tr><td><input type="checkbox"></td><td>user002</td><td>李四</td><td>市场部</td><td>admin</td><td>管理员</td><td>2023-02-20</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+          <button type="button" id="userSelectOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
+          <button type="button" id="userSelectCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 版本查询模态弹窗 -->
+  <div class="modal-mask-version" id="versionMask">
+    <div id="versionModal" class="modal" style="display:block;position:static;background:none;box-shadow:none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="modal-title">版本查询</span>
+            <button type="button" id="closeVersionModal">&times;</button>
+          </div>
+          <div class="version-modal-btns">
+            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>导出历史版本</button>
+            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>历史版本间比较</button>
+            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v4l3 3"/></svg>与最新版本比较</button>
+            <button class="btn" id="versionModalCloseBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>关闭</button>
+          </div>
+          <div style="padding:0 32px 0 32px;">
+            <table class="model-table">
+              <thead>
+                <tr>
+                  <th class="checkbox-cell"><input type="checkbox"></th>
+                  <th>模型名称</th>
+                  <th>模型编码</th>
+                  <th>类型</th>
+                  <th>层级展示</th>
+                  <th>创建人</th>
+                  <th>创建时间</th>
+                  <th>当前修改人</th>
+                  <th>最后修改人</th>
+                  <th>最后修改时间</th>
+                  <th>版本</th>
+                  <th>审核人</th>
+                  <th>状态</th>
+                  <th>语言</th>
+                </tr>
+                <tr class="filter-row">
+                  <td></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                  <td><input type="text" placeholder="" /></td>
+                </tr>
+              </thead>
+              <tbody id="versionModalTableBody">
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">元数据</a></td>
+                  <td>mdm_meta</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2022-03-25</td>
+                  <td><a href="#" class="version-link">2</a></td>
+                  <td>张三</td>
+                  <td>正常</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">元数据</a></td>
+                  <td>mdm_meta</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2022-03-25</td>
+                  <td><a href="#" class="version-link">2</a></td>
+                  <td>张三</td>
+                  <td>正常</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">元数据</a></td>
+                  <td>mdm_meta</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2022-03-25</td>
+                  <td><a href="#" class="version-link">2</a></td>
+                  <td>张三</td>
+                  <td>正常</td>
+                  <td>中文</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="version-modal-footer-bar">
+            <div>共 2 条</div>
+            <div class="version-modal-pagination">
+              <button class="btn" disabled>&lt;&lt;</button>
+              <button class="btn" disabled>&lt;</button>
+              <span>1</span>
+              <span>/</span>
+              <span>1</span>
+              <select><option>50</option><option>100</option></select>
+              <span>条/页</span>
+              <button class="btn" disabled>&gt;</button>
+              <button class="btn" disabled>&gt;&gt;</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="versionModalCloseBtn">关闭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        bindModelTabEvents();
+        document.querySelector('.model-tab.active').click();
+
+        // Bind user select modal events
+        document.getElementById('userSelectClose').onclick = closeUserSelectModal;
+        document.getElementById('userSelectCancel').onclick = closeUserSelectModal;
+        document.getElementById('userSelectOk').onclick = () => {
+            const selected = document.querySelector('#userTableBody input:checked');
+            if (selected) {
+                const userName = selected.closest('tr').children[2].textContent;
+                const creatorPicker = document.getElementById('creator-picker');
+                if(creatorPicker) creatorPicker.value = userName;
+            }
+            closeUserSelectModal();
+        };
+
+        // Bind advanced search modal events
+        const advSearchBtn = document.getElementById('advancedSearchBtn');
+        if(advSearchBtn) {
+            advSearchBtn.onclick = openAdvancedSearchModal;
+        }
+    });
+
+    // 全局变量保存快速查询显示状态
+    let modelQueryShowQueryBar = false;
+    
+    function initDatePicker(selector) {
+        const el = document.querySelector(selector);
+        if (el) {
+            flatpickr(el, {
+                locale: "zh",
+                dateFormat: "Y-m-d",
+                mode: 'range'
+            });
+        }
+    }
+
+    function openUserSelectModal() {
+        document.getElementById('userSelectModal').style.display = 'flex';
+    }
+    function closeUserSelectModal() {
+        document.getElementById('userSelectModal').style.display = 'none';
+    }
+
+    function renderAndBindModelQueryTab() {
+      const tabContent = document.getElementById('modelTabContent');
+      tabContent.innerHTML = renderModelQueryTab(modelQueryShowQueryBar);
+      // 绑定事件和初始化控件
+      bindModelQueryQuickSearch();
+      initDatePicker('#creation-time-picker');
+      initDatePicker('#last-modified-time-picker');
+      const creatorBtn = document.getElementById('creator-picker-btn');
+      if(creatorBtn) creatorBtn.onclick = openUserSelectModal;
+    }
+
+    function bindModelTabEvents() {
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.model-tab').forEach(t => {
+            t.classList.remove('active');
+          });
+          this.classList.add('active');
+
+          // As per request, all tabs now show the query view.
+          modelQueryShowQueryBar = false;
+          renderAndBindModelQueryTab();
+        };
+      });
+    }
+
+    function bindModelQueryQuickSearch() {
+      const btn = document.getElementById('modelQuickSearchBtn');
+      if (!btn) return;
+      btn.onclick = function() {
+        modelQueryShowQueryBar = !modelQueryShowQueryBar;
+        renderAndBindModelQueryTab();
+      };
+    }
+
+    let advancedSearchInitialized = false;
+    function openAdvancedSearchModal() {
+        document.getElementById('advancedSearchModal').style.display = 'flex';
+        if (!advancedSearchInitialized) {
+            initializeAdvancedSearch();
+            advancedSearchInitialized = true;
+        }
+    }
+
+    function closeAdvancedSearchModal() {
+        document.getElementById('advancedSearchModal').style.display = 'none';
+    }
+
+    // --- Advanced Search Logic (ported from advanced_search.html) ---
+    const allUsers = [
+      { code: 'admin', name: '管理员', company: '总部' },
+      { code: 'hefanqi', name: '何凡奇', company: '研发部' },
+      { code: 'lichunyang', name: '李春阳', company: '产品部' },
+      { code: 'zhangsan', name: '张三', company: '市场部' },
+      { code: 'lisi', name: '李四', company: '测试部' }
+    ];
+
+    let activeCreatorInputId = null;
+
+    function initializeAdvancedSearch() {
+        const advSearchCloseBtn = document.getElementById('advSearchCloseBtn');
+        if(advSearchCloseBtn) advSearchCloseBtn.onclick = closeAdvancedSearchModal;
+
+        // Init Status multi-select
+        const statusSelect = document.getElementById('adv-status-select');
+        if (statusSelect) {
+            const choices = new Choices(statusSelect, {
+                removeItemButton: true,
+                placeholderValue: '请选择状态',
+                searchPlaceholderValue: '搜索状态',
+            });
+            choices.setChoices([
+                { value: '草稿', label: '草稿' },
+                { value: '停用', label: '停用' },
+                { value: '正常', label: '正常' },
+                { value: '待提交', label: '待提交' }
+            ], 'value', 'label', false);
+        }
+
+        // Init Creator selection
+        const advCreatorBtn = document.getElementById('adv-creator-btn');
+        const advCreatorInput = document.getElementById('adv-creator-input');
+        
+        const creatorModal = document.getElementById('creatorSelectionModal');
+        const closeCreatorModalBtn = document.getElementById('closeCreatorModal');
+        const cancelCreatorBtn = document.getElementById('cancelCreatorSelection');
+        const confirmCreatorBtn = document.getElementById('confirmCreatorSelection');
+
+        advCreatorBtn.addEventListener('click', () => {
+            document.getElementById('creatorMask').classList.add('show');
+        });
+
+        const hideCreatorModal = () => {
+            document.getElementById('creatorMask').classList.remove('show');
+        };
+
+        closeCreatorModalBtn.addEventListener('click', hideCreatorModal);
+        cancelCreatorBtn.addEventListener('click', hideCreatorModal);
+
+        confirmCreatorBtn.addEventListener('click', () => {
+            const selected = document.querySelector('input[name="creator-select"]:checked');
+            if (selected) {
+                const row = selected.closest('tr');
+                advCreatorInput.value = row.cells[2].innerText;
+            }
+            hideCreatorModal();
+        });
+        
+        // Creator table filtering
+        const filterInputs = document.querySelectorAll('#creator-table .filter-row input');
+        filterInputs.forEach(input => {
+            input.addEventListener('keyup', () => {
+                const tableBody = document.getElementById('creator-table').querySelector('tbody');
+                const rows = tableBody.getElementsByTagName('tr');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    let display = true;
+                    filterInputs.forEach(filter => {
+                        const colIndex = parseInt(filter.getAttribute('data-column'));
+                        const cell = rows[i].getElementsByTagName('td')[colIndex];
+                        if (cell) {
+                            const cellValue = cell.textContent || cell.innerText;
+                            if (cellValue.toUpperCase().indexOf(filter.value.toUpperCase()) === -1) {
+                                display = false;
+                            }
+                        }
+                    });
+                    rows[i].style.display = display ? '' : 'none';
+                }
+            });
+        });
+
+        populateUserTable(allUsers);
+
+        // Init Date picker
+        const dateInput = document.getElementById('adv-creation-time');
+        if (dateInput) {
+            flatpickr(dateInput, {
+                locale: 'zh',
+                dateFormat: 'Y-m-d'
+            });
+        }
+    }
+    
+    function populateUserTable(users, filter = {}) {
+      const tableBody = document.getElementById('userTableBodyAdv');
+      tableBody.innerHTML = '';
+      users
+        .filter(u => (!filter.code || u.code.includes(filter.code)) &&
+                       (!filter.name || u.name.includes(filter.name)) &&
+                       (!filter.company || u.company.includes(filter.company)))
+        .forEach(user => {
+          const row = `<tr>
+            <td><input type="radio" name="user_select" data-name="${user.name}"></td>
+            <td>${user.code}</td>
+            <td>${user.name}</td>
+            <td>${user.company}</td>
+          </tr>`;
+          tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    // --- End of Advanced Search Logic ---
+
+    function renderModelQueryTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='层级展示' style='width:98%;'></td>
+              <td style="min-width:133px;width:133px;">
+                <div style="position:relative;display:flex;align-items:center;">
+                  <input type='text' id='creator-picker' placeholder='请输入或选择创建人' style='width:100%;padding-right:32px;' />
+                  <span id="creator-picker-btn" style="position:absolute;right:8px;cursor:pointer;display:flex;align-items:center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2176c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </td>
+              <td><input type='text' id='creation-time-picker' placeholder='创建时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='当前修改人' style='width:98%;'></td>
+              <td><input type='text' placeholder='最后修改人' style='width:98%;'></td>
+              <td><input type='text' id='last-modified-time-picker' placeholder='最后修改时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='版本' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='语言' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelApplyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型申请功能暂未实现</div>`; }
+    function renderModelModifyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型修改功能暂未实现</div>`; }
+    function renderModelFreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型冻结功能暂未实现</div>`; }
+    function renderModelUnfreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型解冻功能暂未实现</div>`; }
+    function renderModelSearchTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型检索功能暂未实现</div>`; }
+
+    // 版本弹窗逻辑（事件委托，兼容动态渲染）
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('version-link')) {
+        e.preventDefault();
+        document.getElementById('versionMask').classList.add('show');
+      }
+    });
+    document.getElementById('closeVersionModal').onclick = function() {
+      document.getElementById('versionMask').classList.remove('show');
+    };
+    document.getElementById('versionModalCloseBtn').onclick = function() {
+      document.getElementById('versionMask').classList.remove('show');
+    };
+
+  </script>
+</body>
+</html> 

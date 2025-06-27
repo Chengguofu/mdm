@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模型版本对比</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+      background: #f7faff;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 36px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(33,118,199,0.10);
+      padding: 32px 36px 28px 36px;
+    }
+    h2 {
+      color: #2176c7;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .version-select-bar {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+    .version-select-bar label {
+      font-weight: 500;
+      color: #185a99;
+      font-size: 15px;
+    }
+    .version-select-bar select {
+      padding: 6px 14px;
+      border: 1.2px solid #c0d3eb;
+      border-radius: 4px;
+      font-size: 15px;
+      background: #fdfdff;
+    }
+    .section-title {
+      color: #2176c7;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 32px 0 16px 0;
+      border-left: 4px solid #2176c7;
+      padding-left: 10px;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      background: #fff;
+      font-size: 15px;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e3eaf3;
+      padding: 8px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .compare-table th {
+      background: #f4f8fb;
+      color: #2176c7;
+      font-weight: 600;
+    }
+    .diff {
+      background: #fff3e0 !important;
+      color: #d84315 !important;
+      font-weight: bold;
+    }
+    .attr-table-wrap {
+      overflow-x: auto;
+      background: #f7faff;
+      border-radius: 8px;
+      padding-bottom: 8px;
+    }
+    .attr-table {
+      min-width: 1200px;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+    }
+    .attr-table th, .attr-table td {
+      border: 1px solid #e3eaf3;
+      padding: 6px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .attr-table th {
+      background: #f4f8fb;
+      color: #2176c7;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .attr-table .diff {
+      background: #fff3e0 !important;
+      color: #d84315 !important;
+      font-weight: bold;
+    }
+    .field-name {
+      color: #2176c7;
+      font-weight: 500;
+    }
+    .attr-table tr:hover td {
+      background: #f0f6fd;
+    }
+    .legend {
+      margin: 18px 0 0 0;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>模型版本对比</h2>
+    <div class="version-select-bar">
+      <label>选择版本1：</label>
+      <select id="ver1">
+        <option value="v1">v1（2024-01-01）</option>
+        <option value="v2">v2（2024-06-01）</option>
+      </select>
+      <label>对比</label>
+      <select id="ver2">
+        <option value="v2">v2（2024-06-01）</option>
+        <option value="v1">v1（2024-01-01）</option>
+      </select>
+      <button id="compareBtn" style="margin-left:18px;padding:6px 22px;background:#2176c7;color:#fff;border:none;border-radius:4px;font-size:15px;cursor:pointer;">对比</button>
+      <label style="margin-left:32px;font-size:15px;color:#2176c7;display:flex;align-items:center;gap:4px;">
+        <input type="checkbox" id="showDiffOnly" style="vertical-align:middle;"> 只显示变化项
+      </label>
+    </div>
+    <div class="section-title">基本配置对比</div>
+    <table class="compare-table" id="baseTable">
+      <thead>
+        <tr>
+          <th>配置项</th>
+          <th>版本1</th>
+          <th>版本2</th>
+        </tr>
+      </thead>
+      <tbody id="baseTableBody">
+      </tbody>
+    </table>
+    <div class="section-title">属性配置对比</div>
+    <div class="attr-table-wrap">
+      <table class="attr-table" id="attrTable">
+        <thead>
+          <tr>
+            <th style="position:relative;">
+              字段名
+              <button id="fieldFilterBtn" style="margin-left:8px;background:none;border:none;cursor:pointer;font-size:12px;color:#2176c7;">▼</button>
+              <div id="fieldFilterDropdown" style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #ddd;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:1000;min-width:150px;padding:8px;">
+                <div style="margin-bottom:8px;font-size:12px;color:#666;">选择字段：</div>
+                <div id="fieldFilterOptions"></div>
+                <div style="margin-top:8px;border-top:1px solid #eee;padding-top:8px;">
+                  <button id="selectAllFields" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:12px;margin-right:8px;">全选</button>
+                  <button id="clearAllFields" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:12px;">清空</button>
+                </div>
+              </div>
+            </th>
+            <th style="position:relative;">
+              属性名
+              <button id="attrFilterBtn" style="margin-left:8px;background:none;border:none;cursor:pointer;font-size:12px;color:#2176c7;">▼</button>
+              <div id="attrFilterDropdown" style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #ddd;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:1000;min-width:150px;padding:8px;">
+                <div style="margin-bottom:8px;font-size:12px;color:#666;">选择属性：</div>
+                <div id="attrFilterOptions"></div>
+                <div style="margin-top:8px;border-top:1px solid #eee;padding-top:8px;">
+                  <button id="selectAllAttrs" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:12px;margin-right:8px;">全选</button>
+                  <button id="clearAllAttrs" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:12px;">清空</button>
+                </div>
+              </div>
+            </th>
+            <th>版本1</th>
+            <th>版本2</th>
+          </tr>
+        </thead>
+        <tbody id="attrTableBody">
+        </tbody>
+      </table>
+    </div>
+    <div class="legend">橙色高亮表示该项有差异或发生了变化</div>
+  </div>
+  <script>
+    // 基本配置数据
+    const baseFields = [
+      { key: 'category', label: '模型分类' },
+      { key: 'mainType', label: '主数据类型' },
+      { key: 'code', label: '模型编码' },
+      { key: 'name', label: '模型名称' },
+      { key: 'desc', label: '模型描述' },
+      { key: 'tree', label: '是否树形展示' },
+      { key: 'refMain', label: '引用主数据' },
+      { key: 'refField', label: '引用字段' }
+    ];
+    const baseDataV1 = {
+      category: '平面模型',
+      mainType: '系统字典表',
+      code: 'mdm_sys_meta',
+      name: '元数据',
+      desc: '系统内置字典表',
+      tree: '否',
+      refMain: '',
+      refField: ''
+    };
+    const baseDataV2 = {
+      category: '平面模型',
+      mainType: '系统字典表',
+      code: 'mdm_sys_meta',
+      name: '元数据（新版）',
+      desc: '新版系统内置字典表，支持多语言',
+      tree: '否',
+      refMain: '',
+      refField: ''
+    };
+    // 属性配置数据
+    const attrRows = [
+      // 编码字段
+      ['编码', '元属性编码', 'code', 'code'],
+      ['编码', '是否引用元数据描述', '否', '否'],
+      ['编码', '元属性名称', '编码', '编码'],
+      ['编码', '取值方式', '自动生成', '自动生成'],
+      ['编码', '字段类型', '字符型', '字符型'],
+      ['编码', '长度 (byte)', '32', '32'],
+      ['编码', '是否敏感信息', '否', '否'],
+      ['编码', '敏感起始位置', '', ''],
+      ['编码', '敏感终止位置', '', ''],
+      ['编码', '是否必填', '是', '是'],
+      ['编码', '小数位长度', '', ''],
+      ['编码', '默认值', '', ''],
+      ['编码', '字典表引用', '', ''],
+      ['编码', '字典表引用字段', '', ''],
+      ['编码', '是否显示字典表代码', '', ''],
+      ['编码', '字典表筛选字段', '', ''],
+      ['编码', '字典表筛选条件', '', ''],
+      ['编码', '是否树节点', '否', '否'],
+      ['编码', '节点描述', '', ''],
+      ['编码', '根节点', '', ''],
+      ['编码', '节点描述字段', '', ''],
+      ['编码', '是否显示树名称', '', ''],
+      ['编码', '关联主数据', '', ''],
+      ['编码', '大小写转换', '', ''],
+      ['编码', '全半角转换', '', ''],
+      ['编码', '是否过滤空格', '是', '是'],
+      ['编码', '是否可编辑', '否', '否'],
+      ['编码', '最大长度', '32', '32'],
+      ['编码', '最小长度', '1', '1'],
+      ['编码', '是否启用', '是', '是'],
+      ['编码', '上下限', '', ''],
+      ['编码', '上限', '', ''],
+      ['编码', '下限', '', ''],
+      ['编码', '是否唯一', '是', '是'],
+      ['编码', '校验类型', '字母数字', '字母数字'],
+      ['编码', '检验正则表达式', '', ''],
+      // 名称字段
+      ['名称', '元属性编码', 'name', 'name'],
+      ['名称', '是否引用元数据描述', '否', '否'],
+      ['名称', '元属性名称', '名称', '名称'],
+      ['名称', '取值方式', '文本', '文本'],
+      ['名称', '字段类型', '字符型', '字符型'],
+      ['名称', '长度 (byte)', '100', '120'], // 有变化
+      ['名称', '是否敏感信息', '否', '否'],
+      ['名称', '敏感起始位置', '', ''],
+      ['名称', '敏感终止位置', '', ''],
+      ['名称', '是否必填', '是', '是'],
+      ['名称', '小数位长度', '', ''],
+      ['名称', '默认值', '', ''],
+      ['名称', '字典表引用', '', ''],
+      ['名称', '字典表引用字段', '', ''],
+      ['名称', '是否显示字典表代码', '', ''],
+      ['名称', '字典表筛选字段', '', ''],
+      ['名称', '字典表筛选条件', '', ''],
+      ['名称', '是否树节点', '否', '否'],
+      ['名称', '节点描述', '', ''],
+      ['名称', '根节点', '', ''],
+      ['名称', '节点描述字段', '', ''],
+      ['名称', '是否显示树名称', '', ''],
+      ['名称', '关联主数据', '', ''],
+      ['名称', '大小写转换', '', ''],
+      ['名称', '全半角转换', '', ''],
+      ['名称', '是否过滤空格', '是', '否'], // 有变化
+      ['名称', '是否可编辑', '是', '是'],
+      ['名称', '最大长度', '120', '120'],
+      ['名称', '最小长度', '1', '1'],
+      ['名称', '是否启用', '是', '是'],
+      ['名称', '上下限', '', ''],
+      ['名称', '上限', '', ''],
+      ['名称', '下限', '', ''],
+      ['名称', '是否唯一', '否', '否'],
+      ['名称', '校验类型', '', ''],
+      ['名称', '检验正则表达式', '', ''],
+      // 英文名称字段
+      ['英文名称', '元属性编码', 'en_name', 'en_name'],
+      ['英文名称', '是否引用元数据描述', '否', '否'],
+      ['英文名称', '元属性名称', '英文名称', '英文名称'],
+      ['英文名称', '取值方式', '文本', '文本'],
+      ['英文名称', '字段类型', '字符型', '字符型'],
+      ['英文名称', '长度 (byte)', '100', '100'],
+      ['英文名称', '是否敏感信息', '否', '否'],
+      ['英文名称', '敏感起始位置', '', ''],
+      ['英文名称', '敏感终止位置', '', ''],
+      ['英文名称', '是否必填', '否', '否'],
+      ['英文名称', '小数位长度', '', ''],
+      ['英文名称', '默认值', '', ''],
+      ['英文名称', '字典表引用', '', ''],
+      ['英文名称', '字典表引用字段', '', ''],
+      ['英文名称', '是否显示字典表代码', '', ''],
+      ['英文名称', '字典表筛选字段', '', ''],
+      ['英文名称', '字典表筛选条件', '', ''],
+      ['英文名称', '是否树节点', '否', '否'],
+      ['英文名称', '节点描述', '', ''],
+      ['英文名称', '根节点', '', ''],
+      ['英文名称', '节点描述字段', '', ''],
+      ['英文名称', '是否显示树名称', '', ''],
+      ['英文名称', '关联主数据', '', ''],
+      ['英文名称', '大小写转换', '', ''],
+      ['英文名称', '全半角转换', '', ''],
+      ['英文名称', '是否过滤空格', '是', '是'],
+      ['英文名称', '是否可编辑', '是', '是'],
+      ['英文名称', '最大长度', '100', '100'],
+      ['英文名称', '最小长度', '1', '1'],
+      ['英文名称', '是否启用', '是', '是'],
+      ['英文名称', '上下限', '', ''],
+      ['英文名称', '上限', '', ''],
+      ['英文名称', '下限', '', ''],
+      ['英文名称', '是否唯一', '否', '否'],
+      ['英文名称', '校验类型', '', ''],
+      ['英文名称', '检验正则表达式', '', ''],
+      // 英文简称字段
+      ['英文简称', '元属性编码', 'en_short', 'en_short'],
+      ['英文简称', '是否引用元数据描述', '否', '否'],
+      ['英文简称', '元属性名称', '英文简称', '英文简称'],
+      ['英文简称', '取值方式', '文本', '文本'],
+      ['英文简称', '字段类型', '字符型', '字符型'],
+      ['英文简称', '长度 (byte)', '50', '50'],
+      ['英文简称', '是否敏感信息', '否', '否'],
+      ['英文简称', '敏感起始位置', '', ''],
+      ['英文简称', '敏感终止位置', '', ''],
+      ['英文简称', '是否必填', '否', '否'],
+      ['英文简称', '小数位长度', '', ''],
+      ['英文简称', '默认值', '', ''],
+      ['英文简称', '字典表引用', '', ''],
+      ['英文简称', '字典表引用字段', '', ''],
+      ['英文简称', '是否显示字典表代码', '', ''],
+      ['英文简称', '字典表筛选字段', '', ''],
+      ['英文简称', '字典表筛选条件', '', ''],
+      ['英文简称', '是否树节点', '否', '否'],
+      ['英文简称', '节点描述', '', ''],
+      ['英文简称', '根节点', '', ''],
+      ['英文简称', '节点描述字段', '', ''],
+      ['英文简称', '是否显示树名称', '', ''],
+      ['英文简称', '关联主数据', '', ''],
+      ['英文简称', '大小写转换', '', ''],
+      ['英文简称', '全半角转换', '', ''],
+      ['英文简称', '是否过滤空格', '是', '是'],
+      ['英文简称', '是否可编辑', '是', '是'],
+      ['英文简称', '最大长度', '50', '50'],
+      ['英文简称', '最小长度', '1', '1'],
+      ['英文简称', '是否启用', '是', '否'], // 有变化
+      ['英文简称', '上下限', '', ''],
+      ['英文简称', '上限', '', ''],
+      ['英文简称', '下限', '', ''],
+      ['英文简称', '是否唯一', '否', '否'],
+      ['英文简称', '校验类型', '', ''],
+      ['英文简称', '检验正则表达式', '', ''],
+      // 国家字段
+      ['国家', '元属性编码', 'country', 'country'],
+      ['国家', '是否引用元数据描述', '否', '否'],
+      ['国家', '元属性名称', '国家', '国家'],
+      ['国家', '取值方式', '下拉选择', '下拉选择'],
+      ['国家', '字段类型', '字符型', '字符型'],
+      ['国家', '长度 (byte)', '50', '50'],
+      ['国家', '是否敏感信息', '否', '否'],
+      ['国家', '敏感起始位置', '', ''],
+      ['国家', '敏感终止位置', '', ''],
+      ['国家', '是否必填', '否', '否'],
+      ['国家', '小数位长度', '', ''],
+      ['国家', '默认值', '', ''],
+      ['国家', '字典表引用', 'country_dict', 'country_dict'],
+      ['国家', '字典表引用字段', 'code', 'code'],
+      ['国家', '是否显示字典表代码', '是', '否'], // 有变化
+      ['国家', '字典表筛选字段', '', ''],
+      ['国家', '字典表筛选条件', '', ''],
+      ['国家', '是否树节点', '否', '否'],
+      ['国家', '节点描述', '', ''],
+      ['国家', '根节点', '', ''],
+      ['国家', '节点描述字段', '', ''],
+      ['国家', '是否显示树名称', '', ''],
+      ['国家', '关联主数据', '', ''],
+      ['国家', '大小写转换', '', ''],
+      ['国家', '全半角转换', '', ''],
+      ['国家', '是否过滤空格', '是', '是'],
+      ['国家', '是否可编辑', '是', '是'],
+      ['国家', '最大长度', '50', '50'],
+      ['国家', '最小长度', '1', '1'],
+      ['国家', '是否启用', '是', '是'],
+      ['国家', '上下限', '', ''],
+      ['国家', '上限', '', ''],
+      ['国家', '下限', '', ''],
+      ['国家', '是否唯一', '否', '否'],
+      ['国家', '校验类型', '', ''],
+      ['国家', '检验正则表达式', '', ''],
+    ];
+    // 获取所有字段名
+    const allFields = [...new Set(attrRows.map(row => row[0]))];
+    // 获取所有属性名
+    const allAttrs = [
+      '元属性编码',
+      '是否引用元数据描述',
+      '元属性名称',
+      '取值方式',
+      '字段类型',
+      '长度 (byte)',
+      '是否敏感信息',
+      '敏感起始位置',
+      '敏感终止位置',
+      '是否必填',
+      '小数位长度',
+      '默认值',
+      '字典表引用',
+      '字典表引用字段',
+      '是否显示字典表代码',
+      '字典表筛选字段',
+      '字典表筛选条件',
+      '是否树节点',
+      '节点描述',
+      '根节点',
+      '节点描述字段',
+      '是否显示树名称',
+      '关联主数据',
+      '大小写转换',
+      '全半角转换',
+      '是否过滤空格',
+      '是否可编辑',
+      '最大长度',
+      '最小长度',
+      '是否启用',
+      '上下限',
+      '上限',
+      '下限',
+      '是否唯一',
+      '校验类型',
+      '检验正则表达式'
+    ];
+    // 渲染字段筛选下拉选项
+    function renderFieldFilterOptions() {
+      const container = document.getElementById('fieldFilterOptions');
+      container.innerHTML = '';
+      allFields.forEach(field => {
+        const id = 'field_' + field;
+        container.innerHTML += `<label style='display:block;margin-bottom:4px;font-size:12px;'><input type='checkbox' id='${id}' value='${field}' checked style='vertical-align:middle;margin-right:6px;'>${field}</label>`;
+      });
+    }
+    // 渲染属性筛选下拉选项
+    function renderAttrFilterOptions() {
+      const container = document.getElementById('attrFilterOptions');
+      container.innerHTML = '';
+      allAttrs.forEach(attr => {
+        const id = 'attr_' + attr;
+        container.innerHTML += `<label style='display:block;margin-bottom:4px;font-size:12px;'><input type='checkbox' id='${id}' value='${attr}' checked style='vertical-align:middle;margin-right:6px;'>${attr}</label>`;
+      });
+    }
+    // 渲染基本配置表格
+    function renderBaseTable() {
+      const showDiffOnly = document.getElementById('showDiffOnly').checked;
+      let html = '';
+      baseFields.forEach(f => {
+        const v1 = baseDataV1[f.key] || '';
+        const v2 = baseDataV2[f.key] || '';
+        const diff = v1 !== v2;
+        if (showDiffOnly && !diff) return;
+        html += `<tr><td>${f.label}</td><td${diff ? '' : ''}>${v1}</td><td${diff ? ' class="diff"' : ''}>${v2}</td></tr>`;
+      });
+      document.getElementById('baseTableBody').innerHTML = html;
+    }
+    // 渲染属性配置表格
+    function renderAttrTable() {
+      const showDiffOnly = document.getElementById('showDiffOnly').checked;
+      const checkedFields = allFields.filter(field => document.getElementById('field_' + field).checked);
+      const checkedAttrs = allAttrs.filter(attr => document.getElementById('attr_' + attr).checked);
+      let html = '';
+      attrRows.forEach(row => {
+        const fieldName = row[0];
+        const attrName = row[1];
+        if (!checkedFields.includes(fieldName) || !checkedAttrs.includes(attrName)) return;
+        const diff = row[2] !== row[3];
+        if (showDiffOnly && !diff) return;
+        html += `<tr><td class='field-name'>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td${diff ? ' class="diff"' : ''}>${row[3]}</td></tr>`;
+      });
+      document.getElementById('attrTableBody').innerHTML = html;
+    }
+    // 事件绑定
+    document.addEventListener('DOMContentLoaded', function() {
+      renderFieldFilterOptions();
+      renderAttrFilterOptions();
+      renderBaseTable();
+      renderAttrTable();
+      
+      // 字段筛选按钮点击事件
+      document.getElementById('fieldFilterBtn').onclick = function(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('fieldFilterDropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      };
+      
+      // 属性筛选按钮点击事件
+      document.getElementById('attrFilterBtn').onclick = function(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('attrFilterDropdown');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      };
+      
+      // 点击其他地方关闭下拉
+      document.addEventListener('click', function() {
+        document.getElementById('fieldFilterDropdown').style.display = 'none';
+        document.getElementById('attrFilterDropdown').style.display = 'none';
+      });
+      
+      // 字段全选按钮
+      document.getElementById('selectAllFields').onclick = function() {
+        allFields.forEach(field => {
+          document.getElementById('field_' + field).checked = true;
+        });
+        renderAttrTable();
+      };
+      
+      // 字段清空按钮
+      document.getElementById('clearAllFields').onclick = function() {
+        allFields.forEach(field => {
+          document.getElementById('field_' + field).checked = false;
+        });
+        renderAttrTable();
+      };
+      
+      // 属性全选按钮
+      document.getElementById('selectAllAttrs').onclick = function() {
+        allAttrs.forEach(attr => {
+          document.getElementById('attr_' + attr).checked = true;
+        });
+        renderAttrTable();
+      };
+      
+      // 属性清空按钮
+      document.getElementById('clearAllAttrs').onclick = function() {
+        allAttrs.forEach(attr => {
+          document.getElementById('attr_' + attr).checked = false;
+        });
+        renderAttrTable();
+      };
+      
+      document.getElementById('showDiffOnly').onchange = function() {
+        renderBaseTable();
+        renderAttrTable();
+      };
+      allFields.forEach(field => {
+        document.getElementById('field_' + field).onchange = renderAttrTable;
+      });
+      allAttrs.forEach(attr => {
+        document.getElementById('attr_' + attr).onchange = renderAttrTable;
+      });
+    });
+  </script>
+</body>
+</html> 

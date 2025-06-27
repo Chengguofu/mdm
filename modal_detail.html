@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>模型详情</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:rgba(0,0,0,0.15); font-size:15px; }
+    .modal-mask {
+      position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.25); z-index:1000; display:flex; align-items:center; justify-content:center;
+    }
+    .modal-window {
+      background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:900px; max-width:98vw; min-height:480px; position:relative; animation:popin .25s;
+    }
+    @keyframes popin { from{transform:scale(0.95);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .modal-header {
+      padding:22px 32px 0 32px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .modal-title { font-size:20px; font-weight:600; color:#185a99; }
+    .modal-close {
+      font-size:20px; color:#888; cursor:pointer; border:none; background:none; transition:.2s; }
+    .modal-close:hover { color:#d33; }
+    .modal-tabs {
+      display:flex; border-bottom:1.5px solid #e5e6eb; margin:18px 32px 0 32px;
+    }
+    .modal-tab {
+      padding:10px 32px; font-size:15px; color:#185a99; cursor:pointer; background:none; border:none; outline:none; border-bottom:2.5px solid transparent; transition:.2s; }
+    .modal-tab.active {
+      color:#2176c7; font-weight:600; border-bottom:2.5px solid #2176c7; background:#f6f8fa;
+    }
+    .modal-content { padding:28px 32px 32px 32px; min-height:320px; font-size:15px; }
+    /* 表格样式 */
+    table { border-collapse:collapse; width:100%; background:#fff; font-size:15px; }
+    th,td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .section-title { font-size:15px; color:#2176c7; margin:18px 0 10px 0; font-weight:600; }
+    .kv-row { display:flex; margin-bottom:12px; }
+    .kv-label { width:140px; color:#444; font-size:15px; text-align:right; margin-right:12px; }
+    .kv-value { flex:1; color:#222; font-size:15px; }
+    .tag { display:inline-block; background:#eaf3ff; color:#2176c7; border-radius:3px; padding:2px 8px; font-size:13px; margin-right:6px; }
+    .rule-list { margin:0; padding-left:18px; color:#444; font-size:15px; }
+    .layout-box { background:#f6f8fa; border-radius:6px; padding:18px; margin-bottom:12px; font-size:15px; }
+    .form-2col { display:flex; flex-direction:column; gap:0; margin-top:10px; }
+    .form-row { display:flex; align-items:center; margin-bottom:18px; }
+    .form-label { width:160px; color:#333; font-size:15px; text-align:right; margin-right:8px; }
+    .form-value { width:320px; color:#222; font-size:15px; margin-right:32px; background:#f8fafd; border-radius:4px; min-height:32px; display:flex; align-items:center; padding-left:8px; }
+    .required { color:#e53935; margin-left:2px; font-size:15px; }
+    .attr-flexbox {
+      display: flex;
+      height: 420px;
+      min-height: 320px;
+      box-sizing: border-box;
+    }
+    .attr-field-list {
+      width: 140px;
+      background: #f6f8fa;
+      border-radius: 6px 0 0 6px;
+      padding: 0;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .attr-field-item {
+      padding: 18px 0 18px 18px;
+      font-size: 15px;
+      color: #185a99;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: .2s;
+      background: none;
+    }
+    .attr-field-item.active {
+      background: #2176c7;
+      color: #fff;
+      border-left: 3px solid #185a99;
+      font-weight: 600;
+    }
+    .attr-field-detail {
+      flex: 1;
+      background: #fff;
+      border-radius: 0 6px 6px 0;
+      padding: 0 0 0 32px;
+      overflow-y: auto;
+      max-height: 420px;
+      min-width: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .attr-detail-title {
+      color: #185a99;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 0 0 10px 0;
+      margin-bottom: 10px;
+      background: none;
+      border-radius: 0;
+    }
+    .attr-detail-table {
+      width: 100%;
+    }
+    .attr-detail-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .attr-detail-label {
+      width: 140px;
+      color: #222;
+      font-size: 15px;
+      text-align: right;
+      margin-right: 8px;
+    }
+    .attr-detail-value {
+      width: 220px;
+      color: #222;
+      font-size: 15px;
+      background: #f8fafd;
+      border-radius: 4px;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      margin-right: 32px;
+    }
+    .attr-detail-label .required {
+      color: #e53935;
+      margin-left: 2px;
+      font-size: 15px;
+    }
+    .rule-table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; }
+    .rule-table th, .rule-table td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    .rule-table th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .rule-link { color:#2176c7; cursor:pointer; text-decoration:underline; }
+    .rule-link:hover { color:#e53935; }
+    .rule-detail-modal { position:fixed; left:0;top:0;right:0;bottom:0;z-index:2000; }
+    .rule-detail-mask { position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.18); }
+    .rule-detail-box { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.18); min-width:380px; max-width:90vw; min-height:180px; padding:28px 32px 22px 32px; }
+    .rule-detail-title { font-size:15px; color:#185a99; font-weight:600; margin-bottom:16px; }
+    .rule-detail-close { margin-top:18px; background:#2176c7; color:#fff; border:none; border-radius:4px; padding:6px 22px; font-size:15px; cursor:pointer; }
+    .code-rule-table th, .code-rule-table td { font-size: 15px; }
+    .code-rule-table td { white-space: nowrap; }
+    .code-rule-table .code-rule-btn { white-space: nowrap; font-size: 13px; padding: 2px 10px; line-height: 1.5; }
+    .layout-tabs { display:flex; border-bottom:1.5px solid #e5e6eb; margin-bottom:12px; }
+    .layout-tab { padding:8px 32px; font-size:15px; color:#185a99; cursor:pointer; background:none; border:none; outline:none; border-bottom:2.5px solid transparent; transition:.2s; }
+    .layout-tab.active { color:#2176c7; font-weight:600; border-bottom:2.5px solid #2176c7; background:#f6f8fa; }
+    .layout-content { margin-top:10px; }
+    .layout-table { width:100%; border-collapse:collapse; background:#fff; font-size:15px; }
+    .layout-table th, .layout-table td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    .layout-table th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .layout-width-input { width:80px; padding:4px 6px; font-size:15px; border:1px solid #bfc8d6; border-radius:3px; }
+    
+    .layout-detail-flexbox { display: flex; min-height: 360px; border: 1px solid #e5e6eb; border-radius: 6px; }
+    .layout-detail-nav { width: 160px; background: #f6f8fa; border-right: 1px solid #e5e6eb; padding: 8px 0; }
+    .layout-detail-nav-item { padding: 12px 20px; font-size: 15px; color: #185a99; cursor: pointer; border-left: 3px solid transparent; transition: .2s; }
+    .layout-detail-nav-item.active { background: #fff; color: #2176c7; font-weight: 600; border-left-color: #2176c7; }
+    .layout-detail-pane-container { flex: 1; padding: 20px; overflow-y: auto; }
+    .layout-detail-pane { display: none; }
+    .layout-detail-pane.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="modal-mask">
+  <div class="modal-window">
+    <div class="modal-header">
+      <span class="modal-title">模型详情</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="base">基本配置</button>
+      <button class="modal-tab" data-tab="attr">属性配置</button>
+      <button class="modal-tab" data-tab="rule">业务规则</button>
+      <button class="modal-tab" data-tab="code">编码规则</button>
+      <button class="modal-tab" data-tab="layout">布局配置</button>
+    </div>
+    <div class="modal-content" id="tab-base">
+      <div class="form-2col">
+        <div class="form-row">
+          <div class="form-label">模型分类：</div>
+          <div class="form-value">平面模型</div>
+          <div class="form-label">模型编码<span class="required">*</span>：</div>
+          <div class="form-value">mdm_sys_master_data_type</div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">模型名称<span class="required">*</span>：</div>
+          <div class="form-value">模型类型</div>
+          <div class="form-label">主数据类型<span class="required">*</span>：</div>
+          <div class="form-value">系统字典表</div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">是否树形展示：</div>
+          <div class="form-value">否</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-attr" style="display:none;">
+      <div class="attr-flexbox">
+        <div class="attr-field-list">
+          <div class="attr-field-item active" data-field="编码">编码</div>
+          <div class="attr-field-item" data-field="名称">名称</div>
+          <div class="attr-field-item" data-field="英文名称">英文名称</div>
+          <div class="attr-field-item" data-field="英文简称">英文简称</div>
+          <div class="attr-field-item" data-field="国家">国家</div>
+        </div>
+        <div class="attr-field-detail" id="attr-detail-box">
+          <!-- 详情内容由JS渲染 -->
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-rule" style="display:none;">
+      <table class="rule-table">
+        <thead>
+          <tr>
+            <th style="width:180px;">规则名称</th>
+            <th style="width:120px;">规则类型</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:160px;">创建时间</th>
+          </tr>
+        </thead>
+        <tbody id="ruleTableBody">
+        </tbody>
+      </table>
+      <div id="ruleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">规则详情</div>
+          <div id="ruleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeRuleDetail()">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-code" style="display:none;">
+      <table class="rule-table code-rule-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">编码ID</th>
+            <th style="width:100px;">生成方式</th>
+            <th style="width:100px;">起始值</th>
+            <th style="width:100px;">终止值</th>
+            <th style="width:120px;">是否引用上层编码</th>
+            <th style="width:80px;">步长</th>
+            <th style="width:100px;">编码长度</th>
+            <th style="width:100px;">编码状态</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:120px;">创建时间</th>
+            <th style="width:90px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="codeRuleTableBody">
+        </tbody>
+      </table>
+      <div id="codeRuleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeCodeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">编码规则条件详情</div>
+          <div id="codeRuleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeCodeRuleDetail()">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-layout" style="display:none;">
+      <div class="layout-tabs">
+        <button class="layout-tab active" data-layouttab="list">列表布局</button>
+        <button class="layout-tab" data-layouttab="detail">详情布局</button>
+      </div>
+      <div class="layout-content" id="layout-list">
+        <table class="layout-table">
+          <thead>
+            <tr>
+              <th style="width:100px;">显示顺序</th>
+              <th style="width:180px;">元数据名称</th>
+              <th style="width:180px;">展示宽度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>编码</td><td><input class="layout-width-input" value="120" /></td></tr>
+            <tr><td>2</td><td>名称</td><td><input class="layout-width-input" value="200" /></td></tr>
+            <tr><td>3</td><td>国家</td><td><input class="layout-width-input" value="100" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="layout-content" id="layout-detail" style="display:none;">
+        <div class="layout-detail-flexbox">
+          <div class="layout-detail-nav">
+            <div class="layout-detail-nav-item active" data-detailtab="base">基本视图</div>
+            <div class="layout-detail-nav-item" data-detailtab="manage">管理视图</div>
+            <div class="layout-detail-nav-item" data-detailtab="finance">财务视图</div>
+            <div class="layout-detail-nav-item" data-detailtab="produce">生产视图</div>
+          </div>
+          <div class="layout-detail-pane-container">
+            <div class="layout-detail-pane active" id="detailtab-base">
+              <div class="layout-detail-form">
+                <div class="form-row">
+                  <div class="form-label">编码：</div>
+                  <div class="form-value">DICT_0001</div>
+                  <div class="form-label">名称：</div>
+                  <div class="form-value">系统字典表</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">国家：</div>
+                  <div class="form-value">中国</div>
+                  <div class="form-label">英文名称：</div>
+                  <div class="form-value">Dictionary</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">英文简称：</div>
+                  <div class="form-value">DICT</div>
+                </div>
+              </div>
+            </div>
+            <div class="layout-detail-pane" id="detailtab-manage">
+              <div class="layout-detail-form">
+                <div class="form-row">
+                  <div class="form-label">管理编号：</div>
+                  <div class="form-value">MGR-001</div>
+                  <div class="form-label">负责人：</div>
+                  <div class="form-value">张三</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">管理部门：</div>
+                  <div class="form-value">信息部</div>
+                  <div class="form-label">联系电话：</div>
+                  <div class="form-value">010-88888888</div>
+                </div>
+              </div>
+            </div>
+            <div class="layout-detail-pane" id="detailtab-finance">
+              <div class="layout-detail-form">
+                <div class="form-row">
+                  <div class="form-label">财务编码：</div>
+                  <div class="form-value">FIN-2024-01</div>
+                  <div class="form-label">预算：</div>
+                  <div class="form-value">100,000</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">会计科目：</div>
+                  <div class="form-value">6001</div>
+                  <div class="form-label">财务负责人：</div>
+                  <div class="form-value">李四</div>
+                </div>
+              </div>
+            </div>
+            <div class="layout-detail-pane" id="detailtab-produce">
+              <div class="layout-detail-form">
+                <div class="form-row">
+                  <div class="form-label">生产编号：</div>
+                  <div class="form-value">PRD-2024-01</div>
+                  <div class="form-label">生产线：</div>
+                  <div class="form-value">一号线</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">负责人：</div>
+                  <div class="form-value">王五</div>
+                  <div class="form-label">产能：</div>
+                  <div class="form-value">5000件/天</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function closeModal() {
+  window.close && window.close();
+  // 或者隐藏模态框
+}
+const tabs = document.querySelectorAll('.modal-tab');
+const contents = document.querySelectorAll('.modal-content');
+tabs.forEach(tab => {
+  tab.onclick = function() {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    contents.forEach(c => c.style.display = 'none');
+    document.getElementById('tab-' + tab.dataset.tab).style.display = '';
+  }
+});
+</script>
+<script>
+const attrDetailData = {
+  '编码': [
+    [
+      {label:'元属性编码', value:'code'},
+      {label:'是否引用元数据描述', value:'否'},
+      {label:'元属性名称*', value:'编码', required:true}
+    ],[
+      {label:'取值方式*', value:'自动生成', required:true},
+      {label:'类型*', value:'字符型', required:true},
+      {label:'长度(byte)*', value:'32', required:true}
+    ],[
+      {label:'是否敏感信息', value:'否'},
+      {label:'是否必填*', value:'是', required:true},
+      {label:'小数位长度', value:''}
+    ],[
+      {label:'默认值', value:''},
+      {label:'字典表引用*', value:'', required:true},
+      {label:'字典表引用字段*', value:'', required:true}
+    ],[
+      {label:'是否显示字典表代码', value:''},
+      {label:'字典表筛选字段', value:''},
+      {label:'字典表筛选条件', value:''}
+    ],[
+      {label:'联动应用字段', value:''},
+      {label:'联动条件', value:''},
+      {label:'是否逐级联动', value:''}
+    ],[
+      {label:'是否树节点', value:'否'},
+      {label:'节点描述', value:''},
+      {label:'根节点', value:''}
+    ]
+  ],
+  '名称': [
+    [
+      {label:'元属性编码', value:'name'},
+      {label:'是否引用元数据描述', value:'否'},
+      {label:'元属性名称*', value:'名称', required:true}
+    ],[
+      {label:'取值方式*', value:'文本', required:true},
+      {label:'类型*', value:'字符型', required:true},
+      {label:'长度(byte)*', value:'120', required:true}
+    ],[
+      {label:'是否敏感信息', value:'否'},
+      {label:'是否必填*', value:'是', required:true},
+      {label:'小数位长度', value:''}
+    ],[
+      {label:'默认值', value:''},
+      {label:'字典表引用*', value:'', required:true},
+      {label:'字典表引用字段*', value:'', required:true}
+    ],[
+      {label:'是否显示字典表代码', value:''},
+      {label:'字典表筛选字段', value:''},
+      {label:'字典表筛选条件', value:''}
+    ],[
+      {label:'联动应用字段', value:''},
+      {label:'联动条件', value:''},
+      {label:'是否逐级联动', value:''}
+    ],[
+      {label:'是否树节点', value:'否'},
+      {label:'节点描述', value:''},
+      {label:'根节点', value:''}
+    ]
+  ],
+  '英文名称': [
+    [
+      {label:'元属性编码', value:'en_name'},
+      {label:'是否引用元数据描述', value:'否'},
+      {label:'元属性名称*', value:'英文名称', required:true}
+    ],[
+      {label:'取值方式*', value:'文本', required:true},
+      {label:'类型*', value:'字符型', required:true},
+      {label:'长度(byte)*', value:'100', required:true}
+    ],[
+      {label:'是否敏感信息', value:'否'},
+      {label:'是否必填*', value:'否', required:true},
+      {label:'小数位长度', value:''}
+    ],[
+      {label:'默认值', value:''},
+      {label:'字典表引用*', value:'', required:true},
+      {label:'字典表引用字段*', value:'', required:true}
+    ],[
+      {label:'是否显示字典表代码', value:''},
+      {label:'字典表筛选字段', value:''},
+      {label:'字典表筛选条件', value:''}
+    ],[
+      {label:'联动应用字段', value:''},
+      {label:'联动条件', value:''},
+      {label:'是否逐级联动', value:''}
+    ],[
+      {label:'是否树节点', value:'否'},
+      {label:'节点描述', value:''},
+      {label:'根节点', value:''}
+    ]
+  ],
+  '英文简称': [
+    [
+      {label:'元属性编码', value:'en_short'},
+      {label:'是否引用元数据描述', value:'否'},
+      {label:'元属性名称*', value:'英文简称', required:true}
+    ],[
+      {label:'取值方式*', value:'文本', required:true},
+      {label:'类型*', value:'字符型', required:true},
+      {label:'长度(byte)*', value:'50', required:true}
+    ],[
+      {label:'是否敏感信息', value:'否'},
+      {label:'是否必填*', value:'否', required:true},
+      {label:'小数位长度', value:''}
+    ],[
+      {label:'默认值', value:''},
+      {label:'字典表引用*', value:'', required:true},
+      {label:'字典表引用字段*', value:'', required:true}
+    ],[
+      {label:'是否显示字典表代码', value:''},
+      {label:'字典表筛选字段', value:''},
+      {label:'字典表筛选条件', value:''}
+    ],[
+      {label:'联动应用字段', value:''},
+      {label:'联动条件', value:''},
+      {label:'是否逐级联动', value:''}
+    ],[
+      {label:'是否树节点', value:'否'},
+      {label:'节点描述', value:''},
+      {label:'根节点', value:''}
+    ]
+  ],
+  '国家': [
+    [
+      {label:'元属性编码', value:'country'},
+      {label:'是否引用元数据描述', value:'否'},
+      {label:'元属性名称*', value:'国家', required:true}
+    ],[
+      {label:'取值方式*', value:'下拉选择', required:true},
+      {label:'类型*', value:'字符型', required:true},
+      {label:'长度(byte)*', value:'50', required:true}
+    ],[
+      {label:'是否敏感信息', value:'否'},
+      {label:'是否必填*', value:'否', required:true},
+      {label:'小数位长度', value:''}
+    ],[
+      {label:'默认值', value:''},
+      {label:'字典表引用*', value:'country_dict', required:true},
+      {label:'字典表引用字段*', value:'code', required:true}
+    ],[
+      {label:'是否显示字典表代码', value:'是'},
+      {label:'字典表筛选字段', value:''},
+      {label:'字典表筛选条件', value:''}
+    ],[
+      {label:'联动应用字段', value:''},
+      {label:'联动条件', value:''},
+      {label:'是否逐级联动', value:''}
+    ],[
+      {label:'是否树节点', value:'否'},
+      {label:'节点描述', value:''},
+      {label:'根节点', value:''}
+    ]
+  ]
+};
+function renderAttrDetail(field) {
+  var box = document.getElementById('attr-detail-box');
+  var rows = attrDetailData[field] || [];
+  var html = '<div class="attr-detail-title">元属性信息</div>';
+  html += '<div class="attr-detail-table">';
+  rows.forEach(function(row) {
+    html += '<div class="attr-detail-row">';
+    row.forEach(function(cell) {
+      html += '<div class="attr-detail-label">' + cell.label.replace('*','<span class="required">*</span>') + '</div><div class="attr-detail-value">' + (cell.value || '') + '</div>';
+    });
+    for(var i=row.length;i<3;i++){
+      html += '<div class="attr-detail-label"></div><div class="attr-detail-value"></div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  box.innerHTML = html;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  renderAttrDetail('编码');
+  document.querySelectorAll('.attr-field-item').forEach(function(item) {
+    item.onclick = function() {
+      document.querySelectorAll('.attr-field-item').forEach(function(i){i.classList.remove('active')});
+      item.classList.add('active');
+      renderAttrDetail(item.getAttribute('data-field'));
+    }
+  });
+});
+</script>
+<script>
+// 业务规则静态数据
+const ruleList = [
+  { name: '编码唯一校验', type: '校验规则', creator: 'admin', ctime: '2024-06-01 10:00', detail: '校验编码字段在主数据中唯一，且不可为空。' },
+  { name: '名称必填', type: '校验规则', creator: 'admin', ctime: '2024-06-01 10:05', detail: '名称字段为必填项，长度不超过120字节。' },
+  { name: '国家字典引用', type: '赋值规则', creator: 'hefanqi', ctime: '2024-06-01 10:10', detail: '国家字段需引用国家字典表，自动赋值。' },
+  { name: '英文简称只读', type: '只读', creator: 'admin', ctime: '2024-06-01 10:15', detail: '英文简称字段只读，不允许编辑。' },
+  { name: '是否启用显隐', type: '显隐', creator: 'admin', ctime: '2024-06-01 10:20', detail: '当主数据类型为"系统字典表"时，显示"是否启用"字段，否则隐藏。' }
+];
+function renderRuleTable() {
+  var html = '';
+  ruleList.forEach(function(rule, idx) {
+    html += '<tr>' +
+      '<td><span class="rule-link" onclick="showRuleDetail(' + idx + ')">' + rule.name + '</span></td>' +
+      '<td>' + rule.type + '</td>' +
+      '<td>' + rule.creator + '</td>' +
+      '<td>' + rule.ctime + '</td>' +
+      '</tr>';
+  });
+  document.getElementById('ruleTableBody').innerHTML = html;
+}
+function showRuleDetail(idx) {
+  var rule = ruleList[idx];
+  document.getElementById('ruleDetailContent').innerHTML =
+    '<div style="margin-bottom:8px;"><b>规则名称：</b>' + rule.name + '</div>' +
+    '<div style="margin-bottom:8px;"><b>规则类型：</b>' + rule.type + '</div>' +
+    '<div style="margin-bottom:8px;"><b>创建人：</b>' + rule.creator + '</div>' +
+    '<div style="margin-bottom:8px;"><b>创建时间：</b>' + rule.ctime + '</div>' +
+    '<div style="margin-top:12px;"><b>规则说明：</b>' + rule.detail + '</div>';
+  document.getElementById('ruleDetailModal').style.display = 'block';
+}
+function closeRuleDetail() {
+  document.getElementById('ruleDetailModal').style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  renderRuleTable();
+});
+</script>
+<script>
+// 编码规则静态数据
+const codeRuleList = [
+  { genType: '自动', start: '1000', end: '9999', refParent: '是', step: '1', code: 'DICT_', len: 8, status: '启用', creator: 'admin', ctime: '2024-06-01 10:00', cond: '主数据类型为"系统字典表"时，编码以DICT_开头，长度8位，自动生成，步长1。' },
+  { genType: '手动', start: 'A001', end: 'A999', refParent: '否', step: '1', code: 'ITEM_', len: 10, status: '停用', creator: 'hefanqi', ctime: '2024-06-01 10:10', cond: '主数据类型为"商品"时，编码以ITEM_开头，长度10位，手动输入，步长1。' }
+];
+function renderCodeRuleTable() {
+  var html = '';
+  codeRuleList.forEach(function(rule, idx) {
+    html += '<tr>' +
+      '<td>' + (idx + 1) + '</td>' +
+      '<td>' + rule.genType + '</td>' +
+      '<td>' + rule.start + '</td>' +
+      '<td>' + rule.end + '</td>' +
+      '<td>' + rule.refParent + '</td>' +
+      '<td>' + rule.step + '</td>' +
+      '<td>' + rule.len + '</td>' +
+      '<td>' + rule.status + '</td>' +
+      '<td>' + rule.creator + '</td>' +
+      '<td>' + rule.ctime + '</td>' +
+      '<td><button class="code-rule-btn rule-detail-close" onclick="showCodeRuleDetail(' + idx + ')">查看条件</button></td>' +
+      '</tr>';
+  });
+  document.getElementById('codeRuleTableBody').innerHTML = html;
+}
+function showCodeRuleDetail(idx) {
+  var rule = codeRuleList[idx];
+  document.getElementById('codeRuleDetailContent').innerHTML =
+    '<div style="margin-bottom:8px;"><b>规则编码：</b>' + rule.codeNo + '</div>' +
+    '<div style="margin-bottom:8px;"><b>生成方式：</b>' + rule.genType + '</div>' +
+    '<div style="margin-bottom:8px;"><b>起始值：</b>' + rule.start + '</div>' +
+    '<div style="margin-bottom:8px;"><b>终止值：</b>' + rule.end + '</div>' +
+    '<div style="margin-bottom:8px;"><b>是否引用上层编码：</b>' + rule.refParent + '</div>' +
+    '<div style="margin-bottom:8px;"><b>步长：</b>' + rule.step + '</div>' +
+    '<div style="margin-bottom:8px;"><b>编码：</b>' + rule.code + '</div>' +
+    '<div style="margin-bottom:8px;"><b>编码长度：</b>' + rule.len + '</div>' +
+    '<div style="margin-bottom:8px;"><b>编码状态：</b>' + rule.status + '</div>' +
+    '<div style="margin-bottom:8px;"><b>创建人：</b>' + rule.creator + '</div>' +
+    '<div style="margin-bottom:8px;"><b>创建时间：</b>' + rule.ctime + '</div>' +
+    '<div style="margin-top:12px;"><b>规则条件说明：</b>' + rule.cond + '</div>';
+  document.getElementById('codeRuleDetailModal').style.display = 'block';
+}
+function closeCodeRuleDetail() {
+  document.getElementById('codeRuleDetailModal').style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  renderCodeRuleTable();
+});
+</script>
+<script>
+// 二级页签切换
+document.addEventListener('DOMContentLoaded', function() {
+  var layoutTabs = document.querySelectorAll('.layout-tab');
+  var layoutContents = { list: document.getElementById('layout-list'), detail: document.getElementById('layout-detail') };
+  layoutTabs.forEach(function(tab) {
+    tab.onclick = function() {
+      layoutTabs.forEach(function(t){t.classList.remove('active')});
+      tab.classList.add('active');
+      for(var k in layoutContents) layoutContents[k].style.display = 'none';
+      layoutContents[tab.getAttribute('data-layouttab')].style.display = '';
+    }
+  });
+});
+</script>
+<script>
+// 详情布局左右两栏切换
+document.addEventListener('DOMContentLoaded', function() {
+  const detailNavItems = document.querySelectorAll('.layout-detail-nav-item');
+  detailNavItems.forEach(item => {
+    item.addEventListener('click', function() {
+      // Deactivate all nav items
+      detailNavItems.forEach(i => i.classList.remove('active'));
+      // Deactivate all panes
+      document.querySelectorAll('.layout-detail-pane').forEach(p => p.classList.remove('active'));
+
+      // Activate clicked item and corresponding pane
+      item.classList.add('active');
+      const tabKey = item.getAttribute('data-detailtab');
+      document.getElementById('detailtab-' + tabKey).classList.add('active');
+    });
+  });
+});
+</script>
+</body>
+</html> 

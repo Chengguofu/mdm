@@ -193,6 +193,37 @@
     .user-table thead th { background-color: #fafafa; font-weight: 500; }
     .user-table .filter-row th { padding: 8px 0; background-color: #fafafa; }
     .user-table tr:hover td { background: #e6f7ff; }
+
+    /* Collapsible Sub-query Section */
+    .sub-query-section summary {
+      position: relative;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      list-style: none;
+      padding-left: 15px;
+    }
+    .sub-query-section summary::-webkit-details-marker { display: none; }
+    .sub-query-section summary:focus { outline: none; }
+    .sub-query-section summary::before {
+      content: '▼';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
+      font-size: 12px;
+      transition: transform 0.2s ease-in-out;
+      color: #555;
+    }
+    .sub-query-section details:not([open]) > summary::before {
+      transform: translateY(-50%) rotate(-90deg);
+    }
+    .sub-query-section details[open] > summary {
+      margin-bottom: 16px;
+    }
+    .sub-query-section details > .query-builder {
+      padding-left: 15px; /* indent content */
+    }
   </style>
 </head>
 <body>
@@ -203,6 +234,41 @@
     <div class="modal-header">高级查询</div>
     <div class="modal-body">
       <div class="query-builder" id="queryBuilder"></div>
+
+      <!-- Sub-table Query Section START -->
+      <div class="sub-query-section" style="margin-top: 24px;">
+        <details>
+          <summary>子表查询</summary>
+          <div class="query-builder" id="subQueryBuilder">
+            <!-- Static example rows for sub-table query -->
+            <div class="query-row">
+              <label>子表字段一</label>
+              <select class="form-control" style="width: 150px;">
+                <option value="equals">等于</option>
+                <option value="contains">包含</option>
+                <option value="startsWith">开头是</option>
+                <option value="endsWith">结尾是</option>
+              </select>
+              <div class="query-value-container">
+                <input type="text" class="form-control" placeholder="请输入值">
+              </div>
+            </div>
+            <div class="query-row">
+              <label>子表字段二</label>
+              <select class="form-control" style="width: 150px;">
+                <option value="equals">等于</option>
+                <option value="greater_than">大于</option>
+                <option value="less_than">小于</option>
+              </select>
+              <div class="query-value-container">
+                <input type="number" class="form-control" placeholder="请输入数字">
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+      <!-- Sub-table Query Section END -->
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" id="searchBtn">高级查询</button>

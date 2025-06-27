@@ -248,9 +248,8 @@
     }
     .column-filter { width: 95%; padding: 4px 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
     .user-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .user-table th, .user-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
-    .user-table thead th { background-color: #fafafa; font-weight: 500; }
-    .user-table .filter-row th { padding: 8px 0; background-color: #fafafa; }
+    .user-table th, .user-table td { padding: 8px 12px; border: 1px solid #dee2e6; }
+    .user-table th { background-color: #f8f9fa; }
 
     /* Choices.js Customizations */
     #advancedSearchModal .choices { width: 100%; margin: 0; }
@@ -325,105 +324,20 @@
       background: #2176c7;
       border: none;
       color: #fff;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: 500;
-      font-size: 15px;
-      padding: 8px 22px;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 13px;
+      padding: 3px 12px;
+      display: flex; align-items: center; gap: 6px;
       transition: background 0.18s;
       box-shadow: none;
-      min-width: 120px;
+      min-width: 70px;
+      height: 28px;
       cursor: pointer;
     }
-    .version-modal-btns .btn svg {
-      stroke: #fff;
-    }
-    .version-modal-btns .btn:hover {
-      background: #125ea7;
-    }
-    #versionModalCloseBtn {
-      background: #2176c7;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      padding: 8px 32px;
-      font-weight: 500;
-      transition: background 0.18s;
-      box-shadow: none;
-      margin-left: 18px;
-      cursor: pointer;
-      display: flex; align-items: center; gap: 8px;
-    }
-    #versionModalCloseBtn svg {
-      stroke: #fff;
-    }
-    #versionModalCloseBtn:hover {
-      background: #125ea7;
-    }
-    #versionModal .model-table {
-      margin: 18px 0 0 0;
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 15px;
-      background: #fff;
-      box-shadow: none;
-    }
-    #versionModal .model-table thead tr {
-      background: #fff;
-    }
-    #versionModal .model-table th {
-      color: #2176c7;
-      font-weight: 600;
-      padding: 10px 0 6px 0;
-      border-bottom: 1.5px solid #e6eaf0;
-      text-align: left;
-      font-size: 15px;
-    }
-    #versionModal .model-table td {
-      padding: 13px 0;
-      text-align: left;
-      border-bottom: 1px solid #f0f2f5;
-      font-size: 15px;
-      background: #fff;
-    }
-    #versionModal .model-table tr:hover td {
-      background: #f8fafc;
-    }
-    #versionModal .model-table a {
-      color: #2176c7;
-      text-decoration: underline;
-      transition: color 0.18s;
-    }
-    #versionModal .model-table a:hover {
-      color: #125ea7;
-    }
-    #versionModal .model-table input[type="checkbox"] {
-      width: 16px; height: 16px;
-      accent-color: #2176c7;
-    }
-    #versionModal .model-table .filter-row input {
-      width: 90%;
-      border: 1px solid #e6eaf0;
-      border-radius: 5px;
-      padding: 2px 8px;
-      font-size: 14px;
-      background: #f6f7fa;
-      margin-bottom: 2px;
-    }
-    #versionModal .model-table .filter-row td {
-      padding: 4px 0 4px 0;
-      background: #f6f7fa;
-      border-bottom: 1.5px solid #e6eaf0;
-    }
-    .version-modal-footer-bar {
-      padding: 10px 32px 0 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 15px;
-      color: #888;
+    .version-btn-small svg {
+      width: 14px;
+      height: 14px;
     }
     .version-modal-pagination {
       display: flex;
@@ -461,6 +375,219 @@
       border-radius: 0 0 20px 20px;
       border-top: 1px solid #e6eaf0;
     }
+    #versionModalCount {
+      text-align: right;
+      width: 100%;
+      font-size: 15px;
+      color: #888;
+      padding-right: 32px;
+      box-sizing: border-box;
+    }
+    .er-drawer {
+      position: fixed;
+      top: 0;
+      right: -800px;
+      width: 800px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 16px rgba(33,118,199,0.13);
+      z-index: 9999;
+      transition: right 0.35s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .er-drawer.open {
+      right: 0;
+    }
+    .er-drawer-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(30,40,60,0.18);
+      z-index: 9998;
+      display: none;
+    }
+    .er-drawer-mask.show {
+      display: block;
+    }
+    .er-drawer-header {
+      height: 54px;
+      background: #2176c7;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .er-drawer-close {
+      font-size: 28px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .er-drawer-body {
+      flex: 1;
+      overflow: auto;
+      padding: 24px;
+      background: #f7faff;
+      min-height: 220px;
+    }
+    .btn-er {
+      border: none;
+      background: none;
+      color: #2176c7;
+      font-size: 15px;
+      padding: 0 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+    .btn-er:hover {
+      color: #125ea7;
+      text-decoration: underline;
+      background: none;
+    }
+
+    /* --- Drawer Styles --- */
+    .drawer-mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, .35);
+      z-index: 1040;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease;
+    }
+    .drawer-mask.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 850px;
+      max-width: 90%;
+      height: 100%;
+      background: #fff;
+      box-shadow: -3px 0 15px rgba(0,0,0,0.1);
+      z-index: 1050;
+      transform: translateX(100%);
+      transition: transform .3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-panel.open {
+      transform: translateX(0);
+    }
+    .drawer-panel .modal-header {
+      padding: 22px 32px 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .drawer-panel .modal-title { font-size: 20px; font-weight: 600; color: #185a99; }
+    .drawer-panel .modal-close { font-size: 20px; color: #888; cursor: pointer; border: none; background: none; transition: .2s; }
+    .drawer-panel .modal-close:hover { color: #d33; }
+    .drawer-panel .modal-tabs {
+      display: flex;
+      border-bottom: 1.5px solid #e5e6eb;
+      margin: 18px 32px 0 32px;
+      flex-shrink: 0;
+    }
+    .drawer-panel .modal-tab {
+      padding: 10px 32px;
+      font-size: 15px;
+      color: #185a99;
+      cursor: pointer;
+      background: none;
+      border: none;
+      outline: none;
+      border-bottom: 2.5px solid transparent;
+      transition: .2s;
+    }
+    .drawer-panel .modal-tab.active {
+      color: #2176c7;
+      font-weight: 600;
+      border-bottom: 2.5px solid #2176c7;
+      background: #f6f8fa;
+    }
+    .drawer-panel .drawer-body {
+      padding: 28px 32px 32px 32px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    /* Copied styles from modal_detail.html */
+    .drawer-panel table { border-collapse: collapse; width: 100%; background: #fff; font-size: 15px; }
+    .drawer-panel th, .drawer-panel td { border: 1px solid #e5e6eb; padding: 8px 12px; font-size: 15px; }
+    .drawer-panel th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .drawer-panel .section-title { font-size: 15px; color: #2176c7; margin: 18px 0 10px 0; font-weight: 600; }
+    .drawer-panel .kv-row { display: flex; margin-bottom: 12px; }
+    .drawer-panel .kv-label { width: 140px; color: #444; text-align: right; margin-right: 12px; }
+    .drawer-panel .kv-value { flex: 1; color: #222; }
+    .drawer-panel .tag { display: inline-block; background: #eaf3ff; color: #2176c7; border-radius: 3px; padding: 2px 8px; font-size: 13px; margin-right: 6px; }
+    .drawer-panel .rule-list { margin: 0; padding-left: 18px; color: #444; }
+    .drawer-panel .layout-box { background: #f6f8fa; border-radius: 6px; padding: 18px; margin-bottom: 12px; }
+    .drawer-panel .form-2col { display: flex; flex-direction: column; gap: 0; margin-top: 10px; }
+    .drawer-panel .form-row { display: flex; align-items: center; margin-bottom: 18px; }
+    .drawer-panel .form-label { width: 160px; color: #333; text-align: right; margin-right: 8px; }
+    .drawer-panel .form-value { width: 320px; color: #222; margin-right: 32px; background: #f8fafd; border-radius: 4px; min-height: 32px; display: flex; align-items: center; padding-left: 8px; }
+    .drawer-panel .required { color: #e53935; margin-left: 2px; }
+    .drawer-panel .attr-flexbox { display: flex; height: 420px; min-height: 320px; box-sizing: border-box; }
+    .drawer-panel .attr-field-list { width: 140px; background: #f6f8fa; border-radius: 6px 0 0 6px; padding: 0; min-height: 100%; display: flex; flex-direction: column; align-items: stretch; }
+    .drawer-panel .attr-field-item { padding: 18px 0 18px 18px; color: #185a99; cursor: pointer; border-left: 3px solid transparent; transition: .2s; background: none; }
+    .drawer-panel .attr-field-item.active { background: #2176c7; color: #fff; border-left: 3px solid #185a99; font-weight: 600; }
+    .drawer-panel .attr-field-detail { flex: 1; background: #fff; border-radius: 0 6px 6px 0; padding: 0 0 0 32px; overflow-y: auto; max-height: 420px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-start; }
+    .drawer-panel .attr-detail-title { color: #185a99; font-size: 15px; font-weight: 600; padding: 0 0 10px 0; margin-bottom: 10px; background: none; border-radius: 0; }
+    .drawer-panel .attr-detail-row { display: flex; align-items: center; margin-bottom: 18px; }
+    .drawer-panel .attr-detail-label { width: 140px; color: #222; text-align: right; margin-right: 8px; }
+    .drawer-panel .attr-detail-value { width: 220px; color: #222; background: #f8fafd; border-radius: 4px; min-height: 32px; display: flex; align-items: center; padding-left: 8px; margin-right: 32px; }
+    .drawer-panel .rule-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; }
+    .drawer-panel .layout-detail-flexbox { display: flex; min-height: 360px; border: 1px solid #e5e6eb; border-radius: 6px; }
+    .drawer-panel .layout-detail-nav { width: 160px; background: #f6f8fa; border-right: 1px solid #e5e6eb; padding: 8px 0; }
+    .drawer-panel .layout-detail-nav-item { padding: 12px 20px; color: #185a99; cursor: pointer; border-left: 3px solid transparent; transition: .2s; }
+    .drawer-panel .layout-detail-nav-item.active { background: #fff; color: #2176c7; font-weight: 600; border-left-color: #2176c7; }
+    .drawer-panel .layout-detail-pane { display: none; }
+    .drawer-panel .layout-detail-pane.active { display: block; }
+    /* Modern input style for drawer form */
+    #detailDrawerPanel .form-control, #detailDrawerPanel input[type="text"], #detailDrawerPanel select {
+      border: 1.5px solid #c0d3eb;
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-size: 15px;
+      background: #f7faff;
+      box-shadow: 0 1px 4px rgba(33,118,199,0.06);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    #detailDrawerPanel .form-control:focus, #detailDrawerPanel input[type="text"]:focus, #detailDrawerPanel select:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px rgba(33,118,199,0.13);
+      background: #fff;
+    }
+    #detailDrawerPanel .form-control:hover, #detailDrawerPanel input[type="text"]:hover, #detailDrawerPanel select:hover {
+      border-color: #3ba1e3;
+    }
+    #detailDrawerPanel .form-value {
+      background: none;
+      padding: 0;
+      min-height: unset;
+    }
+    #detailDrawerPanel .form-row {
+      margin-bottom: 22px;
+    }
+    #detailDrawerPanel .form-label {
+      font-size: 15px;
+      color: #185a99;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -493,6 +620,13 @@
                 <select class="form-control operator-select" style="width:120px;"><option>等于</option></select>
                 <div class="query-value-container">
                     <input type="text" class="form-control" placeholder="多值用空格分隔">
+                </div>
+            </div>
+            <div class="query-row">
+                <label>模型描述</label>
+                <select class="form-control operator-select" style="width:120px;"><option>包含</option></select>
+                <div class="query-value-container">
+                    <input type="text" class="form-control" placeholder="请输入模型描述">
                 </div>
             </div>
             <div class="query-row">
@@ -642,10 +776,7 @@
             <button type="button" id="closeVersionModal">&times;</button>
           </div>
           <div class="version-modal-btns">
-            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>导出历史版本</button>
-            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>历史版本间比较</button>
-            <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v4l3 3"/></svg>与最新版本比较</button>
-            <button class="btn" id="versionModalCloseBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>关闭</button>
+            <button class="btn version-btn-small" id="versionCompareBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>版本比较</button>
           </div>
           <div style="padding:0 32px 0 32px;">
             <table class="model-table">
@@ -654,6 +785,7 @@
                   <th class="checkbox-cell"><input type="checkbox"></th>
                   <th>模型名称</th>
                   <th>模型编码</th>
+                  <th>模型描述</th>
                   <th>类型</th>
                   <th>层级展示</th>
                   <th>创建人</th>
@@ -661,7 +793,7 @@
                   <th>当前修改人</th>
                   <th>最后修改人</th>
                   <th>最后修改时间</th>
-                  <th>版本</th>
+                  <th>模型版本</th>
                   <th>审核人</th>
                   <th>状态</th>
                   <th>语言</th>
@@ -688,6 +820,7 @@
                   <td><input type="checkbox"></td>
                   <td><a href="#">元数据</a></td>
                   <td>mdm_meta</td>
+                  <td>系统元数据管理</td>
                   <td>系统字典表</td>
                   <td>否</td>
                   <td>admin</td>
@@ -702,8 +835,26 @@
                 </tr>
                 <tr>
                   <td><input type="checkbox"></td>
-                  <td><a href="#">元数据</a></td>
-                  <td>mdm_meta</td>
+                  <td><a href="#">模型类型</a></td>
+                  <td>mdm_model_type</td>
+                  <td>数据模型类型定义</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>hefanqi</td>
+                  <td>admin</td>
+                  <td>2022-03-25</td>
+                  <td><a href="#" class="version-link">4</a></td>
+                  <td>李四</td>
+                  <td>待提交</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">文件类型</a></td>
+                  <td>mdm_sys_file_type</td>
+                  <td>系统支持的文件类型</td>
                   <td>系统字典表</td>
                   <td>否</td>
                   <td>admin</td>
@@ -712,47 +863,203 @@
                   <td>admin</td>
                   <td>2022-03-25</td>
                   <td><a href="#" class="version-link">2</a></td>
-                  <td>张三</td>
+                  <td>王五</td>
+                  <td>待提交</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">字段类型</a></td>
+                  <td>mdm_field_type</td>
+                  <td>数据字段类型定义</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>lichunyang</td>
+                  <td>admin</td>
+                  <td>2025-04-17</td>
+                  <td><a href="#" class="version-link">2</a></td>
+                  <td>赵六</td>
                   <td>正常</td>
                   <td>中文</td>
                 </tr>
                 <tr>
                   <td><input type="checkbox"></td>
-                  <td><a href="#">元数据</a></td>
-                  <td>mdm_meta</td>
+                  <td><a href="#">是否</a></td>
+                  <td>mdm_sys_if</td>
+                  <td>系统是否选项</td>
                   <td>系统字典表</td>
                   <td>否</td>
                   <td>admin</td>
                   <td>2019-01-01</td>
                   <td>admin</td>
                   <td>admin</td>
-                  <td>2022-03-25</td>
-                  <td><a href="#" class="version-link">2</a></td>
-                  <td>张三</td>
+                  <td>2025-06-11</td>
+                  <td><a href="#" class="version-link">3</a></td>
+                  <td>孙七</td>
                   <td>正常</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">操作类型</a></td>
+                  <td>mdm_op_type</td>
+                  <td>系统操作类型定义</td>
+                  <td>系统字典表</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2025-06-11</td>
+                  <td><a href="#" class="version-link">4</a></td>
+                  <td>周八</td>
+                  <td>正常</td>
+                  <td>英文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">MDM_SYSLOG</a></td>
+                  <td>mdm_syslog</td>
+                  <td>系统日志记录</td>
+                  <td>主数据</td>
+                  <td>否</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2025-06-11</td>
+                  <td><a href="#" class="version-link">5</a></td>
+                  <td>吴九</td>
+                  <td>正常</td>
+                  <td>中文</td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td><a href="#">MDM_SYSTEM</a></td>
+                  <td>mdm_system</td>
+                  <td>系统信息管理</td>
+                  <td>主数据</td>
+                  <td>是</td>
+                  <td>admin</td>
+                  <td>2019-01-01</td>
+                  <td>admin</td>
+                  <td>admin</td>
+                  <td>2025-06-11</td>
+                  <td><a href="#" class="version-link">6</a></td>
+                  <td>郑十</td>
+                  <td>待提交</td>
                   <td>中文</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="version-modal-footer-bar">
-            <div>共 2 条</div>
-            <div class="version-modal-pagination">
-              <button class="btn" disabled>&lt;&lt;</button>
-              <button class="btn" disabled>&lt;</button>
-              <span>1</span>
-              <span>/</span>
-              <span>1</span>
-              <select><option>50</option><option>100</option></select>
-              <span>条/页</span>
-              <button class="btn" disabled>&gt;</button>
-              <button class="btn" disabled>&gt;&gt;</button>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" id="versionModalCloseBtn">关闭</button>
+            <div id="versionModalCount"></div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="erDrawerMask" class="er-drawer-mask"></div>
+  <div id="erDrawer" class="er-drawer">
+    <div class="er-drawer-header">
+      <span>ER图关系展示</span>
+      <span id="erDrawerClose" class="er-drawer-close">×</span>
+    </div>
+    <div class="er-drawer-body" id="erDrawerBody">
+      <div id="erSvgContainer" style="width:100%;height:400px;display:flex;align-items:center;justify-content:center;"></div>
+    </div>
+  </div>
+
+  <!-- Right side Drawer for Model Detail -->
+  <div id="detailDrawerMask" class="drawer-mask"></div>
+  <div id="detailDrawerPanel" class="drawer-panel">
+    <div class="modal-header">
+      <span class="modal-title">模型详情</span>
+      <button class="modal-close" id="drawerCloseBtn">×</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="base">基本配置</button>
+      <button class="modal-tab" data-tab="attr">属性配置</button>
+      <button class="modal-tab" data-tab="rule">业务规则</button>
+      <button class="modal-tab" data-tab="code">编码规则</button>
+      <button class="modal-tab" data-tab="layout">布局配置</button>
+    </div>
+    <div class="drawer-body">
+      <div id="drawerTabContent"></div>
+      <div id="drawerTabFooter"></div>
+    </div>
+  </div>
+
+  <!-- 复制模型选择弹窗 -->
+  <div class="modal-mask" id="copyModelSelectMask" style="display:none;align-items:center;justify-content:center;z-index:2000;">
+    <div class="modal-content" style="width:380px;max-width:95vw;border-radius:12px;box-shadow:0 8px 32px rgba(33,118,199,0.13);padding:0;overflow:hidden;">
+      <div class="modal-header" style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:18px 28px 12px 28px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;">
+        <span>选择要复制的主数据模型</span>
+        <span style="cursor:pointer;font-size:22px;" id="copyModelSelectClose">×</span>
+      </div>
+      <div class="modal-body" style="padding:28px 28px 10px 28px;">
+        <label for="copyModelSelect" style="font-size:15px;color:#185a99;font-weight:500;display:block;margin-bottom:10px;">主数据模型：</label>
+        <select id="copyModelSelect" class="form-control" style="width:100%;font-size:15px;padding:8px 12px;border-radius:6px;border:1.2px solid #c0d3eb;background:#f7faff;">
+          <option value="" disabled selected>请选择模型</option>
+          <option value="mdm_meta">元数据（mdm_meta）</option>
+          <option value="mdm_model_type">模型类型（mdm_model_type）</option>
+        </select>
+      </div>
+      <div class="modal-footer" style="padding:16px 28px 18px 28px;text-align:right;background:#f7faff;border-radius:0 0 12px 12px;">
+        <button class="btn btn-default" id="copyModelSelectCancel" style="margin-right:10px;">取消</button>
+        <button class="btn btn-primary" id="copyModelSelectOk">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 新增/复制模型弹窗 -->
+  <div class="modal-mask" id="addModelMask" style="display:none;align-items:center;justify-content:center;">
+    <div class="modal-content" style="width:600px;max-width:98vw;">
+      <div class="modal-header" style="font-size:18px;font-weight:500;">新增模型
+        <span style="float:right;cursor:pointer;font-size:22px;" id="addModelClose">×</span>
+      </div>
+      <div class="modal-body">
+        <form id="addModelForm">
+          <div style="margin-bottom:12px;">
+            <label>模型名称：</label>
+            <input type="text" class="form-control" name="name" required style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>模型编码：</label>
+            <input type="text" class="form-control" name="code" required style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>模型描述：</label>
+            <input type="text" class="form-control" name="desc" style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>类型：</label>
+            <input type="text" class="form-control" name="type" style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>层级展示：</label>
+            <input type="text" class="form-control" name="level" style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>创建人：</label>
+            <input type="text" class="form-control" name="creator" style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>创建时间：</label>
+            <input type="text" class="form-control" name="ctime" style="width:80%;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label>状态：</label>
+            <input type="text" class="form-control" name="status" style="width:80%;">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="text-align:right;">
+        <button class="btn btn-default" id="addModelCancel">取消</button>
+        <button class="btn btn-primary" id="addModelSave">保存</button>
       </div>
     </div>
   </div>
@@ -783,6 +1090,113 @@
         if(advSearchBtn) {
             advSearchBtn.onclick = openAdvancedSearchModal;
         }
+
+        // 绑定模型申请页签下按钮事件
+        document.body.addEventListener('click', function(e) {
+          // 复制按钮
+          if (e.target && e.target.id === 'applyCopyBtn') {
+            document.getElementById('copyModelSelectMask').style.display = 'flex';
+          }
+          // 关闭选择模型弹窗
+          if (e.target && (e.target.id === 'copyModelSelectClose' || e.target.id === 'copyModelSelectCancel')) {
+            document.getElementById('copyModelSelectMask').style.display = 'none';
+          }
+          // 选择模型后，弹出新增模型表单并填充
+          if (e.target && e.target.id === 'copyModelSelectOk') {
+            const select = document.getElementById('copyModelSelect');
+            const val = select.value;
+            if (!val) { alert('请选择要复制的模型'); return; }
+            let data = {};
+            if (val === 'mdm_meta') {
+              data = { name: '元数据', code: 'mdm_meta', desc: '系统元数据管理', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', status: '草稿' };
+            } else if (val === 'mdm_model_type') {
+              data = { name: '模型类型', code: 'mdm_model_type', desc: '数据模型类型定义', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', status: '草稿' };
+            }
+            // 填充表单
+            const form = document.getElementById('addModelForm');
+            if (form) {
+              form.name.value = data.name;
+              form.code.value = data.code;
+              form.desc.value = data.desc;
+              form.type.value = data.type;
+              form.level.value = data.level;
+              form.creator.value = data.creator;
+              form.ctime.value = data.ctime;
+              form.status.value = data.status;
+            }
+            document.getElementById('copyModelSelectMask').style.display = 'none';
+            document.getElementById('addModelMask').style.display = 'flex';
+          }
+          // 新增按钮，弹出空表单
+          if (e.target && e.target.id === 'applyAddBtn') {
+            const drawerMask = document.getElementById('detailDrawerMask');
+            const drawerPanel = document.getElementById('detailDrawerPanel');
+            drawerMask.classList.add('open');
+            drawerPanel.classList.add('open');
+            // 只显示基本配置tab
+            drawerPanel.querySelector('.modal-title').textContent = '新增模型';
+            const tabs = drawerPanel.querySelectorAll('.modal-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabs[0].classList.add('active');
+            const tabContent = drawerPanel.querySelector('#drawerTabContent');
+            const tabFooter = drawerPanel.querySelector('#drawerTabFooter');
+            tabContent.innerHTML = renderModelDrawerEditForm();
+            tabFooter.innerHTML = renderDrawerFooterBtns(0, tabs.length);
+          }
+          // 关闭新增模型弹窗
+          if (e.target && (e.target.id === 'addModelClose' || e.target.id === 'addModelCancel')) {
+            document.getElementById('addModelMask').style.display = 'none';
+          }
+          // 编辑按钮点击事件
+          if (e.target && e.target.textContent === '编辑') {
+            const row = e.target.closest('tr');
+            if (row) {
+              const modelName = row.querySelector('.model-name-link').textContent;
+              const modelCode = row.children[2].textContent;
+              // 打开模型详情抽屉
+              const drawerMask = document.getElementById('detailDrawerMask');
+              const drawerPanel = document.getElementById('detailDrawerPanel');
+              drawerMask.classList.add('open');
+              drawerPanel.classList.add('open');
+              // 设置标题
+              drawerPanel.querySelector('.modal-title').textContent = `编辑模型 - ${modelName}`;
+              // 显示基本配置tab
+              const tabs = drawerPanel.querySelectorAll('.modal-tab');
+              tabs.forEach(tab => tab.classList.remove('active'));
+              tabs[0].classList.add('active');
+              const tabContent = drawerPanel.querySelector('#drawerTabContent');
+              const tabFooter = drawerPanel.querySelector('#drawerTabFooter');
+              // 填充表单数据
+              const formData = {
+                category: '系统字典表',
+                code: modelCode,
+                name: modelName,
+                type: row.children[4].textContent,
+                tree: row.children[5].textContent
+              };
+              tabContent.innerHTML = renderModelDrawerEditForm(formData);
+              tabFooter.innerHTML = renderDrawerFooterBtns(0, tabs.length);
+            }
+          }
+        });
+
+        // 全局事件委托，保证所有.btn-er按钮都能弹出抽屉
+        document.body.addEventListener('click', function(e) {
+          if (e.target.classList.contains('btn-er')) {
+            const code = e.target.getAttribute('data-code');
+            openErDrawer(code);
+          }
+        });
+
+        // 关闭抽屉
+        document.getElementById('erDrawerClose').onclick = function() {
+          document.getElementById('erDrawer').classList.remove('open');
+          document.getElementById('erDrawerMask').classList.remove('show');
+        };
+        document.getElementById('erDrawerMask').onclick = function() {
+          document.getElementById('erDrawer').classList.remove('open');
+          document.getElementById('erDrawerMask').classList.remove('show');
+        };
     });
 
     // 全局变量保存快速查询显示状态
@@ -820,14 +1234,19 @@
     function bindModelTabEvents() {
       document.querySelectorAll('.model-tab').forEach(tab => {
         tab.onclick = function() {
-          document.querySelectorAll('.model-tab').forEach(t => {
-            t.classList.remove('active');
-          });
+          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
           this.classList.add('active');
-
-          // As per request, all tabs now show the query view.
-          modelQueryShowQueryBar = false;
-          renderAndBindModelQueryTab();
+          const tabType = this.getAttribute('data-tab');
+          if (tabType === 'query') {
+            modelQueryShowQueryBar = false;
+            renderAndBindModelQueryTab();
+          } else if (tabType === 'apply') {
+            document.getElementById('modelTabContent').innerHTML = renderModelApplyTab();
+            // 这里可以加apply相关的事件绑定
+          } else if (tabType === 'modify') {
+            document.getElementById('modelTabContent').innerHTML = renderModelModifyTab();
+          }
+          // 其他tab同理
         };
       });
     }
@@ -987,6 +1406,7 @@
                 <th class="checkbox-cell"><input type="checkbox"></th>
                 <th>模型名称</th>
                 <th>模型编码</th>
+                <th>模型描述</th>
                 <th>类型</th>
                 <th>层级展示</th>
                 <th>创建人</th>
@@ -994,16 +1414,18 @@
                 <th>当前修改人</th>
                 <th>最后修改人</th>
                 <th>最后修改时间</th>
-                <th>版本</th>
+                <th>模型版本</th>
                 <th>审核人</th>
                 <th>状态</th>
                 <th>语言</th>
+                <th>操作</th>
               </tr>
             </thead>
             ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
               <td class='checkbox-cell'></td>
               <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
               <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型描述' style='width:98%;'></td>
               <td>
                 <select class="form-select" style="width:98%;">
                   <option value="">请选择类型</option>
@@ -1025,16 +1447,18 @@
               <td><input type='text' placeholder='当前修改人' style='width:98%;'></td>
               <td><input type='text' placeholder='最后修改人' style='width:98%;'></td>
               <td><input type='text' id='last-modified-time-picker' placeholder='最后修改时间' style='width:98%;'></td>
-              <td><input type='text' placeholder='版本' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型版本' style='width:98%;'></td>
               <td><input type='text' placeholder='审核人' style='width:98%;'></td>
               <td><input type='text' placeholder='状态' style='width:98%;'></td>
               <td><input type='text' placeholder='语言' style='width:98%;'></td>
+              <td></td>
             </tr>` : ''}
             <tbody>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">元数据</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
                 <td>mdm_meta</td>
+                <td>系统元数据管理</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1046,11 +1470,13 @@
                 <td>张三</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_meta">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">模型类型</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
                 <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1062,11 +1488,13 @@
                 <td>李四</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_model_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">文件类型</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
                 <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1078,11 +1506,13 @@
                 <td>王五</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_sys_file_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">字段类型</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
                 <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1094,11 +1524,13 @@
                 <td>赵六</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_field_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">是否</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
                 <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1110,11 +1542,13 @@
                 <td>孙七</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_sys_if">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">操作类型</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
                 <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
                 <td>系统字典表</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1126,11 +1560,13 @@
                 <td>周八</td>
                 <td>正常</td>
                 <td>英文</td>
+                <td><button class="btn-er" data-code="mdm_op_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">MDM_SYSLOG</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
                 <td>mdm_syslog</td>
+                <td>系统日志记录</td>
                 <td>主数据</td>
                 <td>否</td>
                 <td>admin</td>
@@ -1142,11 +1578,13 @@
                 <td>吴九</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_syslog">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><a href="#">MDM_SYSTEM</a></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
                 <td>mdm_system</td>
+                <td>系统信息管理</td>
                 <td>主数据</td>
                 <td>是</td>
                 <td>admin</td>
@@ -1158,6 +1596,7 @@
                 <td>郑十</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button class="btn-er" data-code="mdm_system">查看关系</button></td>
               </tr>
             </tbody>
           </table>
@@ -1165,26 +1604,627 @@
       `;
     }
 
-    function renderModelApplyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型申请功能暂未实现</div>`; }
+    function renderModelApplyTab() {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-main" id="applyAddBtn">新增</button>
+          <button class="btn-line" id="applyDeleteBtn">删除</button>
+          <button class="btn-line" id="applyCopyBtn">复制</button>
+          <button class="btn-line" id="applySubmitBtn">提交</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
     function renderModelModifyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型修改功能暂未实现</div>`; }
     function renderModelFreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型冻结功能暂未实现</div>`; }
     function renderModelUnfreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型解冻功能暂未实现</div>`; }
     function renderModelSearchTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型检索功能暂未实现</div>`; }
 
     // 版本弹窗逻辑（事件委托，兼容动态渲染）
+    let currentVersionModelCode = null;
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('version-link')) {
         e.preventDefault();
+        // 获取当前行的模型编码
+        const row = e.target.closest('tr');
+        if(row) {
+          currentVersionModelCode = row.children[2].textContent;
+        }
+        renderVersionModalTable();
         document.getElementById('versionMask').classList.add('show');
       }
     });
     document.getElementById('closeVersionModal').onclick = function() {
       document.getElementById('versionMask').classList.remove('show');
     };
-    document.getElementById('versionModalCloseBtn').onclick = function() {
-      document.getElementById('versionMask').classList.remove('show');
-    };
 
+    // 渲染版本弹窗表格，只显示当前模型的所有历史版本
+    function renderVersionModalTable() {
+      const tbody = document.getElementById('versionModalTableBody');
+      if (!tbody) return;
+      // 静态模拟所有模型的历史版本数据
+      const allVersions = [
+        { name: '元数据', code: 'mdm_meta', desc: '系统元数据管理', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'admin', lastmod: 'admin', lmtime: '2022-03-25', version: '2', reviewer: '张三', status: '正常', lang: '中文' },
+        { name: '元数据', code: 'mdm_meta', desc: '系统元数据管理', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'admin', lastmod: 'admin', lmtime: '2021-12-10', version: '1', reviewer: '张三', status: '正常', lang: '中文' },
+        { name: '模型类型', code: 'mdm_model_type', desc: '数据模型类型定义', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'hefanqi', lastmod: 'admin', lmtime: '2022-03-25', version: '4', reviewer: '李四', status: '待提交', lang: '中文' },
+        { name: '模型类型', code: 'mdm_model_type', desc: '数据模型类型定义', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'hefanqi', lastmod: 'admin', lmtime: '2021-11-11', version: '3', reviewer: '李四', status: '正常', lang: '中文' },
+        { name: '文件类型', code: 'mdm_sys_file_type', desc: '系统支持的文件类型', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'admin', lastmod: 'admin', lmtime: '2022-03-25', version: '2', reviewer: '王五', status: '待提交', lang: '中文' },
+        { name: '字段类型', code: 'mdm_field_type', desc: '数据字段类型定义', type: '系统字典表', level: '否', creator: 'admin', ctime: '2019-01-01', curmod: 'lichunyang', lastmod: 'admin', lmtime: '2025-04-17', version: '2', reviewer: '赵六', status: '正常', lang: '中文' },
+        // ...可继续补充其他模型的历史版本...
+      ];
+      tbody.innerHTML = '';
+      if (!currentVersionModelCode) return;
+      const filtered = allVersions.filter(v => v.code === currentVersionModelCode);
+      filtered.forEach(v => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="checkbox"></td>
+          <td><a href="#">${v.name}</a></td>
+          <td>${v.code}</td>
+          <td>${v.desc}</td>
+          <td>${v.type}</td>
+          <td>${v.level}</td>
+          <td>${v.creator}</td>
+          <td>${v.ctime}</td>
+          <td>${v.curmod}</td>
+          <td>${v.lastmod}</td>
+          <td>${v.lmtime}</td>
+          <td><a href="#" class="version-link">${v.version}</a></td>
+          <td>${v.reviewer}</td>
+          <td>${v.status}</td>
+          <td>${v.lang}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      // 更新底部条数统计
+      const countDiv = document.getElementById('versionModalCount');
+      if(countDiv) countDiv.textContent = `共 ${filtered.length} 条`;
+    }
+
+    function openErDrawer(code) {
+      document.getElementById('erDrawer').classList.add('open');
+      document.getElementById('erDrawerMask').classList.add('show');
+      document.getElementById('erSvgContainer').innerHTML = `
+        <svg width="800" height="400">
+          <!-- 用户表 -->
+          <rect x="80" y="40" width="140" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
+          <text x="150" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">用户表</text>
+          <text x="95" y="90" font-size="13" fill="#333">user_id</text>
+          <text x="95" y="110" font-size="13" fill="#333">user_name</text>
+          <text x="95" y="130" font-size="13" fill="#333">email</text>
+          <!-- 订单表 -->
+          <rect x="340" y="40" width="180" height="130" fill="#f7faff" stroke="#2176c7" rx="10"/>
+          <text x="430" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">订单表</text>
+          <text x="355" y="90" font-size="13" fill="#333">order_id</text>
+          <text x="355" y="110" font-size="13" fill="#333">user_id</text>
+          <text x="355" y="130" font-size="13" fill="#333">product_id</text>
+          <text x="355" y="150" font-size="13" fill="#333">amount</text>
+          <text x="355" y="170" font-size="13" fill="#333">order_time</text>
+          <!-- 商品表（下方） -->
+          <rect x="340" y="250" width="180" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
+          <text x="430" y="270" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">商品表</text>
+          <text x="355" y="300" font-size="13" fill="#333">product_id</text>
+          <text x="355" y="320" font-size="13" fill="#333">product_name</text>
+          <!-- 连线 用户表.user_id -> 订单表.user_id -->
+          <line x1="220" y1="85" x2="340" y2="100" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="250" y="90" font-size="12" fill="#2176c7">user_id</text>
+          <!-- 连线 订单表.product_id -> 商品表.product_id -->
+          <line x1="430" y1="170" x2="430" y2="250" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="440" y="220" font-size="12" fill="#2176c7">product_id</text>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
+            </marker>
+          </defs>
+        </svg>
+        <div style='margin-top:12px;color:#888;font-size:13px;text-align:center;'>示例：用户表-订单表-商品表的典型ER关系</div>
+      `;
+    }
+
+    // --- Drawer Logic ---
+    const drawerMask = document.getElementById('detailDrawerMask');
+    const drawerPanel = document.getElementById('detailDrawerPanel');
+    const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+
+    function openDrawer() {
+      drawerMask.classList.add('open');
+      drawerPanel.classList.add('open');
+      initializeDrawerLogic();
+    }
+
+    function closeDrawer() {
+      drawerMask.classList.remove('open');
+      drawerPanel.classList.remove('open');
+    }
+
+    // Use event delegation on the body for dynamically added model name links
+    document.body.addEventListener('click', function(e) {
+      if (e.target.matches('a.model-name-link')) {
+        e.preventDefault();
+        const modelId = e.target.getAttribute('data-id');
+        // You can use modelId to fetch specific data later
+        openDrawer();
+      }
+       if (e.target.classList.contains('rule-link')) {
+        const ruleId = e.target.getAttribute('data-rule-id');
+        openRuleDetail(ruleId);
+      }
+    });
+
+    drawerMask.addEventListener('click', closeDrawer);
+    drawerCloseBtn.addEventListener('click', closeDrawer);
+    
+    // --- Drawer Content Logic (from modal_detail.html) ---
+    let drawerInitialized = false;
+    function initializeDrawerLogic() {
+      if (drawerInitialized) return;
+      drawerInitialized = true;
+
+      const tabs = document.querySelectorAll('#detailDrawerPanel .modal-tab');
+      const tabContent = document.querySelector('#detailDrawerPanel #drawerTabContent');
+      const tabFooter = document.querySelector('#detailDrawerPanel #drawerTabFooter');
+
+      tabs.forEach((tab, idx) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          // 只切换内容和按钮
+          if(tabId === 'base') {
+            tabContent.innerHTML = renderModelDrawerEditForm();
+            tabFooter.innerHTML = renderDrawerFooterBtns(idx, tabs.length);
+          } else {
+            // 其他tab内容可根据需要渲染为可编辑表单，这里暂用原内容
+            tabContent.innerHTML = document.querySelector(`#tab-${tabId}`)?.innerHTML || '';
+            tabFooter.innerHTML = renderDrawerFooterBtns(idx, tabs.length);
+          }
+          if (tabId === 'rule') {
+            renderRuleTable();
+          }
+          if (tabId === 'code') {
+            renderCodeRuleTable();
+          }
+        });
+      });
+
+      // Attr Tab Logic
+      const attrItems = document.querySelectorAll('#detailDrawerPanel .attr-field-item');
+      const attrDetailBox = document.getElementById('attr-detail-box');
+      const attrData = {
+        '编码': { '字段名称': '编码', '字段编码': 'code', '是否主键': '是', '是否必填': '是', '是否唯一': '是', '字段类型': '文本' },
+        '名称': { '字段名称': '名称', '字段编码': 'name', '是否主键': '否', '是否必填': '是', '是否唯一': '否', '字段类型': '文本' },
+        '英文名称': { '字段名称': '英文名称', '字段编码': 'name_en', '是否主键': '否', '是否必填': '否', '是否唯一': '否', '字段类型': '文本' },
+        '英文简称': { '字段名称': '英文简称', '字段编码': 'name_en_short', '是否主键': '否', '是否必填': '否', '是否唯一': '否', '字段类型': '文本' },
+        '国家': { '字段名称': '国家', '字段编码': 'country', '是否主键': '否', '是否必填': '是', '是否唯一': '否', '字段类型': '引用' }
+      };
+
+      function renderAttrDetail(field) {
+        const data = attrData[field];
+        let html = `<div class="attr-detail-title">${field} - 属性详情</div><div class="attr-detail-table">`;
+        for (const [key, value] of Object.entries(data)) {
+          html += `<div class="attr-detail-row"><div class="attr-detail-label">${key}:</div><div class="attr-detail-value">${value}</div></div>`;
+        }
+        html += '</div>';
+        attrDetailBox.innerHTML = html;
+      }
+
+      attrItems.forEach(item => {
+        item.addEventListener('click', () => {
+          attrItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          renderAttrDetail(item.getAttribute('data-field'));
+        });
+      });
+      
+      renderAttrDetail('编码'); // Initial render
+
+      // Rule Tab Logic
+      const ruleData = {
+          'UNIQUE_NAME': { name: '名称唯一性校验', type: '唯一校验', creator: 'admin', time: '2023-01-01', detail: '在全表范围内，字段 [name] 的值必须是唯一的。' },
+          'CODE_NOT_EMPTY': { name: '编码非空校验', type: '非空校验', creator: 'admin', time: '2023-01-01', detail: '字段 [code] 的值不允许为空或只包含空白字符。' }
+      };
+      function renderRuleTable() {
+        const tbody = document.getElementById('ruleTableBody');
+        tbody.innerHTML = '';
+        Object.keys(ruleData).forEach(id => {
+            const rule = ruleData[id];
+            tbody.innerHTML += `<tr>
+                <td><a href="#" class="rule-link" data-rule-id="${id}">${rule.name}</a></td>
+                <td>${rule.type}</td>
+                <td>${rule.creator}</td>
+                <td>${rule.time}</td>
+            </tr>`;
+        });
+      }
+      window.openRuleDetail = function(ruleId) {
+        document.getElementById('ruleDetailContent').innerText = ruleData[ruleId].detail;
+        document.getElementById('ruleDetailModal').style.display = 'block';
+      }
+      window.closeRuleDetail = function() {
+        document.getElementById('ruleDetailModal').style.display = 'none';
+      }
+
+      // Code Rule Tab Logic
+      function renderCodeRuleTable() {
+        const tbody = document.getElementById('codeRuleTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td>1</td>
+                <td>自动生成</td>
+                <td>1</td>
+                <td>99999</td>
+                <td>否</td>
+                <td>1</td>
+                <td>5</td>
+                <td>正常</td>
+                <td>admin</td>
+                <td>2023-01-01 10:00:00</td>
+                <td><button>编辑</button> <button>删除</button></td>
+            </tr>
+        `;
+      }
+
+      // Layout Tab Logic
+      const layoutNavItems = document.querySelectorAll('#detailDrawerPanel .layout-detail-nav-item');
+      const layoutPanes = document.querySelectorAll('#detailDrawerPanel .layout-detail-pane');
+
+      layoutNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+          layoutNavItems.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const paneId = item.getAttribute('data-pane');
+          layoutPanes.forEach(pane => {
+            pane.style.display = pane.id === paneId ? 'block' : 'none';
+            if (pane.id === paneId) pane.classList.add('active');
+            else pane.classList.remove('active');
+          });
+        });
+      });
+    }
+
+    // 可编辑表单抽屉内容（不含按钮）
+    function renderModelDrawerEditForm(data = {}) {
+      return `
+        <div class="form-2col">
+          <div class="form-row">
+            <div class="form-label">模型分类：</div>
+            <div class="form-value"><input type="text" name="category" value="${data.category || ''}" class="form-control" style="width:90%"></div>
+            <div class="form-label">模型编码<span class="required">*</span>：</div>
+            <div class="form-value"><input type="text" name="code" value="${data.code || ''}" class="form-control" style="width:90%"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">模型名称<span class="required">*</span>：</div>
+            <div class="form-value"><input type="text" name="name" value="${data.name || ''}" class="form-control" style="width:90%"></div>
+            <div class="form-label">主数据类型<span class="required">*</span>：</div>
+            <div class="form-value"><input type="text" name="type" value="${data.type || ''}" class="form-control" style="width:90%"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">是否树形展示：</div>
+            <div class="form-value"><select name="tree" class="form-control" style="width:90%"><option value="否"${data.tree==="否"?" selected":""}>否</option><option value="是"${data.tree==="是"?" selected":""}>是</option></select></div>
+          </div>
+        </div>
+      `;
+    }
+    // 渲染抽屉底部按钮
+    function renderDrawerFooterBtns(tabIndex, totalTabs) {
+      if(tabIndex === 0) {
+        return `<div style="display:flex;justify-content:flex-end;gap:18px;margin-top:24px;">
+          <button type="button" class="btn btn-default" id="drawerEditCancel">取消</button>
+          <button type="button" class="btn btn-primary" id="drawerEditNext">保存并下一步</button>
+        </div>`;
+      } else if(tabIndex === totalTabs-1) {
+        return `<div style="display:flex;justify-content:flex-end;gap:18px;margin-top:24px;">
+          <button type="button" class="btn btn-default" id="drawerEditPrev">上一步</button>
+          <button type="button" class="btn btn-primary" id="drawerEditFinish">完成</button>
+        </div>`;
+      } else {
+        return `<div style="display:flex;justify-content:flex-end;gap:18px;margin-top:24px;">
+          <button type="button" class="btn btn-default" id="drawerEditPrev">上一步</button>
+          <button type="button" class="btn btn-primary" id="drawerEditNext">下一步</button>
+        </div>`;
+      }
+    }
+
+    document.body.addEventListener('click', function(e) {
+      // ... existing code ...
+      if (e.target && e.target.id === 'drawerEditCancel') {
+        document.getElementById('detailDrawerMask').classList.remove('open');
+        document.getElementById('detailDrawerPanel').classList.remove('open');
+      }
+      // 下一步
+      if (e.target && e.target.id === 'drawerEditNext') {
+        const tabs = document.querySelectorAll('#detailDrawerPanel .modal-tab');
+        const activeIdx = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+        if(activeIdx < tabs.length-1) tabs[activeIdx+1].click();
+      }
+      // 上一步
+      if (e.target && e.target.id === 'drawerEditPrev') {
+        const tabs = document.querySelectorAll('#detailDrawerPanel .modal-tab');
+        const activeIdx = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+        if(activeIdx > 0) tabs[activeIdx-1].click();
+      }
+      // 完成
+      if (e.target && e.target.id === 'drawerEditFinish') {
+        // 可扩展保存逻辑
+        document.getElementById('detailDrawerMask').classList.remove('open');
+        document.getElementById('detailDrawerPanel').classList.remove('open');
+      }
+    });
+
+    // 版本比较按钮事件
+    document.addEventListener('DOMContentLoaded', function() {
+      var compareBtn = document.getElementById('versionCompareBtn');
+      if (compareBtn) {
+        compareBtn.onclick = function() {
+          fetch('modal_compare.html')
+            .then(res => res.text())
+            .then(html => {
+              // 创建遮罩和内容容器
+              let mask = document.createElement('div');
+              mask.id = 'compareModalMask';
+              mask.style.position = 'fixed';
+              mask.style.left = 0;
+              mask.style.top = 0;
+              mask.style.width = '100vw';
+              mask.style.height = '100vh';
+              mask.style.background = 'rgba(0,0,0,0.18)';
+              mask.style.zIndex = 3000;
+              mask.style.display = 'flex';
+              mask.style.alignItems = 'center';
+              mask.style.justifyContent = 'center';
+              // 内容容器
+              let box = document.createElement('div');
+              box.style.background = '#fff';
+              box.style.borderRadius = '10px';
+              box.style.boxShadow = '0 2px 12px rgba(33,118,199,0.10)';
+              box.style.maxWidth = '98vw';
+              box.style.maxHeight = '96vh';
+              box.style.overflow = 'auto';
+              box.innerHTML = html;
+              // 关闭按钮
+              let closeBtn = document.createElement('span');
+              closeBtn.textContent = '×';
+              closeBtn.style.position = 'absolute';
+              closeBtn.style.top = '18px';
+              closeBtn.style.right = '36px';
+              closeBtn.style.fontSize = '32px';
+              closeBtn.style.color = '#2176c7';
+              closeBtn.style.cursor = 'pointer';
+              closeBtn.onclick = function() {
+                document.body.removeChild(mask);
+              };
+              box.style.position = 'relative';
+              box.appendChild(closeBtn);
+              mask.appendChild(box);
+              document.body.appendChild(mask);
+            });
+        };
+      }
+    });
+
+    // 用事件委托绑定版本比较按钮点击事件，确保弹窗能正常弹出
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'versionCompareBtn') {
+        fetch('modal_compare.html')
+          .then(res => res.text())
+          .then(html => {
+            // 创建遮罩和内容容器
+            let mask = document.createElement('div');
+            mask.id = 'compareModalMask';
+            mask.style.position = 'fixed';
+            mask.style.left = 0;
+            mask.style.top = 0;
+            mask.style.width = '100vw';
+            mask.style.height = '100vh';
+            mask.style.background = 'rgba(0,0,0,0.18)';
+            mask.style.zIndex = 3000;
+            mask.style.display = 'flex';
+            mask.style.alignItems = 'center';
+            mask.style.justifyContent = 'center';
+            // 内容容器
+            let box = document.createElement('div');
+            box.style.background = '#fff';
+            box.style.borderRadius = '10px';
+            box.style.boxShadow = '0 2px 12px rgba(33,118,199,0.10)';
+            box.style.maxWidth = '98vw';
+            box.style.maxHeight = '96vh';
+            box.style.overflow = 'auto';
+            box.innerHTML = html;
+            // 关闭按钮
+            let closeBtn = document.createElement('span');
+            closeBtn.textContent = '×';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '18px';
+            closeBtn.style.right = '36px';
+            closeBtn.style.fontSize = '32px';
+            closeBtn.style.color = '#2176c7';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.onclick = function() {
+              document.body.removeChild(mask);
+            };
+            box.style.position = 'relative';
+            box.appendChild(closeBtn);
+            mask.appendChild(box);
+            document.body.appendChild(mask);
+          });
+      }
+    });
   </script>
 </body>
 </html> 

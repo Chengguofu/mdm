@@ -1196,6 +1196,20 @@
               <li class="submenu-item" data-item-id="lang">多语言管理</li>
               <li class="submenu-item" data-item-id="data-perm">数据权限</li>
               <li class="submenu-item" data-item-id="sys-setting">系统设置</li>
+              <li class="submenu-item"><a href="attachmant.html" target="_blank" style="color:inherit;text-decoration:none;display:block;width:100%;height:100%;">批量附件上传</a></li>
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="prototype-reference">
+            <div class="menu-item-header">
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 8h8v8H8z"/></svg>
+              </span>
+              <span>补充（非菜单）</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-content="model-compare" data-url="modal_compare.html">模型版本比较</li>
+              <li class="submenu-item" data-content="model-detail" data-url="modal_detail.html">模型详情查看</li>
+              <li class="submenu-item" data-content="model-add" data-url="modal_detail_new.html">数据模型新增</li>
             </ul>
           </li>
         </ul>
@@ -1656,6 +1670,12 @@
           const content = this.dataset.content;
           if (content === 'model-query') {
             document.getElementById('mainContent').innerHTML = `<iframe src="datamoudual.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'model-compare') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="modal_compare.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'model-detail') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="modal_detail.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'model-add') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="modal_detail_new.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else {
             document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
           }

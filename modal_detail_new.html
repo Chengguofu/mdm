@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>模型详情</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:rgba(0,0,0,0.15); font-size:15px; }
+    .modal-mask {
+      position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.25); z-index:1000; display:flex; align-items:center; justify-content:center;
+    }
+    .modal-window {
+      background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:900px; max-width:98vw; min-height:480px; height:540px; max-height:90vh; overflow:hidden; position:relative; animation:popin .25s;
+    }
+    @keyframes popin { from{transform:scale(0.95);opacity:0;} to{transform:scale(1);opacity:1;} }
+    .modal-header {
+      padding:22px 32px 0 32px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .modal-title { font-size:20px; font-weight:600; color:#185a99; }
+    .modal-close {
+      font-size:20px; color:#888; cursor:pointer; border:none; background:none; transition:.2s; }
+    .modal-close:hover { color:#d33; }
+    .modal-tabs {
+      display:flex; border-bottom:1.5px solid #e5e6eb; margin:18px 32px 0 32px;
+    }
+    .modal-tab {
+      padding:10px 32px; font-size:15px; color:#185a99; cursor:pointer; background:none; border:none; outline:none; border-bottom:2.5px solid transparent; transition:.2s; }
+    .modal-tab.active {
+      color:#2176c7; font-weight:600; border-bottom:2.5px solid #2176c7; background:#f6f8fa;
+    }
+    .modal-content { padding:28px 32px 32px 32px; min-height:320px; font-size:15px; padding-bottom: 110px !important; }
+    /* 表格样式 */
+    table { border-collapse:collapse; width:100%; background:#fff; font-size:15px; }
+    th,td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .section-title { font-size:15px; color:#2176c7; margin:18px 0 10px 0; font-weight:600; }
+    .kv-row { display:flex; margin-bottom:12px; }
+    .kv-label { width:140px; color:#444; font-size:15px; text-align:right; margin-right:12px; }
+    .kv-value { flex:1; color:#222; font-size:15px; }
+    .tag { display:inline-block; background:#eaf3ff; color:#2176c7; border-radius:3px; padding:2px 8px; font-size:13px; margin-right:6px; }
+    .rule-list { margin:0; padding-left:18px; color:#444; font-size:15px; }
+    .layout-box { background:#f6f8fa; border-radius:6px; padding:18px; margin-bottom:12px; font-size:15px; }
+    .form-2col { display:flex; flex-direction:column; gap:0; margin-top:10px; }
+    .form-row { display:flex; align-items:center; margin-bottom:18px; }
+    .form-label { width:160px; color:#333; font-size:15px; text-align:right; margin-right:8px; }
+    .form-value { width:320px; color:#222; font-size:15px; margin-right:32px; background:#f8fafd; border-radius:4px; min-height:32px; display:flex; align-items:center; padding-left:8px; }
+    .required { color:#e53935; margin-left:2px; font-size:15px; }
+    .attr-flexbox {
+      display: flex;
+      height: 100%;
+      min-height: 320px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .attr-field-list {
+      width: 182px;
+      background: #f6f8fa;
+      border-radius: 6px 0 0 6px;
+      padding: 0;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      max-height: 100%;
+      height: 100%;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .attr-field-item {
+      font-size: 13px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .attr-field-item.active {
+      background: #eaf3ff;
+      border-left: 3px solid #2176c7;
+    }
+    .attr-field-item:hover {
+      background: #f4f8fd;
+    }
+    .attr-field-detail {
+      flex: 1;
+      background: #fff;
+      border-radius: 0 6px 6px 0;
+      padding: 0 0 60px 0;
+      overflow-y: auto;
+      max-height: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 420px;
+      max-height: 420px;
+    }
+    .attr-field-detail .form-2col {
+      display: grid;
+      grid-template-columns: 140px 240px 140px 240px;
+      gap: 0 24px;
+      row-gap: 16px;
+      align-items: center;
+      margin-top: 0;
+    }
+    .attr-field-detail .form-row {
+      display: contents;
+    }
+    .attr-field-detail .form-label {
+      text-align: right;
+      font-size: 15px;
+      color: #333;
+      font-weight: 600;
+      padding-right: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .attr-field-detail .form-value {
+      width: 100%;
+      min-width: 0;
+      margin-right: 0;
+      background: none;
+      padding: 0;
+      min-height: unset;
+      display: flex;
+      align-items: center;
+    }
+    .attr-field-detail .form-control,
+    .attr-field-detail input[type="text"],
+    .attr-field-detail select,
+    .attr-field-detail textarea {
+      width: 240px !important;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+      border: 1.5px solid #c0d3eb;
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-size: 15px;
+      background: #f7faff;
+      box-shadow: 0 1px 4px rgba(33,118,199,0.06);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .attr-field-detail .form-control:focus,
+    .attr-field-detail input[type="text"]:focus,
+    .attr-field-detail select:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px rgba(33,118,199,0.13);
+      background: #fff;
+    }
+    .attr-field-detail .form-control:hover,
+    .attr-field-detail input[type="text"]:hover,
+    .attr-field-detail select:hover {
+      border-color: #3ba1e3;
+    }
+    .attr-detail-title {
+      color: #185a99;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 0 0 10px 0;
+      margin-bottom: 10px;
+      background: none;
+      border-radius: 0;
+    }
+    .attr-detail-table {
+      width: 100%;
+    }
+    .attr-detail-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .attr-detail-label {
+      width: 140px;
+      color: #222;
+      font-size: 15px;
+      text-align: right;
+      margin-right: 8px;
+    }
+    .attr-detail-value {
+      width: 220px;
+      color: #222;
+      font-size: 15px;
+      background: #f8fafd;
+      border-radius: 4px;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      margin-right: 32px;
+    }
+    .attr-detail-label .required {
+      color: #e53935;
+      margin-left: 2px;
+      font-size: 15px;
+    }
+    .rule-table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; }
+    .rule-table th, .rule-table td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    .rule-table th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .rule-link { color:#2176c7; cursor:pointer; text-decoration:underline; }
+    .rule-link:hover { color:#e53935; }
+    .rule-detail-modal { position:fixed; left:0;top:0;right:0;bottom:0;z-index:2000; }
+    .rule-detail-mask { position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.18); }
+    .rule-detail-box { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,0.18); min-width:380px; max-width:90vw; min-height:180px; padding:28px 32px 22px 32px; }
+    .rule-detail-title { font-size:15px; color:#185a99; font-weight:600; margin-bottom:16px; }
+    .rule-detail-close { margin-top:18px; background:#2176c7; color:#fff; border:none; border-radius:4px; padding:6px 22px; font-size:15px; cursor:pointer; }
+    .code-rule-table th, .code-rule-table td { font-size: 15px; }
+    .code-rule-table td { white-space: nowrap; }
+    .code-rule-table .code-rule-btn { white-space: nowrap; font-size: 13px; padding: 2px 10px; line-height: 1.5; }
+    .layout-tabs { display:flex; border-bottom:1.5px solid #e5e6eb; margin-bottom:12px; }
+    .layout-tab { padding:8px 32px; font-size:15px; color:#185a99; cursor:pointer; background:none; border:none; outline:none; border-bottom:2.5px solid transparent; transition:.2s; }
+    .layout-tab.active { color:#2176c7; font-weight:600; border-bottom:2.5px solid #2176c7; background:#f6f8fa; }
+    .layout-content { margin-top:10px; }
+    .layout-table { width:100%; border-collapse:collapse; background:#fff; font-size:15px; }
+    .layout-table th, .layout-table td { border:1px solid #e5e6eb; padding:8px 12px; font-size:15px; }
+    .layout-table th { background:#f6f8fa; color:#185a99; font-weight:500; font-size:15px; }
+    .layout-width-input { width:80px; padding:4px 6px; font-size:15px; border:1px solid #bfc8d6; border-radius:3px; }
+    
+    .layout-detail-flexbox { display: flex; min-height: 360px; border: 1px solid #e5e6eb; border-radius: 6px; }
+    .layout-detail-nav { width: 160px; background: #f6f8fa; border-right: 1px solid #e5e6eb; padding: 8px 0; }
+    .layout-detail-nav-item { padding: 12px 20px; font-size: 15px; color: #185a99; cursor: pointer; border-left: 3px solid transparent; transition: .2s; }
+    .layout-detail-nav-item.active { background: #fff; color: #2176c7; font-weight: 600; border-left-color: #2176c7; }
+    .layout-detail-pane-container { flex: 1; padding: 20px; overflow-y: auto; }
+    .layout-detail-pane { display: none; }
+    .layout-detail-pane.active { display: block; }
+    /* Modern input/button style for modal_detail_new.html */
+    #tab-base .form-control, #tab-base input[type="text"], #tab-base select {
+      border: 1.5px solid #c0d3eb;
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-size: 15px;
+      background: #f7faff;
+      box-shadow: 0 1px 4px rgba(33,118,199,0.06);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    #tab-base .form-control:focus, #tab-base input[type="text"]:focus, #tab-base select:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px rgba(33,118,199,0.13);
+      background: #fff;
+    }
+    #tab-base .form-control:hover, #tab-base input[type="text"]:hover, #tab-base select:hover {
+      border-color: #3ba1e3;
+    }
+    #tab-base .form-value {
+      background: none;
+      padding: 0;
+      min-height: unset;
+    }
+    #tab-base .form-row {
+      margin-bottom: 22px;
+    }
+    #tab-base .form-label {
+      font-size: 15px;
+      color: #185a99;
+      font-weight: 500;
+    }
+    .modal-footer-fixed {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: #fff;
+      box-shadow: 0 -2px 12px rgba(33,118,199,0.06);
+      padding: 18px 40px 18px 0;
+      display: flex;
+      justify-content: flex-end;
+      z-index: 10;
+      box-sizing: border-box;
+      width: auto;
+      max-width: none;
+      margin: 0 auto;
+    }
+    .btn-modern {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 6px 22px;
+      margin-left: 6px;
+      cursor: pointer;
+      transition: background 0.18s;
+      box-shadow: 0 2px 8px rgba(33,118,199,0.08);
+    }
+    .btn-modern:hover {
+      background: #185a99;
+    }
+    .btn-line-modern {
+      background: #fff;
+      color: #2176c7;
+      border: 1.5px solid #2176c7;
+      border-radius: 6px;
+      font-size: 15px;
+      padding: 6px 22px;
+      margin-left: 6px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+    .btn-line-modern:hover {
+      background: #f7faff;
+      color: #185a99;
+      border-color: #185a99;
+    }
+    #tab-base .form-2col {
+      display: grid;
+      grid-template-columns: 140px 240px 140px 240px;
+      gap: 0 16px;
+      row-gap: 28px;
+      align-items: center;
+      margin-top: 10px;
+    }
+    #tab-base .form-row {
+      display: contents;
+    }
+    #tab-base .form-label {
+      text-align: right;
+      font-size: 16px;
+      color: #185a99;
+      font-weight: 600;
+      padding-right: 16px;
+    }
+    #tab-base .form-value {
+      width: 100%;
+      min-width: 0;
+      margin-right: 0;
+      background: none;
+      padding: 0;
+      min-height: unset;
+      display: flex;
+      align-items: center;
+    }
+    #tab-base .form-row.desc-row {
+      grid-column: 1 / 5;
+      display: contents;
+    }
+    #tab-base .form-label.desc-label {
+      grid-column: 1 / 2;
+      align-self: start;
+      margin-top: 8px;
+    }
+    #tab-base .form-value.desc-value {
+      grid-column: 2 / 5;
+      width: 100%;
+      min-width: 0;
+      margin-top: 0;
+    }
+    #tab-base textarea.form-control {
+      width: 100%;
+      min-width: 0;
+      margin-top: 0;
+    }
+    #tab-attr.modal-content {
+      height: 100%;
+      display: flex;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    #tab-base .form-value .form-control,
+    #tab-base .form-value input[type="text"],
+    #tab-base .form-value select,
+    #tab-base .form-value textarea {
+      width: 240px !important;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    #tab-base textarea.form-control {
+      width: 100% !important;
+      min-width: 0;
+      max-width: 100%;
+    }
+    #tab-base .form-label.required-label:after {
+      content: '';
+    }
+  </style>
+</head>
+<body>
+<div class="modal-mask">
+  <div class="modal-window">
+    <div class="modal-header">
+      <span class="modal-title">模型详情</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="base">基本配置</button>
+      <button class="modal-tab" data-tab="attr">属性配置</button>
+      <button class="modal-tab" data-tab="rule">业务规则</button>
+      <button class="modal-tab" data-tab="code">编码规则</button>
+      <button class="modal-tab" data-tab="layout">布局配置</button>
+    </div>
+    <div class="modal-content" id="tab-base">
+      <div class="form-2col">
+        <div class="form-row">
+          <div class="form-label required-label"><span class='required'>*</span>模型名称：</div>
+          <div class="form-value"><input type="text" class="form-control" name="name" value="模型类型" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label required-label"><span class='required'>*</span>模型编码：</div>
+          <div class="form-value"><input type="text" class="form-control" name="code" value="mdm_sys_master_data_type" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label required-label"><span class='required'>*</span>模型分类：</div>
+          <div class="form-value">
+            <select class="form-control" name="category" id="modelCategorySelect" required>
+              <option value="普通模型">普通模型</option>
+              <option value="多视图模型">多视图模型</option>
+              <option value="引用分类模型">引用分类模型</option>
+              <option value="引用分类多视图">引用分类多视图</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label required-label"><span class='required'>*</span>主数据类型：</div>
+          <div class="form-value">
+            <select class="form-control" name="type" id="mainDataTypeSelect" required>
+              <option value="系统字典表">系统字典表</option>
+              <option value="字典表">字典表</option>
+              <option value="主数据">主数据</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row ref-row" style="display:none;">
+          <div class="form-label required-label"><span class='required'>*</span>引用主数据：</div>
+          <div class="form-value">
+            <select class="form-control" id="refMasterSelect" required></select>
+          </div>
+          <div class="form-label required-label"><span class='required'>*</span>引用字段：</div>
+          <div class="form-value">
+            <select class="form-control" id="refFieldSelect" required></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">是否树形展示：</div>
+          <div class="form-value"><select class="form-control" name="tree"><option value="否" selected>否</option><option value="是">是</option></select></div>
+        </div>
+        <div class="form-row desc-row">
+          <div class="form-label desc-label">模型描述：</div>
+          <div class="form-value desc-value" style="width: 100%; max-width: 700px;">
+            <textarea class="form-control" name="desc" rows="3" style="width:100%;resize:vertical;min-height:60px;max-height:180px;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer-fixed">
+      <button type="button" class="btn-line-modern" id="modalSaveBtn">保存</button>
+      <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    </div>
+    <div class="modal-content" id="tab-attr" style="display:none;">
+      <div class="attr-flexbox">
+        <div class="attr-field-list" id="attrFieldList">
+          <!-- 字段项由JS渲染 -->
+        </div>
+        <div class="attr-field-detail" id="attr-detail-box">
+          <!-- 详情内容由JS渲染 -->
+        </div>
+      </div>
+    </div>
+    <!-- 字段库弹窗 -->
+    <div id="fieldLibModal" class="modal-mask" style="display:none;z-index:2001;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.18);width:700px;max-width:98vw;min-height:420px;position:relative;">
+        <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:16px 28px 12px 28px;border-radius:10px 10px 0 0;">字段库 <span style='position:absolute;right:28px;top:16px;cursor:pointer;font-size:22px;' id="closeFieldLibModal">×</span></div>
+        <div style="padding:18px 28px 18px 28px;">
+          <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+            <input id="fieldLibSearch" type="text" class="form-control" placeholder="快速查询字段名/描述" style="width:220px;">
+            <button class="btn-modern" id="fieldLibSearchBtn">查询</button>
+          </div>
+          <div style="max-height:320px;overflow:auto;">
+            <table style="width:100%;border-collapse:collapse;background:#fff;font-size:15px;">
+              <thead>
+                <tr style="background:#f6f8fa;">
+                  <th style="width:40px;"><input type="checkbox" id="fieldLibCheckAll"></th>
+                  <th style="width:120px;">值</th>
+                  <th>名称</th>
+                </tr>
+              </thead>
+              <tbody id="fieldLibTableBody">
+                <!-- 字段库数据由JS渲染 -->
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:18px;text-align:right;">
+            <button class="btn-modern" id="fieldLibAddBtn">添加所选字段</button>
+            <button class="btn-line-modern" id="fieldLibCancelBtn">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-rule" style="display:none;">
+      <table class="rule-table">
+        <thead>
+          <tr>
+            <th style="width:180px;">规则名称</th>
+            <th style="width:120px;">规则类型</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:160px;">创建时间</th>
+          </tr>
+        </thead>
+        <tbody id="ruleTableBody">
+        </tbody>
+      </table>
+      <div id="ruleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">规则详情</div>
+          <div id="ruleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeRuleDetail()">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-code" style="display:none;">
+      <table class="rule-table code-rule-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">编码ID</th>
+            <th style="width:100px;">生成方式</th>
+            <th style="width:100px;">起始值</th>
+            <th style="width:100px;">终止值</th>
+            <th style="width:120px;">是否引用上层编码</th>
+            <th style="width:80px;">步长</th>
+            <th style="width:100px;">编码长度</th>
+            <th style="width:100px;">编码状态</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:120px;">创建时间</th>
+            <th style="width:90px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="codeRuleTableBody">
+        </tbody>
+      </table>
+      <div id="codeRuleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeCodeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">编码规则详情</div>
+          <div id="codeRuleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeCodeRuleDetail()">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-content" id="tab-layout" style="display:none;">
+      <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:24px;">
+        <button type="button" class="btn btn-default" id="modalPrevBtn4">上一步</button>
+        <button type="button" class="btn btn-primary" id="modalFinishBtn">完成</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Tab页签切换逻辑
+const tabs = document.querySelectorAll('.modal-tab');
+const contents = document.querySelectorAll('.modal-content');
+const footer = document.querySelector('.modal-footer-fixed');
+function renderFooter(tab) {
+  if(tab.dataset.tab === 'attr') {
+    footer.innerHTML = `
+      <button type="button" class="btn-line-modern" id="modalPrevBtn">上一步</button>
+      <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    `;
+  } else {
+    footer.innerHTML = `
+      <button type="button" class="btn-line-modern" id="modalSaveBtn">保存</button>
+      <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    `;
+  }
+}
+tabs.forEach(tab => {
+  tab.onclick = function() {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    contents.forEach(c => c.style.display = 'none');
+    document.getElementById('tab-' + tab.dataset.tab).style.display = '';
+    renderFooter(tab);
+  }
+});
+// 初始渲染footer
+renderFooter(document.querySelector('.modal-tab.active'));
+
+// 字段库模拟数据
+const FIELD_LIBRARY = [
+  { value: 'desc31', name: '国籍' },
+  { value: 'desc32', name: '身份证号码' },
+  { value: 'desc33', name: '出生日期' },
+  { value: 'desc34', name: '所属组织机构' },
+  { value: 'desc35', name: '现工作单位组织机构' },
+  { value: 'desc36', name: '参加工作时间' },
+  { value: 'desc37', name: '到首钢工作时间' },
+  { value: 'desc38', name: '职称等级' },
+  // 可扩展更多字段
+];
+// 当前属性字段，含状态和属性详情
+let attrFields = [
+  { value: 'desc31', name: '国籍', status: 'normal', enabled: true, detail: { code: 'code1', name: '国籍', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
+  { value: 'desc32', name: '身份证号码', status: 'normal', enabled: true, detail: { code: 'code2', name: '身份证号码', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
+  { value: 'desc33', name: '出生日期', status: 'normal', enabled: true, detail: { code: 'code3', name: '出生日期', type: '日期', length: '', required: '否', getType: '自动生成' } },
+  { value: 'desc34', name: '所属组织机构', status: 'normal', enabled: true, detail: { code: 'code4', name: '所属组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+  { value: 'desc35', name: '现工作单位组织机构', status: 'normal', enabled: true, detail: { code: 'code5', name: '现工作单位组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+  { value: 'desc36', name: '参加工作时间', status: 'normal', enabled: true, detail: { code: 'code6', name: '参加工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
+  { value: 'desc37', name: '到首钢工作时间', status: 'normal', enabled: true, detail: { code: 'code7', name: '到首钢工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
+  { value: 'desc38', name: '职称等级', status: 'normal', enabled: true, detail: { code: 'code8', name: '职称等级', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+];
+// 选中字段索引
+let selectedAttrIdx = 0;
+function renderAttrDetailBox() {
+  const box = document.getElementById('attr-detail-box');
+  const f = attrFields[selectedAttrIdx];
+  if (!f) { box.innerHTML = '<div style="color:#888;padding:32px;">无属性</div>'; return; }
+  if (!f.enabled) {
+    box.innerHTML = `<div style='color:#d33;font-size:16px;padding:48px 0 0 0;text-align:center;'>该字段已被禁用，请点击左侧启用</div>`;
+    return;
+  }
+  // 折叠状态
+  if(typeof window.attrPanelCollapse === 'undefined') window.attrPanelCollapse = { attr: false, validate: true };
+  const collapse = window.attrPanelCollapse;
+  box.innerHTML = `
+    <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='attrInfoToggle'>
+      <svg style='margin-right:6px;transition:.2s;transform:rotate(${collapse.attr?0:90}deg);' width='14' height='14' viewBox='0 0 1024 1024'><path d='M384 192l256 320-256 320z' fill='#2176c7'/></svg>属性信息
+    </div>
+    <div id='attrInfoPanel' style='display:${collapse.attr?'none':'block'};'>
+      <form class='form-2col' style='padding-bottom:8px;'>
+        <div class='form-row'><div class='form-label'>字段名称</div><div class='form-value'><input class='form-control' value='${f.name}'></div>
+          <div class='form-label'>输入类型</div><div class='form-value'><select class='form-control'><option>文本</option><option>下拉</option><option>只读</option></select></div></div>
+        <div class='form-row'><div class='form-label'>元属性编码</div><div class='form-value'><input class='form-control' value='${f.detail?.code||''}' readonly></div>
+          <div class='form-label'>是否引用元数据描述</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>元属性名称</div><div class='form-value'><input class='form-control' value='${f.detail?.name||''}'></div>
+          <div class='form-label'>取值方式</div><div class='form-value'><select class='form-control'><option>自动生成</option><option>手动输入</option></select></div></div>
+        <div class='form-row'><div class='form-label'>字段类型</div><div class='form-value'><select class='form-control'><option>字符串</option><option>数字</option><option>日期</option></select></div>
+          <div class='form-label'>长度 (byte)</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>是否敏感信息</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
+          <div class='form-label'>敏感起始位置</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>敏感终止位置</div><div class='form-value'><input class='form-control'></div>
+          <div class='form-label'>是否必填</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>小数位长度</div><div class='form-value'><input class='form-control'></div>
+          <div class='form-label'>默认值</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>字典表引用</div><div class='form-value'><select class='form-control'><option>无</option><option>引用A</option></select></div>
+          <div class='form-label'>字典表引用字段</div><div class='form-value'><select class='form-control'><option>字段1</option><option>字段2</option></select></div></div>
+        <div class='form-row'><div class='form-label'>是否显示字典表代码</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
+          <div class='form-label'>字典表筛选字段</div><div class='form-value'><select class='form-control'><option>字段A</option><option>字段B</option></select></div></div>
+        <div class='form-row'><div class='form-label'>字典表筛选条件</div><div class='form-value'><input class='form-control'></div>
+          <div class='form-label'>是否树节点</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>节点描述</div><div class='form-value'><select class='form-control'><option>描述A</option><option>描述B</option></select></div>
+          <div class='form-label'>根节点</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>节点描述字段</div><div class='form-value'><select class='form-control'><option>字段A</option><option>字段B</option></select></div>
+          <div class='form-label'>是否显示树名称</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>关联主数据</div><div class='form-value'><select class='form-control'><option>主数据A</option><option>主数据B</option></select></div>
+          <div class='form-label'>大小写转换</div><div class='form-value'><select class='form-control'><option>无</option><option>大写</option><option>小写</option></select></div></div>
+        <div class='form-row'><div class='form-label'>全半角转换</div><div class='form-value'><select class='form-control'><option>无</option><option>全角</option><option>半角</option></select></div>
+          <div class='form-label'>是否过滤空格</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+      </form>
+    </div>
+    <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;margin-top:8px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='validateInfoToggle'>
+      <svg style='margin-right:6px;transition:.2s;transform:rotate(${collapse.validate?0:90}deg);' width='14' height='14' viewBox='0 0 1024 1024'><path d='M384 192l256 320-256 320z' fill='#2176c7'/></svg>校验信息
+    </div>
+    <div id='validateInfoPanel' style='display:${collapse.validate?'none':'block'};'>
+      <form class='form-2col' style='padding-bottom:8px;'>
+        <div class='form-row'><div class='form-label'>是否可编辑</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
+          <div class='form-label'>最大长度</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>最小长度</div><div class='form-value'><input class='form-control'></div>
+          <div class='form-label'>是否启用上下限</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>上限</div><div class='form-value'><input class='form-control'></div>
+          <div class='form-label'>下限</div><div class='form-value'><input class='form-control'></div></div>
+        <div class='form-row'><div class='form-label'>是否唯一</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
+          <div class='form-label'>校验类型</div><div class='form-value'><select class='form-control'><option>无</option><option>类型A</option></select></div></div>
+        <div class='form-row'><div class='form-label'>检验正则表达式</div><div class='form-value'><button type='button' class='btn-line-modern' style='padding:4px 12px;font-size:13px;'>选择正则</button></div></div>
+      </form>
+    </div>
+  `;
+  // 折叠/展开事件
+  setTimeout(()=>{
+    document.getElementById('attrInfoToggle').onclick = function(){
+      window.attrPanelCollapse.attr = !window.attrPanelCollapse.attr;
+      renderAttrDetailBox();
+    };
+    document.getElementById('validateInfoToggle').onclick = function(){
+      window.attrPanelCollapse.validate = !window.attrPanelCollapse.validate;
+      renderAttrDetailBox();
+    };
+  },0);
+}
+function renderAttrFieldList() {
+  const list = document.getElementById('attrFieldList');
+  // 顶部：左标题，右小型添加按钮（更明显的蓝底白加号）
+  list.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 12px 8px 12px;">
+      <span style="font-size:15px;font-weight:600;color:#185a99;">属性列表</span>
+      <button class="btn-modern" id="openFieldLibBtn" style="display:flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;margin:0;min-width:unset;height:20px;line-height:1;">
+        <span style='display:inline-flex;width:11px;height:11px;border-radius:50%;background:transparent;align-items:center;justify-content:center;'><svg width="11" height="11" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span style='color:#fff;font-weight:500;'>添加</span>
+      </button>
+    </div>
+  ` +
+    attrFields.map((f, idx) => {
+      let main = idx === 0 ? '编码' : f.name;
+      let sub = `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>desc${idx+1}</div>`;
+      let icon = f.enabled
+        ? `<span class='field-enable-icon' title='点击禁用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#2176c7'/><circle cx='20' cy='9' r='6' fill='#fff' stroke='#2176c7' stroke-width='2'/></svg></span>`
+        : `<span class='field-enable-icon' title='点击启用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#d6d8db'/><circle cx='8' cy='9' r='6' fill='#fff' stroke='#bfc8d6' stroke-width='2'/></svg></span>`;
+      return `
+        <div class="attr-field-item${idx===selectedAttrIdx?' active':''}" data-field="${f.value}" data-idx="${idx}" style="display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:10px 12px;position:relative;">
+          <div style='display:flex;align-items:center;width:100%;'>
+            <span style="color:#2176c7;font-weight:500;">${main}</span>
+            ${icon}
+          </div>
+          ${sub}
+        </div>
+      `;
+    }).join('');
+  // 绑定点击选中
+  Array.from(list.querySelectorAll('.attr-field-item')).forEach(item => {
+    item.onclick = function(e) {
+      // 禁用/启用图标点击不切换选中
+      if(e.target.closest('.field-enable-icon')) return;
+      selectedAttrIdx = parseInt(this.getAttribute('data-idx'));
+      renderAttrFieldList();
+      renderAttrDetailBox();
+    }
+  });
+  // 绑定启用/禁用切换
+  Array.from(list.querySelectorAll('.field-enable-icon')).forEach(icon => {
+    icon.onclick = function(e) {
+      e.stopPropagation();
+      const idx = parseInt(this.getAttribute('data-idx'));
+      attrFields[idx].enabled = !attrFields[idx].enabled;
+      // 如果当前选中项被禁用，右侧刷新提示
+      renderAttrFieldList();
+      renderAttrDetailBox();
+    }
+  });
+  // 渲染右侧属性
+  renderAttrDetailBox();
+}
+window.toggleFieldStatus = function(value) {
+  attrFields = attrFields.map(f => f.value===value ? { ...f, status: f.status==='normal'?'deleted':'normal' } : f);
+  renderAttrFieldList();
+}
+// 字段库弹窗逻辑
+const fieldLibModal = document.getElementById('fieldLibModal');
+document.body.addEventListener('click', function(e) {
+  if(e.target && e.target.id==='openFieldLibBtn') {
+    renderFieldLibTable();
+    fieldLibModal.style.display = 'flex';
+  }
+  if(e.target && (e.target.id==='closeFieldLibModal'||e.target.id==='fieldLibCancelBtn')) {
+    fieldLibModal.style.display = 'none';
+  }
+  if(e.target && e.target.id==='fieldLibAddBtn') {
+    // 添加所选字段
+    const checked = Array.from(document.querySelectorAll('.field-lib-checkbox:checked')).map(cb=>cb.value);
+    checked.forEach(val => {
+      if(!attrFields.some(f=>f.value===val)) {
+        const field = FIELD_LIBRARY.find(f=>f.value===val);
+        if(field) attrFields.push({ ...field, status: 'normal' });
+      } else {
+        // 如果已存在但被删除，恢复为正常
+        attrFields = attrFields.map(f=>f.value===val ? { ...f, status: 'normal' } : f);
+      }
+    });
+    renderAttrFieldList();
+    fieldLibModal.style.display = 'none';
+  }
+});
+function renderFieldLibTable() {
+  const tbody = document.getElementById('fieldLibTableBody');
+  tbody.innerHTML = FIELD_LIBRARY.map(f => `
+    <tr>
+      <td><input type="checkbox" class="field-lib-checkbox" value="${f.value}" ${attrFields.some(a=>a.value===f.value&&a.status==='normal')?'checked disabled':''}></td>
+      <td>${f.value}</td>
+      <td>${f.name}</td>
+    </tr>
+  `).join('');
+}
+renderAttrFieldList();
+
+// 模拟主数据模型和属性
+const MASTER_MODELS = [
+  { code: 'mdm1', name: '主数据模型A', fields: [ { code: 'f1', name: '属性A1' }, { code: 'f2', name: '属性A2' } ] },
+  { code: 'mdm2', name: '主数据模型B', fields: [ { code: 'f3', name: '属性B1' }, { code: 'f4', name: '属性B2' } ] },
+  { code: 'mdm3', name: '主数据模型C', fields: [ { code: 'f5', name: '属性C1' }, { code: 'f6', name: '属性C2' } ] },
+];
+function updateRefMasterOptions() {
+  const refMaster = document.getElementById('refMasterSelect');
+  if (!refMaster) return;
+  refMaster.innerHTML = MASTER_MODELS.map(m => `<option value="${m.code}">${m.name}</option>`).join('');
+  updateRefFieldOptions();
+}
+function updateRefFieldOptions() {
+  const refMaster = document.getElementById('refMasterSelect');
+  const refField = document.getElementById('refFieldSelect');
+  if (!refMaster || !refField) return;
+  const model = MASTER_MODELS.find(m => m.code === refMaster.value) || MASTER_MODELS[0];
+  refField.innerHTML = model.fields.map(f => `<option value="${f.code}">${f.name}</option>`).join('');
+}
+function updateRefRowVisibility() {
+  const cat = document.getElementById('modelCategorySelect').value;
+  const refRow = document.querySelector('.ref-row');
+  if (cat === '引用分类模型' || cat === '引用分类多视图') {
+    refRow.style.display = '';
+    document.getElementById('refMasterSelect').setAttribute('required', 'required');
+    document.getElementById('refFieldSelect').setAttribute('required', 'required');
+  } else {
+    refRow.style.display = 'none';
+    document.getElementById('refMasterSelect').removeAttribute('required');
+    document.getElementById('refFieldSelect').removeAttribute('required');
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  updateRefMasterOptions();
+  updateRefRowVisibility();
+  document.getElementById('modelCategorySelect').addEventListener('change', function() {
+    updateRefRowVisibility();
+  });
+  document.getElementById('refMasterSelect').addEventListener('change', function() {
+    updateRefFieldOptions();
+  });
+});
+</script>
+</body>
+</html> 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>智能服务管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { background: #f7faff; font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 0; }
+    .container { max-width: 900px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.08); padding: 32px; }
+    .title { font-size: 22px; font-weight: 700; color: #2176c7; margin-bottom: 24px; }
+    .service-list { margin-bottom: 24px; }
+    .service-item { background: #f6f8fa; border-radius: 6px; padding: 16px 18px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .service-name { font-size: 16px; color: #185a99; font-weight: 600; }
+    .service-desc { color: #666; font-size: 14px; margin-left: 18px; flex: 1; }
+    .add-btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-size: 15px; padding: 8px 28px; cursor: pointer; font-weight: 500; transition: background 0.18s; }
+    .add-btn:hover { background: #185a99; }
+    .empty-tip { color: #bbb; font-size: 15px; text-align: center; margin: 32px 0; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-box { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:400px; max-width:98vw; min-height:180px; padding:28px 32px 22px 32px; }
+    .modal-title { font-size:18px; color:#2176c7; font-weight:600; margin-bottom:16px; }
+    .modal-row { margin-bottom:18px; }
+    .modal-label { display:inline-block; width:80px; color:#185a99; font-size:15px; text-align:right; margin-right:8px; }
+    .modal-input { width:220px; padding:6px 10px; border:1.5px solid #c0d3eb; border-radius:6px; font-size:15px; }
+    .modal-actions { text-align:right; }
+    .modal-btn { background:#2176c7; color:#fff; border:none; border-radius:6px; font-size:15px; padding:6px 22px; margin-left:6px; cursor:pointer; }
+    .modal-btn:hover { background:#185a99; }
+    .modal-btn.cancel { background:#fff; color:#2176c7; border:1.5px solid #2176c7; }
+    .modal-btn.cancel:hover { background:#f7faff; color:#185a99; border-color:#185a99; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">智能服务管理</div>
+    <div class="service-list" id="serviceList"></div>
+    <button class="add-btn" id="addServiceBtn">＋ 新增智能服务</button>
+  </div>
+  <div id="addServiceModal" class="modal-mask" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-title">新增智能服务</div>
+      <div class="modal-row">
+        <span class="modal-label">服务名称：</span>
+        <input class="modal-input" id="serviceNameInput" placeholder="请输入服务名称" />
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">服务描述：</span>
+        <input class="modal-input" id="serviceDescInput" placeholder="请输入服务描述" />
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="cancelAddBtn">取消</button>
+        <button class="modal-btn" id="confirmAddBtn">确定</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let services = JSON.parse(localStorage.getItem('smartServices')||'[]');
+    function renderServiceList() {
+      const list = document.getElementById('serviceList');
+      if (!services.length) {
+        list.innerHTML = '<div class="empty-tip">暂无智能服务，请点击下方按钮新增</div>';
+        return;
+      }
+      list.innerHTML = services.map((s,i)=>`
+        <div class="service-item">
+          <span class="service-name">${s.name}</span>
+          <span class="service-desc">${s.desc||''}</span>
+        </div>
+      `).join('');
+    }
+    document.getElementById('addServiceBtn').onclick = function() {
+      document.getElementById('addServiceModal').style.display = 'flex';
+      document.getElementById('serviceNameInput').value = '';
+      document.getElementById('serviceDescInput').value = '';
+    };
+    document.getElementById('cancelAddBtn').onclick = function() {
+      document.getElementById('addServiceModal').style.display = 'none';
+    };
+    document.getElementById('confirmAddBtn').onclick = function() {
+      const name = document.getElementById('serviceNameInput').value.trim();
+      const desc = document.getElementById('serviceDescInput').value.trim();
+      if(!name) { alert('请输入服务名称'); return; }
+      services.push({name, desc});
+      localStorage.setItem('smartServices', JSON.stringify(services));
+      renderServiceList();
+      document.getElementById('addServiceModal').style.display = 'none';
+    };
+    renderServiceList();
+  </script>
+</body>
+</html> 

@@ -5,18 +5,34 @@
   <title>模型详情</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:rgba(0,0,0,0.15); font-size:15px; }
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:rgba(0,0,0,0.15); font-size:12px; }
     .modal-mask {
       position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.25); z-index:1000; display:flex; align-items:center; justify-content:center;
     }
     .modal-window {
-      background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:900px; max-width:98vw; min-height:480px; height:540px; max-height:90vh; overflow:hidden; position:relative; animation:popin .25s;
+      background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); 
+      width:972px; /* 原1080px缩小10% */
+      max-width:98vw; 
+      min-height:444px; /* 原467px再缩小5% */
+      height:500px;    /* 原526px再缩小5% */
+      max-height:108vh; /* 原90vh扩大20% */
+      overflow:hidden; 
+      position:relative; 
+      animation:popin .25s;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto !important;
+      max-height: 98vh !important;
     }
     @keyframes popin { from{transform:scale(0.95);opacity:0;} to{transform:scale(1);opacity:1;} }
     .modal-header {
       padding:22px 32px 0 32px; display:flex; align-items:center; justify-content:space-between;
     }
-    .modal-title { font-size:20px; font-weight:600; color:#185a99; }
+    .modal-title {
+      font-size: 14px !important;
+      font-weight: 600;
+      color: #185a99;
+    }
     .modal-close {
       font-size:20px; color:#888; cursor:pointer; border:none; background:none; transition:.2s; }
     .modal-close:hover { color:#d33; }
@@ -66,6 +82,9 @@
       overflow-y: auto;
       flex-shrink: 0;
     }
+    .attr-field-list > div > span {
+      font-size: 12px !important;
+    }
     .attr-field-item {
       font-size: 13px;
       cursor: pointer;
@@ -81,7 +100,7 @@
     }
     .attr-field-detail {
       flex: 1;
-      background: #fff;
+      background: none !important;
       border-radius: 0 6px 6px 0;
       padding: 0 0 60px 0;
       overflow-y: auto;
@@ -91,45 +110,32 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      height: 420px;
-      max-height: 420px;
+      height: 378px; /* 原420px缩小10% */
+      max-height: 378px; /* 原420px缩小10% */
     }
     .attr-field-detail .form-2col {
       display: grid;
-      grid-template-columns: 140px 240px 140px 240px;
+      grid-template-columns: 140px 168px 140px 168px;
       gap: 0 24px;
-      row-gap: 16px;
+      row-gap: 6px;
       align-items: center;
       margin-top: 0;
     }
     .attr-field-detail .form-row {
       display: contents;
     }
-    .attr-field-detail .form-label {
-      text-align: right;
-      font-size: 15px;
-      color: #333;
-      font-weight: 600;
-      padding-right: 12px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .attr-field-detail .form-value {
-      width: 100%;
-      min-width: 0;
-      margin-right: 0;
-      background: none;
-      padding: 0;
-      min-height: unset;
-      display: flex;
-      align-items: center;
+    .attr-field-detail .form-label,
+    .attr-field-detail .form-value,
+    .attr-detail-label,
+    .attr-detail-value,
+    .attr-detail-title {
+      color: #185a99 !important;
     }
     .attr-field-detail .form-control,
     .attr-field-detail input[type="text"],
     .attr-field-detail select,
     .attr-field-detail textarea {
-      width: 240px !important;
+      width: 168px !important;
       min-width: 0;
       max-width: 100%;
       box-sizing: border-box;
@@ -137,7 +143,7 @@
       border-radius: 7px;
       padding: 8px 14px;
       font-size: 15px;
-      background: #f7faff;
+      background: #fff !important;
       box-shadow: 0 1px 4px rgba(33,118,199,0.06);
       transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
@@ -154,9 +160,15 @@
     .attr-field-detail select:hover {
       border-color: #3ba1e3;
     }
+    .attr-field-detail textarea.form-control {
+      width: 168px !important;
+      min-width: 0;
+      max-width: 100%;
+      resize: vertical;
+    }
     .attr-detail-title {
       color: #185a99;
-      font-size: 15px;
+      font-size: 12px !important;
       font-weight: 600;
       padding: 0 0 10px 0;
       margin-bottom: 10px;
@@ -182,7 +194,7 @@
       width: 220px;
       color: #222;
       font-size: 15px;
-      background: #f8fafd;
+      background: none !important;
       border-radius: 4px;
       min-height: 32px;
       display: flex;
@@ -225,22 +237,22 @@
     .layout-detail-pane { display: none; }
     .layout-detail-pane.active { display: block; }
     /* Modern input/button style for modal_detail_new.html */
-    #tab-base .form-control, #tab-base input[type="text"], #tab-base select {
+    #tab-base .form-control, #tab-base input[type="text"], #tab-base select, #tab-base textarea {
       border: 1.5px solid #c0d3eb;
       border-radius: 7px;
       padding: 8px 14px;
       font-size: 15px;
-      background: #f7faff;
+      background: #fff !important;
       box-shadow: 0 1px 4px rgba(33,118,199,0.06);
       transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
     }
-    #tab-base .form-control:focus, #tab-base input[type="text"]:focus, #tab-base select:focus {
+    #tab-base .form-control:focus, #tab-base input[type="text"]:focus, #tab-base select:focus, #tab-base textarea:focus {
       border-color: #2176c7;
       box-shadow: 0 0 0 2px rgba(33,118,199,0.13);
       background: #fff;
     }
-    #tab-base .form-control:hover, #tab-base input[type="text"]:hover, #tab-base select:hover {
+    #tab-base .form-control:hover, #tab-base input[type="text"]:hover, #tab-base select:hover, #tab-base textarea:hover {
       border-color: #3ba1e3;
     }
     #tab-base .form-value {
@@ -268,7 +280,6 @@
       box-sizing: border-box;
       width: auto;
       max-width: none;
-      margin: 0 auto;
     }
     .btn-modern {
       background: #2176c7;
@@ -345,10 +356,10 @@
       min-width: 0;
       margin-top: 0;
     }
-    #tab-base textarea.form-control {
-      width: 100%;
+    #tab-base .form-value.desc-value textarea.form-control {
+      width: 100% !important;
       min-width: 0;
-      margin-top: 0;
+      max-width: 100%;
     }
     #tab-attr.modal-content {
       height: 100%;
@@ -356,6 +367,7 @@
       padding: 0;
       box-sizing: border-box;
       overflow: hidden;
+      padding-bottom: 110px !important;
     }
     #tab-base .form-value .form-control,
     #tab-base .form-value input[type="text"],
@@ -374,6 +386,79 @@
     #tab-base .form-label.required-label:after {
       content: '';
     }
+    #tab-base.modal-content {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .modal-content#tab-base {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .table-link-delete {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 15px;
+      cursor: pointer;
+      padding: 0 8px;
+      transition: color 0.18s;
+    }
+    .table-link-delete:hover {
+      color: #b71c1c;
+      text-decoration: underline;
+    }
+    .section-collapse-title,
+    .section-collapse-title * {
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: #2176c7 !important;
+    }
+    .section-collapse-title {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 8px;
+      margin-top: 10px;
+    }
+    .section-collapse-title svg {
+      margin-right: 8px;
+      transition: transform 0.2s;
+    }
+    .section-collapse-title.collapsed svg {
+      transform: rotate(-90deg);
+    }
+    .section-content {
+      transition: max-height 0.2s, opacity 0.2s;
+      overflow: hidden;
+    }
+    .section-content.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+      padding: 0 !important;
+      pointer-events: none;
+    }
+    #tab-rule.modal-content {
+      padding-bottom: 110px !important;
+    }
+    #tab-code.modal-content {
+      padding-bottom: 110px !important;
+    }
+    #tab-layout.modal-content {
+      padding-bottom: 110px !important;
+    }
+    .modal-title, .modal-tab, .modal-content, .form-label, .form-value, .form-control, .attr-field-item, .attr-detail-title, .attr-detail-label, .attr-detail-value, .section-title, .rule-list, .layout-box, .table, th, td, .btn-modern, .btn-line-modern, .section-collapse-title, .tag, .rule-detail-title, .layout-detail-nav-item, .layout-detail-pane-container, .layout-detail-pane, .layout-tab, .layout-table th, .layout-table td, .code-rule-table th, .code-rule-table td, .modal-footer-fixed, .form-2col, .form-row, .form-label, .form-value, .form-control, .attr-detail-label, .attr-detail-value, .table-link-delete {
+      font-size:12px !important;
+    }
+    .modal-window .modal-title, .modal-title {
+      font-size: 14px !important;
+      font-weight: 600;
+      color: #185a99;
+    }
+    .attr-detail-title, .section-collapse-title, .section-collapse-title * {
+      font-size: 12px !important;
+    }
   </style>
 </head>
 <body>
@@ -391,56 +476,65 @@
       <button class="modal-tab" data-tab="layout">布局配置</button>
     </div>
     <div class="modal-content" id="tab-base">
-      <div class="form-2col">
-        <div class="form-row">
-          <div class="form-label required-label"><span class='required'>*</span>模型名称：</div>
-          <div class="form-value"><input type="text" class="form-control" name="name" value="模型类型" required></div>
-        </div>
-        <div class="form-row">
-          <div class="form-label required-label"><span class='required'>*</span>模型编码：</div>
-          <div class="form-value"><input type="text" class="form-control" name="code" value="mdm_sys_master_data_type" required></div>
-        </div>
-        <div class="form-row">
-          <div class="form-label required-label"><span class='required'>*</span>模型分类：</div>
-          <div class="form-value">
-            <select class="form-control" name="category" id="modelCategorySelect" required>
-              <option value="普通模型">普通模型</option>
-              <option value="多视图模型">多视图模型</option>
-              <option value="引用分类模型">引用分类模型</option>
-              <option value="引用分类多视图">引用分类多视图</option>
-            </select>
+      <div class="section-collapse-title" id="baseInfoCollapseBtn">
+        <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M384 192l256 320-256 320z" fill="#2176c7"/></svg>
+        基本信息
+      </div>
+      <div class="section-content" id="baseInfoSection">
+        <div class="form-2col">
+          <div class="form-row">
+            <div class="form-label required-label"><span class='required'>*</span>模型分类：</div>
+            <div class="form-value">
+              <select class="form-control" name="category" id="modelCategorySelect" required>
+                <option value="普通模型">普通模型</option>
+                <option value="多视图模型">多视图模型</option>
+                <option value="引用分类模型">引用分类模型</option>
+                <option value="引用分类多视图">引用分类多视图</option>
+              </select>
+            </div>
+            <div class="form-label required-label"><span class='required'>*</span>主数据类型：</div>
+            <div class="form-value">
+              <select class="form-control" name="type" id="mainDataTypeSelect" required>
+                <option value="系统字典表">系统字典表</option>
+                <option value="字典表">字典表</option>
+                <option value="主数据">主数据</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label required-label"><span class='required'>*</span>模型编码：</div>
+            <div class="form-value"><input type="text" class="form-control" name="code" value="mdm_sys_master_data_type" required></div>
+            <div class="form-label required-label"><span class='required'>*</span>模型名称：</div>
+            <div class="form-value"><input type="text" class="form-control" name="name" value="模型类型" required></div>
+          </div>
+          <div class="form-row ref-row" style="display:none;">
+            <div class="form-label required-label"><span class='required'>*</span>引用主数据：</div>
+            <div class="form-value">
+              <select class="form-control" id="refMasterSelect" required></select>
+            </div>
+            <div class="form-label required-label"><span class='required'>*</span>引用字段：</div>
+            <div class="form-value">
+              <select class="form-control" id="refFieldSelect" required></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">是否树形展示：</div>
+            <div class="form-value"><select class="form-control" name="tree"><option value="否" selected>否</option><option value="是">是</option></select></div>
+          </div>
+          <div class="form-row desc-row">
+            <div class="form-label desc-label">模型描述：</div>
+            <div class="form-value desc-value">
+              <textarea class="form-control" name="desc" rows="3" style="resize:vertical;min-height:60px;max-height:180px;"></textarea>
+            </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-label required-label"><span class='required'>*</span>主数据类型：</div>
-          <div class="form-value">
-            <select class="form-control" name="type" id="mainDataTypeSelect" required>
-              <option value="系统字典表">系统字典表</option>
-              <option value="字典表">字典表</option>
-              <option value="主数据">主数据</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row ref-row" style="display:none;">
-          <div class="form-label required-label"><span class='required'>*</span>引用主数据：</div>
-          <div class="form-value">
-            <select class="form-control" id="refMasterSelect" required></select>
-          </div>
-          <div class="form-label required-label"><span class='required'>*</span>引用字段：</div>
-          <div class="form-value">
-            <select class="form-control" id="refFieldSelect" required></select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-label">是否树形展示：</div>
-          <div class="form-value"><select class="form-control" name="tree"><option value="否" selected>否</option><option value="是">是</option></select></div>
-        </div>
-        <div class="form-row desc-row">
-          <div class="form-label desc-label">模型描述：</div>
-          <div class="form-value desc-value" style="width: 100%; max-width: 700px;">
-            <textarea class="form-control" name="desc" rows="3" style="width:100%;resize:vertical;min-height:60px;max-height:180px;"></textarea>
-          </div>
-        </div>
+      </div>
+      <div class="section-collapse-title" id="viewInfoCollapseBtn">
+        <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M384 192l256 320-256 320z" fill="#2176c7"/></svg>
+        视图信息
+      </div>
+      <div class="section-content" id="viewInfoSection">
+        <div id="viewListBox"></div>
       </div>
     </div>
     <div class="modal-footer-fixed">
@@ -460,7 +554,7 @@
     <!-- 字段库弹窗 -->
     <div id="fieldLibModal" class="modal-mask" style="display:none;z-index:2001;align-items:center;justify-content:center;">
       <div style="background:#fff;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.18);width:700px;max-width:98vw;min-height:420px;position:relative;">
-        <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:16px 28px 12px 28px;border-radius:10px 10px 0 0;">字段库 <span style='position:absolute;right:28px;top:16px;cursor:pointer;font-size:22px;' id="closeFieldLibModal">×</span></div>
+        <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:16px 28px 12px 28px;border-radius:10px 10px 0 0;">标准库 <span style='position:absolute;right:28px;top:16px;cursor:pointer;font-size:22px;' id="closeFieldLibModal">×</span></div>
         <div style="padding:18px 28px 18px 28px;">
           <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
             <input id="fieldLibSearch" type="text" class="form-control" placeholder="快速查询字段名/描述" style="width:220px;">
@@ -539,10 +633,6 @@
       </div>
     </div>
     <div class="modal-content" id="tab-layout" style="display:none;">
-      <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:24px;">
-        <button type="button" class="btn btn-default" id="modalPrevBtn4">上一步</button>
-        <button type="button" class="btn btn-primary" id="modalFinishBtn">完成</button>
-      </div>
     </div>
   </div>
 </div>
@@ -556,6 +646,21 @@ function renderFooter(tab) {
     footer.innerHTML = `
       <button type="button" class="btn-line-modern" id="modalPrevBtn">上一步</button>
       <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    `;
+  } else if(tab.dataset.tab === 'rule') {
+    footer.innerHTML = `
+      <button type="button" class="btn-line-modern" id="modalPrevBtn">上一步</button>
+      <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    `;
+  } else if(tab.dataset.tab === 'code') {
+    footer.innerHTML = `
+      <button type="button" class="btn-line-modern" id="modalPrevBtn">上一步</button>
+      <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
+    `;
+  } else if(tab.dataset.tab === 'layout') {
+    footer.innerHTML = `
+      <button type="button" class="btn-line-modern" id="modalPublishBtn">发布并提交</button>
+      <button type="button" class="btn-modern" id="modalFinishBtn">提交</button>
     `;
   } else {
     footer.innerHTML = `
@@ -612,40 +717,44 @@ function renderAttrDetailBox() {
   // 折叠状态
   if(typeof window.attrPanelCollapse === 'undefined') window.attrPanelCollapse = { attr: false, validate: true };
   const collapse = window.attrPanelCollapse;
+  if(typeof collapse.advanced === 'undefined') collapse.advanced = false;
+  // 判断是否为编码或名称
+  const isCode = selectedAttrIdx === 0;
+  const isName = selectedAttrIdx === 1;
   box.innerHTML = `
     <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='attrInfoToggle'>
       <svg style='margin-right:6px;transition:.2s;transform:rotate(${collapse.attr?0:90}deg);' width='14' height='14' viewBox='0 0 1024 1024'><path d='M384 192l256 320-256 320z' fill='#2176c7'/></svg>属性信息
     </div>
     <div id='attrInfoPanel' style='display:${collapse.attr?'none':'block'};'>
       <form class='form-2col' style='padding-bottom:8px;'>
-        <div class='form-row'><div class='form-label'>字段名称</div><div class='form-value'><input class='form-control' value='${f.name}'></div>
-          <div class='form-label'>输入类型</div><div class='form-value'><select class='form-control'><option>文本</option><option>下拉</option><option>只读</option></select></div></div>
+        <div class='form-row'><div class='form-label'>字段名称</div><div class='form-value'><input class='form-control' value='${f.name}' ${isCode?'readonly':''}></div>
+          <div class='form-label'>输入类型</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>文本</option><option>下拉</option><option>只读</option></select></div></div>
         <div class='form-row'><div class='form-label'>元属性编码</div><div class='form-value'><input class='form-control' value='${f.detail?.code||''}' readonly></div>
-          <div class='form-label'>是否引用元数据描述</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
-        <div class='form-row'><div class='form-label'>元属性名称</div><div class='form-value'><input class='form-control' value='${f.detail?.name||''}'></div>
-          <div class='form-label'>取值方式</div><div class='form-value'><select class='form-control'><option>自动生成</option><option>手动输入</option></select></div></div>
-        <div class='form-row'><div class='form-label'>字段类型</div><div class='form-value'><select class='form-control'><option>字符串</option><option>数字</option><option>日期</option></select></div>
-          <div class='form-label'>长度 (byte)</div><div class='form-value'><input class='form-control'></div></div>
-        <div class='form-row'><div class='form-label'>是否敏感信息</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
-          <div class='form-label'>敏感起始位置</div><div class='form-value'><input class='form-control'></div></div>
-        <div class='form-row'><div class='form-label'>敏感终止位置</div><div class='form-value'><input class='form-control'></div>
-          <div class='form-label'>是否必填</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
-        <div class='form-row'><div class='form-label'>小数位长度</div><div class='form-value'><input class='form-control'></div>
-          <div class='form-label'>默认值</div><div class='form-value'><input class='form-control'></div></div>
-        <div class='form-row'><div class='form-label'>字典表引用</div><div class='form-value'><select class='form-control'><option>无</option><option>引用A</option></select></div>
-          <div class='form-label'>字典表引用字段</div><div class='form-value'><select class='form-control'><option>字段1</option><option>字段2</option></select></div></div>
-        <div class='form-row'><div class='form-label'>是否显示字典表代码</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div>
-          <div class='form-label'>字典表筛选字段</div><div class='form-value'><select class='form-control'><option>字段A</option><option>字段B</option></select></div></div>
-        <div class='form-row'><div class='form-label'>字典表筛选条件</div><div class='form-value'><input class='form-control'></div>
-          <div class='form-label'>是否树节点</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
-        <div class='form-row'><div class='form-label'>节点描述</div><div class='form-value'><select class='form-control'><option>描述A</option><option>描述B</option></select></div>
-          <div class='form-label'>根节点</div><div class='form-value'><input class='form-control'></div></div>
-        <div class='form-row'><div class='form-label'>节点描述字段</div><div class='form-value'><select class='form-control'><option>字段A</option><option>字段B</option></select></div>
-          <div class='form-label'>是否显示树名称</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
-        <div class='form-row'><div class='form-label'>关联主数据</div><div class='form-value'><select class='form-control'><option>主数据A</option><option>主数据B</option></select></div>
-          <div class='form-label'>大小写转换</div><div class='form-value'><select class='form-control'><option>无</option><option>大写</option><option>小写</option></select></div></div>
-        <div class='form-row'><div class='form-label'>全半角转换</div><div class='form-value'><select class='form-control'><option>无</option><option>全角</option><option>半角</option></select></div>
-          <div class='form-label'>是否过滤空格</div><div class='form-value'><select class='form-control'><option>是</option><option>否</option></select></div></div>
+          <div class='form-label'>是否引用元数据描述</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>元属性名称</div><div class='form-value'><input class='form-control' value='${f.detail?.name||''}' ${isCode?'readonly':''}></div>
+          <div class='form-label'>取值方式</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>自动生成</option><option>手动输入</option></select></div></div>
+        <div class='form-row'><div class='form-label'>字段类型</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字符串</option><option>数字</option><option>日期</option></select></div>
+          <div class='form-label'>长度 (byte)</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>是否敏感信息</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div>
+          <div class='form-label'>敏感起始位置</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>敏感终止位置</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
+          <div class='form-label'>是否必填</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>小数位长度</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
+          <div class='form-label'>默认值</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>字典表引用</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>无</option><option>引用A</option></select></div>
+          <div class='form-label'>字典表引用字段</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字段1</option><option>字段2</option></select></div></div>
+        <div class='form-row'><div class='form-label'>是否显示字典表代码</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div>
+          <div class='form-label'>字典表筛选字段</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字段A</option><option>字段B</option></select></div></div>
+        <div class='form-row'><div class='form-label'>字典表筛选条件</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
+          <div class='form-label'>是否树节点</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>节点描述</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>描述A</option><option>描述B</option></select></div>
+          <div class='form-label'>根节点</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>节点描述字段</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字段A</option><option>字段B</option></select></div>
+          <div class='form-label'>是否显示树名称</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
+        <div class='form-row'><div class='form-label'>关联主数据</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>主数据A</option><option>主数据B</option></select></div>
+          <div class='form-label'>大小写转换</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>无</option><option>大写</option><option>小写</option></select></div></div>
+        <div class='form-row'><div class='form-label'>全半角转换</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>无</option><option>全角</option><option>半角</option></select></div>
+          <div class='form-label'>是否过滤空格</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
       </form>
     </div>
     <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;margin-top:8px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='validateInfoToggle'>
@@ -664,6 +773,33 @@ function renderAttrDetailBox() {
         <div class='form-row'><div class='form-label'>检验正则表达式</div><div class='form-value'><button type='button' class='btn-line-modern' style='padding:4px 12px;font-size:13px;'>选择正则</button></div></div>
       </form>
     </div>
+    <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;margin-top:8px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='advancedConfigToggle'>
+      <svg width='16' height='16' viewBox='0 0 1024 1024'><path d='M384 192l256 320-256 320z' fill='#2176c7'/></svg>
+      高级配置
+    </div>
+    <div class='section-content' id='advancedConfigPanel' style='display:${collapse.advanced?'none':'block'};'>
+      <form class='form-2col' style='padding-bottom:8px;'>
+        <div class='form-row'>
+          <div class='form-label'>开启智能联想</div>
+          <div class='form-value'>
+            <select class='form-control' id='enableSmartSuggest'>
+              <option value='否'>否</option>
+              <option value='是'>是</option>
+            </select>
+          </div>
+        </div>
+        <div class='form-row' id='smartSuggestServiceRow' style='display:none;'>
+          <div class='form-label'>智能联想服务</div>
+          <div class='form-value'>
+            <select class='form-control' id='smartSuggestService'>
+              <option value='服务A'>服务A</option>
+              <option value='服务B'>服务B</option>
+              <option value='服务C'>服务C</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
   `;
   // 折叠/展开事件
   setTimeout(()=>{
@@ -675,29 +811,54 @@ function renderAttrDetailBox() {
       window.attrPanelCollapse.validate = !window.attrPanelCollapse.validate;
       renderAttrDetailBox();
     };
+    document.getElementById('advancedConfigToggle').onclick = function(){
+      if(typeof window.attrPanelCollapse.advanced === 'undefined') window.attrPanelCollapse.advanced = false;
+      window.attrPanelCollapse.advanced = !window.attrPanelCollapse.advanced;
+      renderAttrDetailBox();
+    };
+    // 智能联想服务下拉显示逻辑
+    const smartSelect = document.getElementById('enableSmartSuggest');
+    const serviceRow = document.getElementById('smartSuggestServiceRow');
+    if(smartSelect && serviceRow) {
+      function updateServiceRow() {
+        serviceRow.style.display = smartSelect.value==='是' ? '' : 'none';
+      }
+      smartSelect.onchange = updateServiceRow;
+      updateServiceRow();
+    }
   },0);
 }
 function renderAttrFieldList() {
   const list = document.getElementById('attrFieldList');
-  // 顶部：左标题，右小型添加按钮（更明显的蓝底白加号）
+  // 批量删除按钮
+  let deleteBtn = `<button class="btn-modern" id="batchDeleteBtn" style="display:flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;margin-left:6px;min-width:unset;height:20px;line-height:1;background:#e53935;"><svg width='13' height='13' viewBox='0 0 1024 1024'><path d='M256 256l512 512M768 256L256 768' stroke='#fff' stroke-width='48' stroke-linecap='round'/></svg></button>`;
   list.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 12px 8px 12px;">
       <span style="font-size:15px;font-weight:600;color:#185a99;">属性列表</span>
-      <button class="btn-modern" id="openFieldLibBtn" style="display:flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;margin:0;min-width:unset;height:20px;line-height:1;">
-        <span style='display:inline-flex;width:11px;height:11px;border-radius:50%;background:transparent;align-items:center;justify-content:center;'><svg width="11" height="11" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <span style='color:#fff;font-weight:500;'>添加</span>
-      </button>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button class="btn-modern" id="openFieldLibBtn" style="display:flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;margin:0;min-width:unset;height:20px;line-height:1;">
+          <span style='display:inline-flex;width:11px;height:11px;border-radius:50%;background:transparent;align-items:center;justify-content:center;'><svg width="11" height="11" viewBox="0 0 13 13"><path d="M6.5 2v9M2 6.5h9" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <span style='color:#fff;font-weight:500;'>添加</span>
+        </button>
+        ${deleteBtn}
+      </div>
     </div>
   ` +
     attrFields.map((f, idx) => {
-      let main = idx === 0 ? '编码' : f.name;
-      let sub = `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>desc${idx+1}</div>`;
-      let icon = f.enabled
-        ? `<span class='field-enable-icon' title='点击禁用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#2176c7'/><circle cx='20' cy='9' r='6' fill='#fff' stroke='#2176c7' stroke-width='2'/></svg></span>`
-        : `<span class='field-enable-icon' title='点击启用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#d6d8db'/><circle cx='8' cy='9' r='6' fill='#fff' stroke='#bfc8d6' stroke-width='2'/></svg></span>`;
+      let main = idx === 0 ? '编码' : (idx === 1 ? '名称' : f.name);
+      let sub = idx === 0 ? `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>code</div>` : (idx === 1 ? `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>name</div>` : `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>desc${idx+1}</div>`);
+      let icon = '';
+      if(idx > 0) {
+        icon = f.enabled
+          ? `<span class='field-enable-icon' title='点击禁用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#2176c7'/><circle cx='20' cy='9' r='6' fill='#fff' stroke='#2176c7' stroke-width='2'/></svg></span>`
+          : `<span class='field-enable-icon' title='点击启用' data-idx='${idx}' style='margin-left:auto;cursor:pointer;display:inline-flex;align-items:center;'><svg width='28' height='18' viewBox='0 0 28 18'><rect x='1' y='1' width='26' height='16' rx='8' fill='#d6d8db'/><circle cx='8' cy='9' r='6' fill='#fff' stroke='#bfc8d6' stroke-width='2'/></svg></span>`;
+      }
+      // 多选checkbox（编码、名称不可选）
+      let checkbox = idx > 1 ? `<input type='checkbox' class='field-checkbox' data-idx='${idx}' style='margin-right:6px;' ${f.selected?'checked':''}>` : `<span style='display:inline-block;width:18px;'></span>`;
       return `
         <div class="attr-field-item${idx===selectedAttrIdx?' active':''}" data-field="${f.value}" data-idx="${idx}" style="display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:10px 12px;position:relative;">
           <div style='display:flex;align-items:center;width:100%;'>
+            ${checkbox}
             <span style="color:#2176c7;font-weight:500;">${main}</span>
             ${icon}
           </div>
@@ -708,8 +869,8 @@ function renderAttrFieldList() {
   // 绑定点击选中
   Array.from(list.querySelectorAll('.attr-field-item')).forEach(item => {
     item.onclick = function(e) {
-      // 禁用/启用图标点击不切换选中
-      if(e.target.closest('.field-enable-icon')) return;
+      // 禁用/启用/checkbox点击不切换选中
+      if(e.target.closest('.field-enable-icon') || e.target.classList.contains('field-checkbox')) return;
       selectedAttrIdx = parseInt(this.getAttribute('data-idx'));
       renderAttrFieldList();
       renderAttrDetailBox();
@@ -721,11 +882,31 @@ function renderAttrFieldList() {
       e.stopPropagation();
       const idx = parseInt(this.getAttribute('data-idx'));
       attrFields[idx].enabled = !attrFields[idx].enabled;
-      // 如果当前选中项被禁用，右侧刷新提示
       renderAttrFieldList();
       renderAttrDetailBox();
     }
   });
+  // 绑定checkbox多选
+  Array.from(list.querySelectorAll('.field-checkbox')).forEach(cb => {
+    cb.onclick = function(e) {
+      e.stopPropagation();
+      const idx = parseInt(this.getAttribute('data-idx'));
+      attrFields[idx].selected = this.checked;
+    }
+  });
+  // 绑定批量删除
+  const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+  if(batchDeleteBtn) {
+    batchDeleteBtn.onclick = function(e) {
+      e.stopPropagation();
+      // 只删除勾选的，且idx>1
+      attrFields = attrFields.filter((f, idx) => idx<=1 || !f.selected);
+      // 重置选中
+      if(selectedAttrIdx >= attrFields.length) selectedAttrIdx = attrFields.length-1;
+      renderAttrFieldList();
+      renderAttrDetailBox();
+    }
+  }
   // 渲染右侧属性
   renderAttrDetailBox();
 }
@@ -736,7 +917,8 @@ window.toggleFieldStatus = function(value) {
 // 字段库弹窗逻辑
 const fieldLibModal = document.getElementById('fieldLibModal');
 document.body.addEventListener('click', function(e) {
-  if(e.target && e.target.id==='openFieldLibBtn') {
+  const btn = e.target.closest('#openFieldLibBtn');
+  if (btn) {
     renderFieldLibTable();
     fieldLibModal.style.display = 'flex';
   }
@@ -757,6 +939,51 @@ document.body.addEventListener('click', function(e) {
     });
     renderAttrFieldList();
     fieldLibModal.style.display = 'none';
+  }
+  // tab-attr 上一步、下一步
+  if(e.target && e.target.id==='modalPrevBtn' && document.querySelector('.modal-tab.active').dataset.tab==='attr') {
+    // 切换到基本配置
+    document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelector('.modal-tab[data-tab="base"]').classList.add('active');
+    document.querySelectorAll('.modal-content').forEach(c=>c.style.display='none');
+    document.getElementById('tab-base').style.display = '';
+    renderFooter(document.querySelector('.modal-tab[data-tab="base"]'));
+  }
+  if(e.target && e.target.id==='modalNextBtn' && document.querySelector('.modal-tab.active').dataset.tab==='attr') {
+    // 切换到业务规则
+    document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelector('.modal-tab[data-tab="rule"]').classList.add('active');
+    document.querySelectorAll('.modal-content').forEach(c=>c.style.display='none');
+    document.getElementById('tab-rule').style.display = '';
+    renderFooter(document.querySelector('.modal-tab[data-tab="rule"]'));
+  }
+  // 属性配置保存
+  if(e.target && e.target.id==='modalSaveBtn' && document.querySelector('.modal-tab.active').dataset.tab==='attr') {
+    // 只允许模型名称和模型描述可编辑
+    document.querySelector('input[name="name"]').removeAttribute('readonly');
+    document.querySelector('textarea[name="desc"]').removeAttribute('readonly');
+    // 其它输入框禁用
+    document.querySelectorAll('#tab-base input, #tab-base select, #tab-base textarea').forEach(el => {
+      if(el.name!=='name' && el.name!=='desc') el.setAttribute('readonly','readonly');
+      if(el.tagName==='SELECT' && el.name!=='name' && el.name!=='desc') el.setAttribute('disabled','disabled');
+    });
+  }
+  // 基本配置页保存
+  if(e.target && e.target.id==='modalSaveBtn' && document.querySelector('.modal-tab.active').dataset.tab==='base') {
+    // 判断模型分类
+    const cat = document.getElementById('modelCategorySelect').value;
+    if(cat==='多视图模型' || cat==='引用分类多视图') {
+      // 如果视图信息区域未显示，则渲染
+      renderViewList();
+      // 如果没有视图，自动添加一行
+      if(!window.viewList || window.viewList.length===0) {
+        window.viewList = [{name:'',desc:''}];
+        renderViewList();
+      }
+      // 滚动到视图信息区域
+      const viewListBox = document.getElementById('viewListBox');
+      if(viewListBox) viewListBox.scrollIntoView({behavior:'smooth',block:'center'});
+    }
   }
 });
 function renderFieldLibTable() {
@@ -808,10 +1035,95 @@ document.addEventListener('DOMContentLoaded', function() {
   updateRefRowVisibility();
   document.getElementById('modelCategorySelect').addEventListener('change', function() {
     updateRefRowVisibility();
+    renderViewList();
   });
   document.getElementById('refMasterSelect').addEventListener('change', function() {
     updateRefFieldOptions();
   });
+});
+// 视图信息动态渲染
+function renderViewList() {
+  const cat = document.getElementById('modelCategorySelect').value;
+  let viewListBox = document.getElementById('viewListBox');
+  let viewInfoBtn = document.getElementById('viewInfoCollapseBtn');
+  let viewInfoSection = document.getElementById('viewInfoSection');
+  if(!viewListBox || !viewInfoBtn || !viewInfoSection) return;
+  if(cat==='多视图模型'||cat==='引用分类多视图') {
+    viewInfoBtn.style.display = '';
+    viewInfoSection.style.display = '';
+    viewListBox.style.display = '';
+    if(!window.viewList) window.viewList = [];
+    const viewOptions = ["人事视图","财务视图","生产视图"];
+    viewListBox.innerHTML = `
+      <div style='margin-bottom:8px;display:flex;justify-content:flex-end;align-items:center;'>
+        <button type='button' class='btn-modern' id='addViewRowBtn' style='margin-bottom:0;'>添加</button>
+      </div>
+      <table style='width:100%;margin-bottom:8px;'>
+        <thead><tr><th style='width:120px;'>视图名称</th><th style='width:40px;'>操作</th></tr></thead>
+        <tbody id='viewListTbody'>
+          ${window.viewList.map((v,i)=>`<tr><td><select class='view-name' data-idx='${i}' style='width:110px;'>${viewOptions.map(opt=>`<option value='${opt}'${v.name===opt?" selected":''}>${opt}</option>`).join('')}</select></td><td><button type='button' class='table-link-delete' onclick='deleteViewRow(${i})'>删除</button></td></tr>`).join('')}
+        </tbody>
+      </table>`;
+    document.getElementById('addViewRowBtn').onclick = function() {
+      window.viewList.push({name:viewOptions[0],desc:''});
+      renderViewList();
+    };
+    // 删除
+    window.deleteViewRow = function(idx) { window.viewList.splice(idx,1); renderViewList(); };
+    // 输入同步
+    viewListBox.querySelectorAll('.view-name').forEach(select=>{
+      select.onchange = function(){ window.viewList[this.dataset.idx].name = this.value; };
+    });
+  } else {
+    viewInfoBtn.style.display = 'none';
+    viewInfoSection.style.display = 'none';
+    viewListBox.style.display = 'none';
+    viewListBox.innerHTML = '';
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // ...已有代码...
+  document.getElementById('modelCategorySelect').addEventListener('change', function() {
+    updateRefRowVisibility();
+    renderViewList();
+  });
+  renderViewList();
+  // ...已有代码...
+});
+// 折叠/展开逻辑
+let isBaseInfoCollapsed = false;
+let isViewInfoCollapsed = false;
+function updateSectionCollapse() {
+  const baseBtn = document.getElementById('baseInfoCollapseBtn');
+  const baseSec = document.getElementById('baseInfoSection');
+  const viewBtn = document.getElementById('viewInfoCollapseBtn');
+  const viewSec = document.getElementById('viewInfoSection');
+  if(isBaseInfoCollapsed) {
+    baseBtn.classList.add('collapsed');
+    baseSec.classList.add('collapsed');
+  } else {
+    baseBtn.classList.remove('collapsed');
+    baseSec.classList.remove('collapsed');
+  }
+  if(isViewInfoCollapsed) {
+    viewBtn.classList.add('collapsed');
+    viewSec.classList.add('collapsed');
+  } else {
+    viewBtn.classList.remove('collapsed');
+    viewSec.classList.remove('collapsed');
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // ...已有代码...
+  document.getElementById('baseInfoCollapseBtn').onclick = function() {
+    isBaseInfoCollapsed = !isBaseInfoCollapsed;
+    updateSectionCollapse();
+  };
+  document.getElementById('viewInfoCollapseBtn').onclick = function() {
+    isViewInfoCollapsed = !isViewInfoCollapsed;
+    updateSectionCollapse();
+  };
+  updateSectionCollapse();
 });
 </script>
 </body>

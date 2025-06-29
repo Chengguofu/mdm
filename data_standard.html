@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>数据元标准</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; }
+    .container { max-width: 1100px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.10); padding: 32px 36px 28px 36px; }
+    .section-title { color: #2176c7; font-size: 20px; font-weight: 600; margin-bottom: 18px; }
+    .query-bar { display: flex; flex-wrap: wrap; gap: 18px 24px; align-items: center; margin-bottom: 18px; padding: 0 0 0 6px; }
+    .query-bar label { font-size: 15px; color: #185a99; margin-right: 6px; }
+    .query-bar input, .query-bar select { padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 15px; background: #f9fbfd; min-width: 120px; margin-right: 8px; }
+    .query-bar button { background: #2176c7; color: #fff; border: none; padding: 6px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: 500; margin-right: 8px; transition: background 0.2s; }
+    .query-bar button:hover { background: #185a99; }
+    .action-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .btn-main { background: #4db6ac; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 15px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; }
+    .btn-main:hover { background: #399488; }
+    .btn-line { background: #fff; color: #444; border: 1px solid #d0d7de; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
+    .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
+    .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 18px 0 0 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; min-width: 900px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    td.center { text-align: center; }
+    .modal-mask { display:none; position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.18);z-index:2000;align-items:center;justify-content:center; }
+    .modal-content { background:#fff;border-radius:8px;max-width:500px;width:90vw;max-height:90vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative; }
+    .modal-header { background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:16px 24px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center; }
+    .modal-body { padding:24px; }
+    .modal-footer { display:flex;justify-content:flex-end;gap:18px;padding:0 24px 18px 24px; }
+    .modal-close { cursor:pointer;font-size:22px; }
+    .form-row { display:flex;align-items:center;margin-bottom:18px; }
+    .form-label { width:90px;color:#185a99;font-size:15px;text-align:right;margin-right:8px; }
+    .form-value { flex:1; }
+    .form-value input, .form-value select { width:100%;padding:6px 10px;border:1.2px solid #c0d3eb;border-radius:4px;font-size:15px;background:#f9fbfd; }
+    .required { color:#e53935; margin-left:2px; font-size:15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section-title">数据元标准</div>
+    <div class="query-bar">
+      <div style="display:flex;gap:18px 24px;align-items:center;flex-wrap:wrap;">
+        <label>代码：</label><input type="text" id="queryCode" placeholder="请输入代码" />
+        <label>名称：</label><input type="text" id="queryName" placeholder="请输入名称" />
+        <label>是否敏感数据：</label>
+        <select id="querySensitive">
+          <option value="">全部</option>
+          <option value="是">是</option>
+          <option value="否">否</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;width:100%;">
+        <button id="queryBtn">查询</button>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
+    </div>
+    <div class="action-bar">
+      <button class="btn-main" id="addBtn">新增</button>
+      <button class="btn-line" id="deleteBtn">删除</button>
+    </div>
+    <div class="table-wrap">
+      <table id="standardTable">
+        <thead>
+          <tr>
+            <th class="checkbox-cell" style="width:36px;"><input type="checkbox" id="checkAll"></th>
+            <th>代码</th>
+            <th>名称</th>
+            <th>类型</th>
+            <th>长度</th>
+            <th>精度</th>
+            <th>是否敏感数据</th>
+            <th style="text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="editModalMask">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">新增数据元标准</span>
+        <span class="modal-close" id="modalClose">×</span>
+      </div>
+      <form id="editForm">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-label">代码<span class="required">*</span>：</div>
+            <div class="form-value"><input type="text" id="editCode" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">名称<span class="required">*</span>：</div>
+            <div class="form-value"><input type="text" id="editName" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">类型<span class="required">*</span>：</div>
+            <div class="form-value">
+              <select id="editType" required>
+                <option value="字符型">字符型</option>
+                <option value="日期型">日期型</option>
+                <option value="数值型">数值型</option>
+                <option value="浮点型">浮点型</option>
+                <option value="文件">文件</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">长度：</div>
+            <div class="form-value"><input type="number" id="editLength" min="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">精度：</div>
+            <div class="form-value"><input type="number" id="editPrecision" min="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-label">是否敏感数据：</div>
+            <div class="form-value">
+              <select id="editSensitive">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn-main">保存</button>
+          <button type="button" class="btn-line" id="modalCancel">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    // 数据模拟
+    let data = [
+      { code: 'code', name: '编码', length: 32, precision: 0, sensitive: '否', type: '字符型' },
+      { code: 'name', name: '名称', length: 50, precision: 0, sensitive: '否', type: '字符型' },
+      { code: 'desc1', name: '所属组织机构', length: 64, precision: 0, sensitive: '否', type: '字符型' },
+      { code: 'desc2', name: '参加工作时间', length: 8, precision: 0, sensitive: '否', type: '日期型' },
+      { code: 'desc3', name: '国家', length: 20, precision: 0, sensitive: '否', type: '字符型' },
+      { code: 'desc4', name: '民族', length: 10, precision: 0, sensitive: '否', type: '字符型' },
+      { code: 'desc5', name: '省份', length: 20, precision: 0, sensitive: '否', type: '字符型' }
+    ];
+    let editIdx = -1;
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = data.map((item, idx) => `
+        <tr>
+          <td class="checkbox-cell"><input type="checkbox" class="rowCheck" data-idx="${idx}"></td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>${item.type||''}</td>
+          <td>${item.length||''}</td>
+          <td>${item.precision||''}</td>
+          <td>${item.sensitive}</td>
+          <td class="center">
+            <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0 8px;">编辑</button>
+            <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:15px;padding:0 8px;">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    renderTable();
+    // 查询
+    document.getElementById('queryBtn').onclick = function() {
+      const code = document.getElementById('queryCode').value.trim();
+      const name = document.getElementById('queryName').value.trim();
+      const sensitive = document.getElementById('querySensitive').value;
+      let filtered = data.filter(item => {
+        return (!code || item.code.includes(code)) && (!name || item.name.includes(name)) && (!sensitive || item.sensitive === sensitive);
+      });
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = filtered.map((item, idx) => `
+        <tr>
+          <td class="checkbox-cell"><input type="checkbox" class="rowCheck" data-idx="${idx}"></td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>${item.type||''}</td>
+          <td>${item.length||''}</td>
+          <td>${item.precision||''}</td>
+          <td>${item.sensitive}</td>
+          <td class="center">
+            <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0 8px;">编辑</button>
+            <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:15px;padding:0 8px;">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    };
+    document.getElementById('resetBtn').onclick = function() {
+      document.getElementById('queryCode').value = '';
+      document.getElementById('queryName').value = '';
+      document.getElementById('querySensitive').value = '';
+      renderTable();
+    };
+    // 新增
+    document.getElementById('addBtn').onclick = function() {
+      editIdx = -1;
+      document.getElementById('modalTitle').textContent = '新增数据元标准';
+      document.getElementById('editCode').value = '';
+      document.getElementById('editName').value = '';
+      document.getElementById('editLength').value = '';
+      document.getElementById('editPrecision').value = '';
+      document.getElementById('editSensitive').value = '否';
+      document.getElementById('editType').value = '字符型';
+      document.getElementById('editModalMask').style.display = 'flex';
+    };
+    // 编辑
+    window.editRow = function(idx) {
+      editIdx = idx;
+      const item = data[idx];
+      document.getElementById('modalTitle').textContent = '编辑数据元标准';
+      document.getElementById('editCode').value = item.code;
+      document.getElementById('editName').value = item.name;
+      document.getElementById('editLength').value = item.length;
+      document.getElementById('editPrecision').value = item.precision;
+      document.getElementById('editSensitive').value = item.sensitive;
+      document.getElementById('editType').value = item.type || '字符型';
+      document.getElementById('editModalMask').style.display = 'flex';
+    };
+    // 保存
+    document.getElementById('editForm').onsubmit = function(e) {
+      e.preventDefault();
+      const code = document.getElementById('editCode').value.trim();
+      const name = document.getElementById('editName').value.trim();
+      const length = document.getElementById('editLength').value;
+      const precision = document.getElementById('editPrecision').value;
+      const sensitive = document.getElementById('editSensitive').value;
+      const type = document.getElementById('editType').value;
+      if (!code || !name) { alert('代码和名称为必填项！'); return; }
+      if (editIdx === -1) {
+        data.push({ code, name, type, length, precision, sensitive });
+      } else {
+        data[editIdx] = { code, name, type, length, precision, sensitive };
+      }
+      renderTable();
+      document.getElementById('editModalMask').style.display = 'none';
+    };
+    // 关闭弹窗
+    document.getElementById('modalClose').onclick = document.getElementById('modalCancel').onclick = function() {
+      document.getElementById('editModalMask').style.display = 'none';
+    };
+    // 删除
+    window.deleteRow = function(idx) {
+      if (!confirm('确定要删除该数据吗？')) return;
+      data.splice(idx, 1);
+      renderTable();
+    };
+    // 全选
+    document.getElementById('checkAll').onclick = function() {
+      const checked = this.checked;
+      document.querySelectorAll('.rowCheck').forEach(cb=>cb.checked = checked);
+    };
+  </script>
+</body>
+</html> 

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>主数据编码规则</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; font-size: 14px; }
+    .container { max-width: 1200px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.10); padding: 32px 36px 28px 36px; }
+    .section-title { color: #2176c7; font-size: 18px; font-weight: 600; margin-bottom: 18px; }
+    .action-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; }
+    .btn-main { background: #4db6ac; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 14px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; }
+    .btn-main:hover { background: #399488; }
+    .btn-line { background: #fff; color: #444; border: 1px solid #d0d7de; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 14px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
+    .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
+    .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 18px 0 0 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; background: #fff; min-width: 900px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    td.center { text-align: center; }
+    
+    /* 抽屉样式 */
+    .modal-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
+    .modal-content { position: fixed; top: 0; right: -800px; width: 800px; height: 100%; background: #fff; box-shadow: -2px 0 10px rgba(0,0,0,0.1); transition: right 0.3s ease; z-index: 1001; display: flex; flex-direction: column; }
+    .modal-content.show { right: 0; }
+    .modal-header { padding: 16px 24px; border-bottom: 1px solid #e0e6ed; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-header span { font-size: 16px; font-weight: 600; color: #2176c7; }
+    .modal-close { font-size: 24px; color: #999; cursor: pointer; padding: 4px; }
+    .modal-close:hover { color: #666; }
+    
+    .modal-body { flex: 1 1 auto; overflow-y: auto; padding: 24px; min-height:0; max-height:calc(100vh - 120px); box-sizing: border-box; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e0e6ed; background: #f8fafc; display: flex; gap: 12px; justify-content: flex-end; flex-shrink: 0; position: sticky; bottom: 0; z-index:2; }
+    
+    /* 表单样式 */
+    .form-row { display: flex; gap: 24px; margin-bottom: 20px; }
+    .form-group { flex: 1; display: flex; align-items: center; }
+    .form-label { width: 80px; color: #185a99; font-size: 14px; text-align: right; margin-right: 8px; flex-shrink: 0; }
+    .form-value { flex: 1; }
+    .form-value input, .form-value select { width: 50%; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 14px; background: #f9fbfd; }
+    .form-value input[type="text"], .form-value input[type="number"] { width: 50%; }
+    .form-value select { width: 50%; }
+    .required { color: #e53935; margin-left: 2px; font-size: 14px; }
+    
+    /* 开关按钮样式 */
+    .switch-container { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #4db6ac; }
+    input:focus + .slider { box-shadow: 0 0 1px #4db6ac; }
+    input:checked + .slider:before { transform: translateX(22px); }
+    .switch-label { font-size: 13px; color: #666; }
+    
+    /* 编码规则配置样式 */
+    .code-segments { margin-top: 20px; }
+    .segment-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e0e6ed; border-radius: 6px; margin-bottom: 12px; }
+    .segment-type { width: 120px; flex-shrink: 0; }
+    .segment-type select { width: 100%; padding: 6px 8px; border: 1px solid #c0d3eb; border-radius: 4px; font-size: 13px; }
+    .segment-config { flex: 1; display: flex; gap: 8px; align-items: center; min-height: 32px; }
+    .segment-config input, .segment-config select { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 12px; }
+    .segment-config label { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+    .segment-separator { display:none; }
+    .separator-input { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 12px; text-align: center; width:90px; margin-left:8px; }
+    .segment-actions { width: 60px; flex-shrink: 0; }
+    .btn-small { padding: 4px 10px; font-size: 11px; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
+    .btn-add { background: #4db6ac; color: #fff; }
+    .btn-add:hover { background: #399488; }
+    .btn-remove { background: #e74c3c; color: #fff; }
+    .btn-remove:hover { background: #c62828; }
+    .code-preview { background: #f0f6fd; border: 1px solid #c0d3eb; border-radius: 4px; padding: 12px 16px; margin-bottom: 16px; font-family: monospace; color: #2176c7; font-size: 13px; }
+    .hidden { display: none; }
+    
+    /* 状态标签 */
+    .status-active { background: #e8f5e8; color: #2e7d32; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+    .status-inactive { background: #ffebee; color: #c62828; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+    
+    /* 空状态 */
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+    .empty-state .text { font-size: 15px; margin-bottom: 8px; }
+    .empty-state .sub-text { font-size: 13px; opacity: 0.7; }
+    
+    /* 新增的CSS */
+    .serial-group { display: flex; flex-direction: column; align-items: flex-start; margin-right: 8px; min-width: 50px; }
+    .serial-group label { font-size: 12px; color: #185a99; margin-bottom: 2px; }
+    .serial-group input { width: 70px; }
+    .serial-group input.serial-length { width: 42px; }
+    .serial-group input.serial-step { width: 35px; }
+    .serial-group input.serial-start, .serial-group input.serial-end { width: 70px; }
+    .serial-group .serial-pad-label { margin:0;font-size:13px;display:flex;align-items:center;gap:2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section-title">主数据编码规则</div>
+    <div class="action-bar">
+      <button class="btn-main" id="addBtn">新增编码规则</button>
+      <button class="btn-line" id="deleteBtn">删除</button>
+    </div>
+    <div class="table-wrap">
+      <table id="codeRuleTable">
+        <thead>
+          <tr>
+            <th class="checkbox-cell" style="width:36px;"><input type="checkbox" id="checkAll"></th>
+            <th>规则编码</th>
+            <th>规则名称</th>
+            <th>编码类型</th>
+            <th>编码字段</th>
+            <th style="text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 抽屉 -->
+  <div class="modal-mask" id="modalMask">
+    <div class="modal-content" id="modal-content">
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <span id="drawerTitle">新增编码规则</span>
+        <span class="modal-close" id="drawerClose">×</span>
+      </div>
+      <div style="display:flex;justify-content:flex-end;align-items:center;padding:10px 24px 0 24px;">
+        <div class="switch-container" style="margin-bottom:0;">
+          <span class="switch-label">状态</span>
+          <label class="switch">
+            <input type="checkbox" id="statusSwitch" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <form id="editForm">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">规则编码<span class="required">*</span>：</div>
+              <div class="form-value"><input type="text" id="editCode" required placeholder="请输入规则编码"></div>
+            </div>
+            <div class="form-group">
+              <div class="form-label">规则名称<span class="required">*</span>：</div>
+              <div class="form-value"><input type="text" id="editName" required placeholder="请输入规则名称"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">编码类型<span class="required">*</span>：</div>
+              <div class="form-value"><select id="editType" required onchange="toggleCodeConfig()"><option value="自动编码">自动编码</option><option value="手动编码">手动编码</option></select></div>
+            </div>
+            <div class="form-group">
+              <div class="form-label">编码字段<span class="required">*</span>：</div>
+              <div class="form-value"><input type="text" id="editField" required placeholder="请输入编码字段"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <div class="form-label">适用条件：</div>
+              <div class="form-value" style="position:relative;width:300px;min-width:0;display:flex;align-items:center;background:#f9fbfd;border:1.2px solid #c0d3eb;border-radius:4px;">
+                <input id="conditionInput" class="form-control" style="flex:1;border:none;background:transparent;padding:6px 10px 6px 10px;height:32px;font-size:14px;outline:none;" readonly placeholder="点击右侧按钮编辑">
+                <button type="button" id="conditionSearchBtn" style="border:none;background:transparent;cursor:pointer;padding:0 8px 0 0;height:32px;width:32px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 20 20"><circle cx="9" cy="9" r="7" stroke="#2176c7" stroke-width="2" fill="none"/><line x1="15" y1="15" x2="11.5" y2="11.5" stroke="#2176c7" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 自动编码配置 -->
+          <div id="autoCodeConfig">
+            <div class="code-segments">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0;">
+                <h4 style="margin:0;color:#2176c7;font-size:15px;">编码规则配置</h4>
+                <button type="button" class="btn-small btn-add" onclick="addSegment(event)">添加编码段</button>
+              </div>
+              <div class="code-preview">
+                <strong>编码预览：</strong><span id="codePreview">请配置编码规则</span>
+              </div>
+              <div id="segmentsContainer">
+                <!-- 编码段将在这里动态生成 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 手动编码配置 -->
+          <div id="manualCodeConfig" class="hidden">
+            <div class="form-row">
+              <div class="form-group">
+                <div class="form-label">编码长度<span class="required">*</span>：</div>
+                <div class="form-value"><input type="number" id="manualLength" min="1" max="50" placeholder="请输入编码长度"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn-main">保存</button>
+          <button type="button" class="btn-line" id="drawerCancel">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 数据模拟
+    let data = [
+      { 
+        code: 'RULE001', 
+        name: '供应商编码规则', 
+        type: '自动编码', 
+        desc: '供应商自动编码规则，包含固定前缀+日期+流水号', 
+        field: 'supplier_code', 
+        status: '启用',
+        segments: [
+          { type: '固定码', config: { value: 'SUP' }, separator: '-' },
+          { type: '日期码', config: { field: 'create_date', format: 'YYYYMMDD' }, separator: '-' },
+          { type: '流水码', config: { maxLength: 4, padZero: true, step: 1 }, separator: '' }
+        ]
+      },
+      { 
+        code: 'RULE002', 
+        name: '员工编码规则', 
+        type: '手动编码', 
+        desc: '员工手动编码规则', 
+        field: 'employee_code', 
+        status: '启用',
+        manualLength: 8
+      },
+      { 
+        code: 'RULE003', 
+        name: '产品编码规则', 
+        type: '自动编码', 
+        desc: '产品编码规则，包含分类代码+流水号', 
+        field: 'product_code', 
+        status: '禁用',
+        segments: [
+          { type: '字段码', config: { field: 'category_code' }, separator: '-' },
+          { type: '流水码', config: { maxLength: 6, padZero: true, step: 1 }, separator: '' }
+        ]
+      }
+    ];
+    let editIdx = -1;
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      if (data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="icon">📋</div>
+                <div class="text">暂无编码规则</div>
+                <div class="sub-text">点击"新增编码规则"开始创建</div>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tbody.innerHTML = data.map((item, idx) => `
+        <tr>
+          <td class="checkbox-cell"><input type="checkbox" class="rowCheck" data-idx="${idx}"></td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>${item.type}</td>
+          <td>${item.field}</td>
+          <td class="center">
+            <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:0 8px;">编辑</button>
+            <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:0 8px;">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showDrawer() {
+      document.getElementById('modalMask').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('modal-content').classList.add('show');
+      }, 10);
+    }
+
+    function hideDrawer() {
+      document.getElementById('modal-content').classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('modalMask').style.display = 'none';
+      }, 300);
+    }
+
+    function toggleCodeConfig() {
+      const codeType = document.getElementById('editType').value;
+      const autoConfig = document.getElementById('autoCodeConfig');
+      const manualConfig = document.getElementById('manualCodeConfig');
+      
+      if (codeType === '自动编码') {
+        autoConfig.classList.remove('hidden');
+        manualConfig.classList.add('hidden');
+        // 清空编码段，因为类型改变了
+        document.getElementById('segmentsContainer').innerHTML = '';
+        document.getElementById('codePreview').textContent = '请配置编码规则';
+      } else {
+        autoConfig.classList.add('hidden');
+        manualConfig.classList.remove('hidden');
+      }
+    }
+
+    function addSegment(event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const container = document.getElementById('segmentsContainer');
+      const segmentId = Date.now();
+      const codeType = document.getElementById('editType').value;
+
+      let typeOptions = '';
+      if (codeType === '自动编码') {
+        typeOptions = `
+          <option value="固定码">固定码</option>
+          <option value="日期码">日期码</option>
+          <option value="字段码">字段码</option>
+          <option value="流水码">流水码</option>
+          <option value="引用码">引用码</option>
+        `;
+      } else {
+        typeOptions = `<option value="手工码">手工码</option>`;
+      }
+
+      // 结构：主字段+分隔符+删除按钮同行
+      const segmentHtml = `
+        <div class="segment-item" data-segment-id="${segmentId}" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <div class="segment-type" style="width:120px;flex-shrink:0;">
+            <select class="segment-type-select" onchange="updateSegmentConfig(${segmentId})">
+              ${typeOptions}
+            </select>
+          </div>
+          <div class="segment-config" id="config-${segmentId}" style="display:inline-block;"></div>
+          <button type="button" class="btn-small btn-remove" onclick="removeSegment(${segmentId}, event)" style="height:32px;margin-left:0;white-space:nowrap;">删除</button>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', segmentHtml);
+      updateSegmentConfig(segmentId);
+    }
+
+    function updateSegmentConfig(segmentId) {
+      const segment = document.querySelector(`[data-segment-id="${segmentId}"]`);
+      const typeSelect = segment.querySelector('.segment-type-select');
+      const configDiv = segment.querySelector('.segment-config');
+      const type = typeSelect.value;
+      const codeType = document.getElementById('editType').value;
+
+      // 先清空
+      configDiv.innerHTML = '';
+
+      let configHtml = '';
+
+      if (codeType === '自动编码') {
+        switch(type) {
+          case '固定码':
+            configHtml = `<input type="text" class="fixed-value" placeholder="固定字符" style="width:120px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">`;
+            break;
+          case '日期码':
+            configHtml = `
+              <select class="date-field" style="width:120px;" onchange="updateCodePreview()">
+                <option value="create_date">创建日期</option>
+                <option value="update_date">更新日期</option>
+              </select>
+              <input type="text" class="date-format" placeholder="日期格式" value="YYYYMMDD" style="width:100px;" oninput="updateCodePreview()">
+              <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">
+            `;
+            break;
+          case '字段码':
+            configHtml = `
+              <select class="field-name" style="width:120px;" onchange="updateCodePreview()">
+                <option value="">模型属性</option>
+                <option value="attr1">属性1</option>
+                <option value="attr2">属性2</option>
+                <option value="attr3">属性3</option>
+              </select>
+              <select class="ref-attr" style="width:120px;margin-left:8px;" onchange="updateCodePreview()">
+                <option value="">引用属性</option>
+                <option value="ref1">引用1</option>
+                <option value="ref2">引用2</option>
+                <option value="ref3">引用3</option>
+              </select>
+              <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">
+            `;
+            break;
+          case '流水码':
+            configHtml = `
+              <div style='display:flex;flex-direction:column;gap:4px;max-width:900px;'>
+                <!-- 第一行：主字段区，所有字段上下结构，横向排列 -->
+                <div style='display:flex;align-items:flex-end;gap:4px;flex-wrap:nowrap;'>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">最大长度</label>
+                    <input type="number" class="serial-length" min="1" max="10" value="4" oninput="updateCodePreview()" style="width:58px;">
+                  </div>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">补零</label>
+                    <input type="checkbox" class="serial-pad" checked onchange="updateCodePreview()" style="width:13px;height:13px;">
+                  </div>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">步长</label>
+                    <input type="number" class="serial-step" value="1" min="1" oninput="updateCodePreview()" style="width:35px;">
+                  </div>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">起始值</label>
+                    <input type="number" class="serial-start" value="1" min="0" oninput="updateCodePreview()" style="width:40px;">
+                  </div>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">终止值</label>
+                    <input type="number" class="serial-end" value="9999" min="0" oninput="updateCodePreview()" style="width:58px;">
+                  </div>
+                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">分隔符</label>
+                    <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:40px;">
+                  </div>
+                </div>
+                <!-- 第二行：重置类型、重置二级项 -->
+                <div style='display:flex;align-items:center;gap:8px;flex-wrap:nowrap;justify-content:flex-start;'>
+                  <label style='white-space:nowrap;'>重置类型</label>
+                  <select class="serial-reset-type" style="width:90px;" onchange="updateSerialResetConfig(this, ${segmentId})">
+                    <option value="none">不重置</option>
+                    <option value="date">按日期重置</option>
+                    <option value="field">按字段值重置</option>
+                  </select>
+                  <div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>
+                </div>
+              </div>
+            `;
+            break;
+          case '引用码':
+            configHtml = `<input type="text" class="parent-field" placeholder="父级字段" style="width:120px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">`;
+            break;
+        }
+      } else {
+        // 手动编码模式
+        configHtml = `<input type="number" class="manual-length" placeholder="最大长度" min="1" max="20" style="width:120px;" oninput="updateCodePreview()">`;
+      }
+
+      configDiv.innerHTML = configHtml;
+      updateCodePreview();
+    }
+
+    function updateCodePreview() {
+      const segments = document.querySelectorAll('.segment-item');
+      let preview = '';
+      
+      segments.forEach((segment, index) => {
+        const type = segment.querySelector('.segment-type-select').value;
+        const separator = segment.querySelector('.separator-input').value;
+        
+        let segmentValue = '';
+        switch(type) {
+          case '固定码':
+            segmentValue = segment.querySelector('.fixed-value').value || 'FIX';
+            break;
+          case '日期码':
+            segmentValue = '20241201';
+            break;
+          case '字段码':
+            segmentValue = segment.querySelector('.field-name').value || 'FIELD';
+            break;
+          case '流水码':
+            const length = segment.querySelector('.serial-length').value || 4;
+            const start = segment.querySelector('.serial-start') ? segment.querySelector('.serial-start').value : 1;
+            segmentValue = String(start).padStart(length, '0');
+            break;
+          case '引用码':
+            segmentValue = segment.querySelector('.parent-field').value || 'REF';
+            break;
+        }
+        
+        preview += segmentValue;
+        if (index < segments.length - 1 && separator) {
+          preview += separator;
+        }
+      });
+      
+      document.getElementById('codePreview').textContent = preview || '请配置编码规则';
+    }
+
+    function removeSegment(segmentId, event) {
+      if (event) {
+        event.stopPropagation();
+      }
+      const segment = document.querySelector(`[data-segment-id="${segmentId}"]`);
+      if (segment) {
+        segment.remove();
+        updateCodePreview();
+      }
+    }
+
+    function saveRow() {
+      const formData = {
+        code: document.getElementById('editCode').value,
+        name: document.getElementById('editName').value,
+        type: document.getElementById('editType').value,
+        field: document.getElementById('editField').value,
+        status: document.getElementById('statusSwitch').checked ? '启用' : '禁用'
+      };
+
+      if (formData.type === '自动编码') {
+        const segments = [];
+        document.querySelectorAll('.segment-item').forEach(segment => {
+          const type = segment.querySelector('.segment-type-select').value;
+          const separator = segment.querySelector('.separator-input').value;
+          let config = {};
+          
+          if (type === '固定码') {
+            config.value = segment.querySelector('.fixed-value').value;
+          } else if (type === '日期码') {
+            config.field = segment.querySelector('.date-field').value;
+            config.format = segment.querySelector('.date-format').value;
+          } else if (type === '字段码') {
+            config.field = segment.querySelector('.field-name').value;
+            config.ref = segment.querySelector('.ref-attr').value;
+          } else if (type === '流水码') {
+            config.maxLength = parseInt(segment.querySelector('.serial-length').value);
+            config.padZero = segment.querySelector('.serial-pad').checked;
+            config.step = parseInt(segment.querySelector('.serial-step').value);
+            config.start = parseInt(segment.querySelector('.serial-start').value);
+            config.end = parseInt(segment.querySelector('.serial-end').value);
+            config.resetType = segment.querySelector('.serial-reset-type').value;
+            if(config.resetType === 'date') {
+              config.resetDate = segment.querySelector('.serial-reset-date').value;
+            } else if(config.resetType === 'field') {
+              config.resetField = segment.querySelector('.serial-reset-field').value;
+            }
+          } else if (type === '引用码') {
+            config.field = segment.querySelector('.parent-field').value;
+          }
+          
+          segments.push({ type, config, separator });
+        });
+        formData.segments = segments;
+      } else if (formData.type === '手动编码') {
+        formData.manualLength = parseInt(document.getElementById('manualLength').value);
+      }
+
+      if (editIdx === -1) {
+        data.push(formData);
+      } else {
+        data[editIdx] = formData;
+      }
+      
+      renderTable();
+      hideDrawer();
+    }
+
+    // 新增
+    function addRow() {
+      editIdx = -1;
+      document.getElementById('drawerTitle').textContent = '新增编码规则';
+      document.getElementById('editForm').reset();
+      document.getElementById('statusSwitch').checked = true;
+      document.getElementById('segmentsContainer').innerHTML = '';
+      document.getElementById('codePreview').textContent = '请配置编码规则';
+      toggleCodeConfig();
+      showDrawer();
+    }
+
+    // 编辑
+    function editRow(idx) {
+      editIdx = idx;
+      const item = data[idx];
+      document.getElementById('drawerTitle').textContent = '编辑编码规则';
+      document.getElementById('editCode').value = item.code;
+      document.getElementById('editName').value = item.name;
+      document.getElementById('editType').value = item.type;
+      document.getElementById('editField').value = item.field;
+      document.getElementById('statusSwitch').checked = item.status === '启用';
+      
+      if (item.type === '自动编码' && item.segments) {
+        document.getElementById('segmentsContainer').innerHTML = '';
+        item.segments.forEach(segment => {
+          addSegment(null);
+          const lastSegment = document.querySelector('.segment-item:last-child');
+          const typeSelect = lastSegment.querySelector('.segment-type-select');
+          typeSelect.value = segment.type;
+          updateSegmentConfig(lastSegment.dataset.segmentId);
+          
+          // 设置配置值
+          setTimeout(() => {
+            const configDiv = lastSegment.querySelector('.segment-config');
+            const separatorInput = lastSegment.querySelector('.separator-input');
+            
+            if (segment.type === '固定码') {
+              configDiv.querySelector('.fixed-value').value = segment.config.value;
+            } else if (segment.type === '日期码') {
+              configDiv.querySelector('.date-field').value = segment.config.field;
+              configDiv.querySelector('.date-format').value = segment.config.format;
+            } else if (segment.type === '字段码') {
+              configDiv.querySelector('.field-name').value = segment.config.field;
+              configDiv.querySelector('.ref-attr').value = segment.config.ref || '';
+            } else if (segment.type === '流水码') {
+              configDiv.querySelector('.serial-length').value = segment.config.maxLength;
+              configDiv.querySelector('.serial-pad').checked = segment.config.padZero;
+              configDiv.querySelector('.serial-step').value = segment.config.step;
+              if(configDiv.querySelector('.serial-start')) configDiv.querySelector('.serial-start').value = segment.config.start || 1;
+              if(configDiv.querySelector('.serial-end')) configDiv.querySelector('.serial-end').value = segment.config.end || 9999;
+              // 回显重置类型
+              const resetType = segment.config.resetType || 'none';
+              const resetTypeSelect = configDiv.parentElement.querySelector('.serial-reset-type');
+              if(resetTypeSelect) {
+                resetTypeSelect.value = resetType;
+                updateSerialResetConfig(resetTypeSelect, segmentId);
+                if(resetType === 'date' && configDiv.parentElement.querySelector('.serial-reset-date')) {
+                  configDiv.parentElement.querySelector('.serial-reset-date').value = segment.config.resetDate || 'year';
+                } else if(resetType === 'field' && configDiv.parentElement.querySelector('.serial-reset-field')) {
+                  configDiv.parentElement.querySelector('.serial-reset-field').value = segment.config.resetField || 'field1';
+                }
+              }
+            } else if (segment.type === '引用码') {
+              configDiv.querySelector('.parent-field').value = segment.config.field;
+            }
+            
+            separatorInput.value = segment.separator;
+          }, 100);
+        });
+        updateCodePreview();
+      } else if (item.type === '手动编码') {
+        document.getElementById('manualLength').value = item.manualLength || '';
+      }
+      
+      toggleCodeConfig();
+      showDrawer();
+    }
+
+    // 删除
+    function deleteRow(idx) {
+      if (confirm('确定要删除这条编码规则吗？')) {
+        data.splice(idx, 1);
+        renderTable();
+      }
+    }
+
+    // 事件监听
+    document.getElementById('addBtn').addEventListener('click', addRow);
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      saveRow();
+    });
+    document.getElementById('drawerClose').addEventListener('click', hideDrawer);
+    document.getElementById('drawerCancel').addEventListener('click', hideDrawer);
+    document.getElementById('modalMask').addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideDrawer();
+      }
+    });
+
+    // 全选功能
+    document.getElementById('checkAll').onchange = function() {
+      const checkboxes = document.querySelectorAll('.rowCheck');
+      checkboxes.forEach(cb => cb.checked = this.checked);
+    };
+
+    // 删除选中
+    document.getElementById('deleteBtn').onclick = function() {
+      const checkedBoxes = document.querySelectorAll('.rowCheck:checked');
+      if (checkedBoxes.length === 0) {
+        alert('请选择要删除的记录');
+        return;
+      }
+      
+      if (confirm(`确定要删除选中的 ${checkedBoxes.length} 条记录吗？`)) {
+        const indices = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.idx)).sort((a, b) => b - a);
+        indices.forEach(idx => data.splice(idx, 1));
+        renderTable();
+        document.getElementById('checkAll').checked = false;
+      }
+    };
+
+    // 初始化
+    renderTable();
+    
+    // 添加事件监听器用于实时更新预览
+    document.addEventListener('input', function(e) {
+      if (e.target.closest('.code-segments')) {
+        updateCodePreview();
+      }
+    });
+
+    // 阻止编码段配置区域的事件冒泡
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.code-segments') || e.target.closest('.modal-body')) {
+        e.stopPropagation();
+      }
+    });
+
+    // 新增JS函数
+    function updateSerialResetConfig(select, segmentId) {
+      const val = select.value;
+      const extraDiv = document.getElementById('serial-reset-extra-' + segmentId);
+      if(val === 'date') {
+        extraDiv.style.display = '';
+        extraDiv.innerHTML = `<label>重置周期</label><select class='serial-reset-date' style='width:90px;'><option value='year'>年</option><option value='quarter'>季度</option><option value='month'>月</option></select>`;
+      } else if(val === 'field') {
+        extraDiv.style.display = '';
+        extraDiv.innerHTML = `<div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>`;
+      } else {
+        extraDiv.style.display = 'none';
+        extraDiv.innerHTML = '';
+      }
+    }
+
+    // 适用条件搜索按钮事件
+    document.getElementById('conditionSearchBtn').onclick = function() {
+      window.open('condition_new.html', '_blank');
+    };
+  </script>
+</body>
+</html> 

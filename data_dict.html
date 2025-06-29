@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>系统字典管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; font-size:15px; }
+    .container { max-width: 980px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(33,118,199,0.08); padding: 32px 36px 28px 36px; }
+    .section-title { font-size: 20px; color: #2176c7; font-weight: 600; margin-bottom: 18px; }
+    .query-bar { display: flex; gap: 18px; align-items: center; margin-bottom: 0; }
+    .query-bar label { font-size: 15px; color: #185a99; margin-right: 6px; }
+    .query-bar input, .query-bar select { padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 15px; background: #f9fbfd; min-width: 120px; margin-right: 8px; }
+    .query-bar button { background: #2176c7; color: #fff; border: none; padding: 6px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: 500; margin-right: 8px; transition: background 0.2s; }
+    .query-bar button:hover { background: #185a99; }
+    .query-btn-bar { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 18px; }
+    .action-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .btn-main { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 15px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; }
+    .btn-main:hover { background: #185a99; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
+    .btn-line:hover { background: #f5f7fa; border-color: #185a99; color: #185a99; }
+    .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    .table-link-edit { background: none; border: none; color: #2176c7; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-edit:hover { color: #185a99; text-decoration: underline; }
+    .table-link-delete { background: none; border: none; color: #e74c3c; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-delete:hover { color: #b71c1c; text-decoration: underline; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:400px; max-width:98vw; min-height:180px; padding:28px 32px 22px 32px; position:relative; }
+    .modal-title { font-size:18px; font-weight:600; color:#2176c7; margin-bottom:18px; }
+    .modal-close { position:absolute; right:18px; top:12px; font-size:20px; color:#888; cursor:pointer; border:none; background:none; transition:.2s; }
+    .modal-close:hover { color:#d33; }
+    .modal-form-row { display:flex; align-items:center; margin-bottom:18px; }
+    .modal-form-label { width:80px; color:#444; font-size:15px; text-align:right; margin-right:12px; }
+    .modal-form-value { flex:1; }
+    .modal-form-value input, .modal-form-value select { width:100%; padding:7px 12px; border:1.2px solid #c0d3eb; border-radius:5px; font-size:15px; background:#f9fbfd; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:12px; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section-title">大小写转换</div>
+    <div class="query-bar" style="flex-wrap:nowrap; margin-bottom: 0;">
+      <label>代码：</label><input type="text" id="queryCode" placeholder="请输入代码">
+      <label>名称：</label><input type="text" id="queryName" placeholder="请输入名称">
+      <label>状态：</label>
+      <select id="queryStatus">
+        <option value="">全部</option>
+        <option value="正常">正常</option>
+      </select>
+    </div>
+    <div class="query-btn-bar" style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:18px;">
+      <button class="btn-main" onclick="doQuery()">查询</button>
+      <button class="btn-line" onclick="resetQuery()">重置</button>
+    </div>
+    <div class="action-bar" style="margin-bottom:18px;">
+      <button class="btn-main" onclick="openAddModal()">新增</button>
+      <button class="btn-line" onclick="deleteSelected()">删除</button>
+    </div>
+    <div class="table-wrap">
+      <table id="dictTable">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="checkAll"></th>
+            <th>代码</th>
+            <th>名称</th>
+            <th>状态</th>
+            <th style="width:80px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="dictTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="dictModalMask" style="display:none;">
+    <div class="modal-window">
+      <div class="modal-title" id="dictModalTitle">新增字典</div>
+      <button class="modal-close" onclick="closeDictModal()">×</button>
+      <div class="modal-form-row">
+        <div class="modal-form-label">代码：</div>
+        <div class="modal-form-value"><input type="text" id="modalCode"></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">名称：</div>
+        <div class="modal-form-value"><input type="text" id="modalName"></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">状态：</div>
+        <div class="modal-form-value">
+          <select id="modalStatus">
+            <option value="启用">启用</option>
+            <option value="停用">停用</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-main" onclick="saveDict()">保存</button>
+        <button class="btn-line" onclick="closeDictModal()">取消</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let dictData = [
+      { code: '1', name: '不转换', status: '正常' },
+      { code: '2', name: '全部小写', status: '正常' },
+      { code: '3', name: '全部大写', status: '正常' }
+    ];
+    let editIndex = null;
+    function renderTable() {
+      const tbody = document.getElementById('dictTableBody');
+      const code = document.getElementById('queryCode').value.trim();
+      const name = document.getElementById('queryName').value.trim();
+      const status = document.getElementById('queryStatus').value;
+      let rows = dictData
+        .map((item, idx) => ({ ...item, idx }))
+        .filter(item => (!code || item.code.includes(code)) && (!name || item.name.includes(name)) && (!status || item.status === status));
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td><input type="checkbox" class="rowCheck" data-idx="${item.idx}"></td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>${item.status}</td>
+          <td>
+            <button class="table-link-edit" onclick="openEditModal(${item.idx})">编辑</button>
+            <button class="table-link-delete" onclick="deleteRow(${item.idx})">删除</button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('checkAll').checked = false;
+    }
+    function doQuery() { renderTable(); }
+    function resetQuery() {
+      document.getElementById('queryCode').value = '';
+      document.getElementById('queryName').value = '';
+      document.getElementById('queryStatus').value = '';
+      renderTable();
+    }
+    function openAddModal() {
+      editIndex = null;
+      document.getElementById('dictModalTitle').textContent = '新增字典';
+      document.getElementById('modalCode').value = '';
+      document.getElementById('modalName').value = '';
+      document.getElementById('modalStatus').value = '启用';
+      document.getElementById('dictModalMask').style.display = 'flex';
+    }
+    function openEditModal(idx) {
+      editIndex = idx;
+      const item = dictData[idx];
+      document.getElementById('dictModalTitle').textContent = '编辑字典';
+      document.getElementById('modalCode').value = item.code;
+      document.getElementById('modalName').value = item.name;
+      document.getElementById('modalStatus').value = item.status;
+      document.getElementById('dictModalMask').style.display = 'flex';
+    }
+    function closeDictModal() {
+      document.getElementById('dictModalMask').style.display = 'none';
+    }
+    function saveDict() {
+      const code = document.getElementById('modalCode').value.trim();
+      const name = document.getElementById('modalName').value.trim();
+      const status = document.getElementById('modalStatus').value;
+      if (!code || !name) { alert('请填写完整信息'); return; }
+      if (editIndex === null) {
+        dictData.push({ code, name, status: '正常' });
+      } else {
+        dictData[editIndex] = { code, name, status: '正常' };
+      }
+      closeDictModal();
+      renderTable();
+    }
+    function deleteRow(idx) {
+      if (confirm('确定要删除该字典项吗？')) {
+        dictData.splice(idx, 1);
+        renderTable();
+      }
+    }
+    function deleteSelected() {
+      const checks = Array.from(document.querySelectorAll('.rowCheck:checked'));
+      if (checks.length === 0) { alert('请选择要删除的项'); return; }
+      if (!confirm('确定要批量删除选中的字典项吗？')) return;
+      const idxs = checks.map(cb => parseInt(cb.dataset.idx)).sort((a,b)=>b-a);
+      idxs.forEach(idx => dictData.splice(idx, 1));
+      renderTable();
+    }
+    document.getElementById('checkAll').onclick = function() {
+      const checked = this.checked;
+      document.querySelectorAll('.rowCheck').forEach(cb => cb.checked = checked);
+    };
+    renderTable();
+  </script>
+</body>
+</html> 

@@ -1159,6 +1159,7 @@
               <li class="submenu-item" data-item-id="push-config">数据推送接口配置</li>
               <li class="submenu-item" data-item-id="push-log">数据推送接口日志</li>
               <li class="submenu-item" data-item-id="filter-config">筛选配置</li>
+              <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="data-analysis-management">
@@ -1186,6 +1187,7 @@
             </div>
             <ul class="submenu">
               <li class="submenu-item" data-item-id="sys-dict">系统字典</li>
+              <li class="submenu-item" data-content="data-standard" data-url="data_standard.html">数据元标准</li>
               <li class="submenu-item" data-item-id="account">账号管理</li>
               <li class="submenu-item" data-item-id="role">角色管理</li>
               <li class="submenu-item" data-item-id="menu">系统菜单管理</li>
@@ -1210,6 +1212,10 @@
               <li class="submenu-item" data-content="model-compare" data-url="modal_compare.html">模型版本比较</li>
               <li class="submenu-item" data-content="model-detail" data-url="modal_detail.html">模型详情查看</li>
               <li class="submenu-item" data-content="model-add" data-url="modal_detail_new.html">数据模型新增</li>
+              <li class="submenu-item" data-content="condition-new" data-url="condition_new.html">筛选条件</li>
+              <li class="submenu-item" data-content="expression" data-url="expression.html">表达式</li>
+              <li class="submenu-item" data-content="business-rule" data-url="businessrule.html">业务规则</li>
+              <li class="submenu-item" data-content="data-coderule" data-url="data_coderule.html">编码规则</li>
             </ul>
           </li>
         </ul>
@@ -1666,6 +1672,9 @@
         else if (this.dataset.itemId === 'degree') {
           showDegreeListTable();
         }
+        else if (this.dataset.itemId === 'sys-dict') {
+          document.getElementById('mainContent').innerHTML = `<iframe src="data_dict.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        }
         else {
           const content = this.dataset.content;
           if (content === 'model-query') {
@@ -1676,6 +1685,16 @@
             document.getElementById('mainContent').innerHTML = `<iframe src="modal_detail.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else if (content === 'model-add') {
             document.getElementById('mainContent').innerHTML = `<iframe src="modal_detail_new.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'data-standard') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="data_standard.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'condition-new') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="condition_new.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'expression') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="expression.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'business-rule') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="businessrule.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'data-coderule') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="data_coderule.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else {
             document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
           }

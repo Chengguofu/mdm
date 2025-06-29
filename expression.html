@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>表达式编辑器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; font-size: 13px; }
+    .container {
+      max-width: 616px;
+      margin: 22px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 18px rgba(33,118,199,0.10);
+      padding: 22px 27px 18px 27px;
+      position: relative;
+    }
+    .header-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .title-area {
+      flex: 1;
+    }
+    .main-title {
+      color: #222;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .sub-title {
+      color: #888;
+      font-size: 10.6px;
+      margin-bottom: 0;
+      font-weight: 400;
+    }
+    .header-btns {
+      display: flex;
+      gap: 11px;
+      margin-left: 12px;
+    }
+    .icon-btn {
+      width: 31px;
+      height: 31px;
+      border-radius: 8px;
+      background: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.18s, background 0.18s;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(33,118,199,0.06);
+    }
+    .icon-btn:hover {
+      background: #f4f8fb;
+      box-shadow: 0 4px 16px rgba(33,118,199,0.13);
+    }
+    .expr-tools {
+      display: flex;
+      gap: 11px;
+      margin: 22px 0 12px 0;
+      align-items: center;
+    }
+    .expr-tools select, .expr-tools input {
+      width: 112px;
+      font-size: 8.5px;
+      padding: 5px 7px;
+      border-radius: 5.6px;
+      border: 1px solid #c0d3eb;
+      background: #fafdff;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .expr-tools select:focus, .expr-tools input:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px #e3f0fc;
+      outline: none;
+      background: #fff;
+    }
+    .form-row { display: block; margin-bottom: 15px; }
+    .form-label { width: auto; display: block; padding-top: 0; margin-bottom: 6px; }
+    .form-value { display: block; }
+    .form-value textarea {
+      width: 90%;
+      min-height: 98px;
+      height: 98px;
+      resize: vertical;
+      padding: 14px 18px;
+      font-size: 12.5px;
+      border: 1.8px solid #e3eaf3;
+      border-radius: 16px;
+      background: #fafdff;
+      transition: border 0.22s, box-shadow 0.22s, background 0.22s;
+      box-shadow: 0 2px 12px rgba(33,118,199,0.07);
+      color: #222;
+      outline: none;
+    }
+    .form-value textarea:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 3px #e3f0fc;
+      background: #fff;
+    }
+    .form-value textarea::placeholder {
+      color: #b0b8c1;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .btns-bar { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 19px; margin-right: 36px; }
+    .btns-bar .btn-main, .btns-bar .btn-line { margin: 0; border-radius: 5.6px; }
+    .btn-main {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      border-radius: 5.6px;
+      padding: 0 22px;
+      height: 28.8px;
+      font-size: 10.6px;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 600;
+      transition: background 0.18s;
+      margin-right: 12.6px;
+    }
+    .btn-main:hover { background: #185a99; }
+    .btn-line {
+      background: #fff;
+      color: #444;
+      border: 1.5px solid #d0d7de;
+      border-radius: 5.6px;
+      padding: 0 17.6px;
+      height: 28.8px;
+      font-size: 10.6px;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.18s, border 0.18s;
+    }
+    .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
+    @media (max-width: 650px) {
+      .container { max-width: 98vw; padding: 8px 1vw; }
+      .main-title { font-size: 12px; }
+      .form-label { width: 50px; font-size: 8.5px; }
+      .expr-tools select, .expr-tools input { width: 56px; font-size: 7px; }
+    }
+    #refAttrSelect {
+      width: 120px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: 1.2px solid #c0d3eb;
+      background: #fafdff;
+      font-size: 10.5px;
+      color: #222;
+      transition: border 0.2s, box-shadow 0.2s;
+      margin-right: 0;
+    }
+    #refAttrSelect:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px #e3f0fc;
+      outline: none;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <div class="title-area">
+        <div class="main-title">表达式编辑器</div>
+        <div class="sub-title">在下方输入框中直接编辑表达式，或使用下方工具构建</div>
+      </div>
+      <div class="header-btns">
+        <button class="icon-btn" id="closeBtn" title="关闭">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M7 7L15 15M15 7L7 15" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="expr-tools" id="exprTools">
+      <select id="fieldSelect">
+        <option value="">选择字段</option>
+        <option value="customerName">客户名称</option>
+        <option value="customerCode">客户编码</option>
+        <option value="supplierName">供应商名称</option>
+        <option value="supplierCode">供应商编码</option>
+        <option value="materialName">物料名称</option>
+        <option value="materialCode">物料编码</option>
+        <option value="useUnitName">使用单位名称</option>
+        <option value="useUnitCode">使用单位编码</option>
+        <option value="city">市</option>
+        <option value="province">省</option>
+      </select>
+      <div id="refAttrWrap" style="display:none;">
+        <select id="refAttrSelect" style="width:120px;padding:7px 10px;border-radius:6px;border:1.2px solid #c0d3eb;background:#fafdff;font-size:12px;"></select>
+      </div>
+      <select id="opSelect">
+        <option value="">操作符</option>
+        <option value="+">+</option>
+        <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+        <option value="||">字符拼接（||）</option>
+        <option value="=">=</option>
+        <option value="!=">!=</option>
+        <option value=">">&gt;</option>
+        <option value="<">&lt;</option>
+        <option value=">=">&gt;=</option>
+        <option value="<=">&lt;=</option>
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>
+      </select>
+      <select id="funcSelect">
+        <option value="">常用函数</option>
+        <option value="LEN">LEN(字段)</option>
+        <option value="ISNULL">ISNULL(字段,默认值)</option>
+        <option value="SUBSTR">SUBSTR(字段,起始,长度)</option>
+        <option value="TRIM">TRIM(字段)</option>
+        <option value="UPPER">UPPER(字段)</option>
+        <option value="LOWER">LOWER(字段)</option>
+        <option value="REPLACE">REPLACE(字段,原,新)</option>
+        <option value="CONCAT">CONCAT(字段1,字段2,...)</option>
+        <option value="IF">IF(条件,值1,值2)</option>
+      </select>
+      <input id="constInput" placeholder="常量/值" style="width:120px;">
+    </div>
+    <div class="form-row">
+      <div class="form-label">表达式</div>
+      <div class="form-value">
+        <textarea id="exprInput" placeholder="请输入表达式，例如：{user_name} || ' - ' || UPPER({department})"></textarea>
+      </div>
+    </div>
+    <div class="btns-bar">
+      <button class="btn-main" id="okBtn">确定</button>
+      <button class="btn-main" id="validateBtn" style="background:#fff;color:#2176c7;border:1.5px solid #2176c7;">校验</button>
+      <button class="btn-line" id="cancelBtn">取消</button>
+    </div>
+  </div>
+  <script>
+    const exprInput = document.getElementById('exprInput');
+    const fieldSelect = document.getElementById('fieldSelect');
+    const opSelect = document.getElementById('opSelect');
+    const funcSelect = document.getElementById('funcSelect');
+    const constInput = document.getElementById('constInput');
+    const refAttrWrap = document.getElementById('refAttrWrap');
+    const refAttrSelect = document.getElementById('refAttrSelect');
+    const refAttrMap = {
+      city: [
+        {name:'市编码', val:'code'},
+        {name:'市名称', val:'name'}
+      ],
+      province: [
+        {name:'省编码', val:'code'},
+        {name:'省名称', val:'name'}
+      ]
+    };
+    fieldSelect.onchange = function() {
+      if (fieldSelect.value && refAttrMap[fieldSelect.value]) {
+        // 显示属性下拉
+        refAttrWrap.style.display = '';
+        refAttrSelect.innerHTML = '<option value="">选择属性</option>' + refAttrMap[fieldSelect.value].map(opt=>`<option value="${opt.val}">${opt.name}</option>`).join('');
+      } else {
+        refAttrWrap.style.display = 'none';
+        refAttrSelect.innerHTML = '';
+        if (fieldSelect.value) {
+          exprInput.value += fieldSelect.value;
+          fieldSelect.value = '';
+        }
+      }
+    };
+    opSelect.onchange = function() {
+      if (opSelect.value) {
+        exprInput.value += (exprInput.value ? ' ' : '') + opSelect.value + ' ';
+        opSelect.value = '';
+      }
+    };
+    funcSelect.onchange = function() {
+      let part = '';
+      if (funcSelect.value === 'LEN' || funcSelect.value === 'TRIM' || funcSelect.value === 'UPPER' || funcSelect.value === 'LOWER') {
+        part = funcSelect.value + '()';
+      } else if (funcSelect.value === 'ISNULL') {
+        part = 'ISNULL(,)';
+      } else if (funcSelect.value === 'SUBSTR') {
+        part = 'SUBSTR(,,)';
+      } else if (funcSelect.value === 'REPLACE') {
+        part = 'REPLACE(,,)';
+      } else if (funcSelect.value === 'CONCAT') {
+        part = 'CONCAT(,)';
+      }
+      if (part) {
+        exprInput.value += part;
+        funcSelect.value = '';
+      }
+    };
+    constInput.addEventListener('change', function() {
+      if (constInput.value) {
+        exprInput.value += constInput.value;
+        constInput.value = '';
+      }
+    });
+    refAttrSelect.onchange = function() {
+      if (refAttrSelect.value) {
+        // 拼接 city.属性
+        exprInput.value += fieldSelect.value + '.' + refAttrSelect.value;
+        refAttrSelect.value = '';
+        refAttrWrap.style.display = 'none';
+        fieldSelect.value = '';
+      }
+    };
+    // 关闭按钮
+    document.getElementById('closeBtn').onclick = function() {
+      window.close && window.close();
+    };
+    // ===== 新增：与父窗口通信，支持业务规则页面弹窗集成 =====
+    // 1. 打开时向父窗口请求初始表达式内容
+    if (window.opener && window.opener !== window) {
+      window.addEventListener('DOMContentLoaded', function() {
+        window.opener.postMessage({ type: 'getExprInit' }, '*');
+      });
+      // 2. 接收初始表达式内容
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'exprInit') {
+          exprInput.value = e.data.value || '';
+        }
+      });
+    }
+    // 3. 点击确定时将表达式内容通过postMessage发回父窗口
+    document.getElementById('okBtn').onclick = function() {
+      if (window.opener && window.opener !== window) {
+        window.opener.postMessage({ type: 'exprResult', value: exprInput.value }, '*');
+        window.close && window.close();
+      } else {
+        alert('表达式内容：\n' + exprInput.value);
+      }
+    };
+    document.getElementById('cancelBtn').onclick = function() {
+      exprInput.value = '';
+    };
+    // 校验按钮
+    document.getElementById('validateBtn').onclick = function() {
+      alert('表达式校验通过！（此处可接入实际校验逻辑）');
+    };
+  </script>
+</body>
+</html> 

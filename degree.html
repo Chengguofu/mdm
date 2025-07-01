@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学位管理 - 主数据管理平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    :root {
+      --theme-bg: #f7faff;
+      --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+      --theme-sidebar: #fff;
+      --theme-content: #f4f8fb;
+      --theme-topbar-font: #fff;
+      --theme-menu-active: #2176c7;
+      --theme-menu-hover: #185a99;
+      --theme-table-header: #f4f8fb;
+      --theme-table-header-font: #2176c7;
+      --theme-table-row-hover: #f0f6fd;
+      --theme-table-border: #e3eaf3;
+      --theme-btn: #2176c7;
+      --theme-btn-hover: #185a99;
+      --theme-avatar-bg: #eaf3fb;
+      --theme-avatar-font: #2176c7;
+      --theme-content-text: #185a99;
+      --theme-shadow-color: rgba(33, 118, 199, 0.06);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+      background: var(--theme-bg);
+      color: #222;
+    }
+
+    .layout {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 56px;
+      background: var(--theme-topbar);
+      color: var(--theme-topbar-font);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08);
+      z-index: 10;
+      position: relative;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 120px;
+      height: 36px;
+      background: transparent;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #2176c7;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .topbar-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--theme-topbar-font);
+      letter-spacing: 1px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+    }
+
+    .back-btn {
+      background: rgba(255,255,255,0.13);
+      border: none;
+      border-radius: 16px;
+      padding: 2px 18px;
+      font-size: 15px;
+      color: #fff;
+      margin-right: 4px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      height: 32px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .model-tabs-bar {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1.5px solid #e3eaf3;
+      margin-bottom: 18px;
+    }
+
+    .model-tab {
+      padding: 12px 28px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: #185a99;
+      transition: all 0.2s;
+    }
+
+    .model-tab.active {
+      color: #2176c7;
+      border-bottom: 2px solid #2176c7;
+    }
+
+    .model-tab:hover:not(.active) {
+      background: #f0f6fd;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .btn-main {
+      background: var(--theme-btn);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-main:hover {
+      background: var(--theme-btn-hover);
+    }
+
+    .btn-line {
+      background: #fff;
+      color: var(--theme-btn);
+      border: 1px solid var(--theme-btn);
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-line:hover {
+      background: var(--theme-btn);
+      color: #fff;
+    }
+
+    .export-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .export-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      border: 1px solid #e3eaf3;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      min-width: 140px;
+      margin-top: 4px;
+    }
+
+    .export-menu-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .export-menu-item:hover {
+      background: #f0f6fd;
+    }
+
+    .export-menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08);
+      overflow: hidden;
+    }
+
+    .model-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .model-table th {
+      background: var(--theme-table-header);
+      color: var(--theme-table-header-font);
+      font-weight: 600;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--theme-table-border);
+      font-size: 14px;
+    }
+
+    .model-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--theme-table-border);
+      color: #333;
+    }
+
+    .model-table tbody tr:hover {
+      background: var(--theme-table-row-hover);
+    }
+
+    .checkbox-cell {
+      width: 36px;
+      text-align: center;
+    }
+
+    .checkbox-cell input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+
+    .modal-mask {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 8px;
+      max-width: 900px;
+      width: 90vw;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 4px 24px rgba(33,118,199,0.13);
+      position: relative;
+    }
+
+    .version-link {
+      color: #2176c7;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .version-link:hover {
+      text-decoration: underline;
+    }
+
+    .drawer-mask {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 4000;
+      background: rgba(0,0,0,0.10);
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 420px;
+      max-width: 98vw;
+      background: #fff;
+      box-shadow: -2px 0 16px rgba(33,118,199,0.18);
+      z-index: 4100;
+      display: flex;
+      flex-direction: column;
+      animation: drawerIn .25s;
+    }
+
+    @keyframes drawerIn {
+      from {
+        right: -440px;
+        opacity: 0;
+      }
+      to {
+        right: 0;
+        opacity: 1;
+      }
+    }
+
+    .icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo">主数据管理平台</div>
+        <div class="topbar-title">学位管理</div>
+      </div>
+      <div class="topbar-right">
+        <button class="back-btn" onclick="goBack()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          返回首页
+        </button>
+      </div>
+    </div>
+    
+    <div class="content">
+      <div class="model-tabs-bar">
+        <div class="model-tab active" data-tab="query">查询</div>
+        <div class="model-tab" data-tab="apply">申请</div>
+        <div class="model-tab" data-tab="edit">修改</div>
+        <div class="model-tab" data-tab="freeze">冻结</div>
+        <div class="model-tab" data-tab="unfreeze">解冻</div>
+        <div class="model-tab" data-tab="audit">审核</div>
+        <div class="model-tab" data-tab="archive">归档</div>
+        <div class="model-tab" data-tab="search">检索</div>
+      </div>
+      
+      <div class="model-tab-content" id="degreeTabContent">
+        <!-- 学位查询页面内容 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 版本列表对话框 -->
+  <div id="versionModal" class="modal-mask">
+    <div class="modal-content">
+      <div style="background:#185a99;color:#fff;font-size:20px;font-weight:500;padding:16px 24px;border-radius:8px 8px 0 0;">
+        版本列表 - <span id="versionModalTitle">建筑学学士</span>
+        <span style='position:absolute;right:24px;top:16px;cursor:pointer;font-size:24px;' id="versionModalClose">×</span>
+      </div>
+      <div style="padding:24px;">
+        <div style="margin-bottom:20px; display:flex; justify-content:flex-end; align-items:center;">
+          <button class="btn-main" id="versionCompareBtn" style="margin-right:0;">
+            <span class="icon">📊</span>版本比较
+          </button>
+        </div>
+        <!-- 快速查询栏 -->
+        <div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <input id="versionQuickSearchInput" type="text" placeholder="快速查询：学位描述/代码/创建人..." style="width:50%;min-width:180px;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;">
+          <button id="versionQuickSearchBtn" class="btn-main" style="padding:6px 18px;">查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="versionSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="versionTableBody">
+              <!-- 版本数据行 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学位详情抽屉 -->
+  <div id="degreeDetailDrawerMask" class="drawer-mask">
+    <div class="drawer">
+      <div style="padding:18px 24px;font-size:18px;font-weight:600;color:#2176c7;border-bottom:1px solid #e3eaf3;display:flex;align-items:center;justify-content:space-between;">
+        学位详情
+        <button id="degreeDetailDrawerClose" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+      </div>
+      <div id="degreeDetailContent" style="flex:1;padding:24px;overflow-y:auto;font-size:16px;color:#222;">
+        <!-- 详情内容填充在这里 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 学位申请编辑抽屉 -->
+  <div id="degreeApplyDrawerMask" class="drawer-mask">
+    <div class="drawer">
+      <div style="padding:18px 24px;font-size:18px;font-weight:600;color:#2176c7;border-bottom:1px solid #e3eaf3;display:flex;align-items:center;justify-content:space-between;">
+        <span id="degreeApplyDrawerTitle">新增学位申请</span>
+        <button id="degreeApplyDrawerClose" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+      </div>
+      <div id="degreeApplyContent" style="flex:1;padding:24px;overflow-y:auto;font-size:16px;color:#222;">
+        <form id="degreeApplyForm">
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: #2176c7; margin-bottom: 16px; font-size: 16px;">基本信息</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">学位代码 <span style="color: #f5222d;">*</span></label>
+                <input type="text" id="degreeCode" name="degreeCode" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;" placeholder="请输入学位代码" required>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">学位描述 <span style="color: #f5222d;">*</span></label>
+                <input type="text" id="degreeDescription" name="degreeDescription" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;" placeholder="请输入学位描述" required>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">英文名称</label>
+                <input type="text" id="degreeEnglishName" name="degreeEnglishName" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;" placeholder="请输入英文名称">
+              </div>
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">学位类型</label>
+                <select id="degreeType" name="degreeType" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;">
+                  <option value="">请选择学位类型</option>
+                  <option value="学士">学士</option>
+                  <option value="硕士">硕士</option>
+                  <option value="博士">博士</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: #2176c7; margin-bottom: 16px; font-size: 16px;">分类信息</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">学科门类</label>
+                <select id="subjectCategory" name="subjectCategory" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;">
+                  <option value="">请选择学科门类</option>
+                  <option value="哲学">哲学</option>
+                  <option value="经济学">经济学</option>
+                  <option value="法学">法学</option>
+                  <option value="教育学">教育学</option>
+                  <option value="文学">文学</option>
+                  <option value="历史学">历史学</option>
+                  <option value="理学">理学</option>
+                  <option value="工学">工学</option>
+                  <option value="农学">农学</option>
+                  <option value="医学">医学</option>
+                  <option value="管理学">管理学</option>
+                  <option value="艺术学">艺术学</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">一级学科</label>
+                <select id="firstLevelSubject" name="firstLevelSubject" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;">
+                  <option value="">请选择一级学科</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <h3 style="color: #2176c7; margin-bottom: 16px; font-size: 16px;">其他信息</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">是否有效</label>
+                <select id="isValid" name="isValid" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;">
+                  <option value="1">是</option>
+                  <option value="0">否</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">排序号</label>
+                <input type="number" id="sortOrder" name="sortOrder" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px;" placeholder="请输入排序号">
+              </div>
+            </div>
+            <div style="margin-top: 16px;">
+              <label style="display: block; font-weight: 500; color: #666; margin-bottom: 8px;">备注</label>
+              <textarea id="remarks" name="remarks" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; min-height: 80px; resize: vertical;" placeholder="请输入备注信息"></textarea>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; border-top: 1px solid #f0f0f0;">
+            <button type="button" id="degreeApplyCancelBtn" style="padding: 8px 16px; border: 1px solid #d9d9d9; background: #fff; color: #666; border-radius: 4px; cursor: pointer; font-size: 14px;">取消</button>
+            <button type="submit" id="degreeApplySaveBtn" style="padding: 8px 16px; border: none; background: #2176c7; color: #fff; border-radius: 4px; cursor: pointer; font-size: 14px;">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      renderDegreeQueryTab();
+      bindDegreeTabEvents();
+      bindVersionEvents();
+      bindExportEvents();
+    });
+
+    function goBack() {
+      window.history.back();
+    }
+
+    function renderDegreeQueryTab(showQueryBar = false) {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeQuickSearchBtn" onclick="quickSearchQuery()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeAdvancedSearchBtn" onclick="advancedSearchQuery()"><span class="icon">📄</span>高级查询</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('444', '建筑学学士')">查看详情</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('445', '艺术学学士')">查看详情</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('490', '政治经济学')">查看详情</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 申请页签渲染函数
+    function renderDegreeApplyTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeApplyQuickSearchBtn" onclick="quickSearchApply()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeApplyAdvancedSearchBtn" onclick="advancedSearchApply()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-main" id="degreeApplyAddBtn" onclick="addDegreeApply()"><span class="icon">➕</span>新增</button>
+          <button class="btn-line" id="degreeApplyDeleteBtn" onclick="deleteDegreeApply()"><span class="icon">🗑️</span>删除</button>
+          <button class="btn-line" id="degreeApplyTemplateBtn" onclick="exportApplyTemplate()"><span class="icon">📋</span>申请模版导出</button>
+          <button class="btn-line" id="degreeApplyImportBtn" onclick="importApplyData()"><span class="icon">📥</span>批量申请导入</button>
+          <button class="btn-line" id="degreeApplyExportBtn" onclick="exportApplyData()"><span class="icon">📤</span>数据导出</button>
+          <button class="btn-main" id="degreeApplySubmitBtn" onclick="submitDegreeApply()"><span class="icon">✅</span>提交</button>
+          <button class="btn-line" id="degreeApplyCopyBtn" onclick="copyDegreeApply()"><span class="icon">📋</span>复制</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeApplySelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeApplySelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-apply" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeApply('444')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeApplyRow('444')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeApplySelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeApply('445')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeApplyRow('445')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeApplySelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-apply" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeApply('490')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeApplyRow('490')">删除</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定申请页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeApplySelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeApplySelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 修改页签渲染函数
+    function renderDegreeEditTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeEditQuickSearchBtn" onclick="quickSearchEdit()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeEditAdvancedSearchBtn" onclick="advancedSearchEdit()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-main" id="degreeEditSelectDataBtn" onclick="selectEditData()"><span class="icon">☑️</span>选择数据</button>
+          <button class="btn-line" id="degreeEditDeleteBtn" onclick="deleteEditData()"><span class="icon">🗑️</span>删除</button>
+          <button class="btn-line" id="degreeEditTemplateBtn" onclick="exportEditTemplate()"><span class="icon">📋</span>批量修改模版导出</button>
+          <button class="btn-line" id="degreeEditImportBtn" onclick="importEditData()"><span class="icon">📥</span>批量修改导入</button>
+          <button class="btn-line" id="degreeEditExportBtn" onclick="exportEditData()"><span class="icon">📤</span>数据导出</button>
+          <button class="btn-main" id="degreeEditSubmitBtn" onclick="submitEditData()"><span class="icon">✅</span>提交</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeEditSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeEditSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-edit" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeEdit('444')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeEditRow('444')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeEditSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeEdit('445')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeEditRow('445')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeEditSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-edit" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editDegreeEdit('490')">编辑</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteDegreeEditRow('490')">删除</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定修改页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeEditSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeEditSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 冻结页签渲染函数
+    function renderDegreeFreezeTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeFreezeQuickSearchBtn" onclick="quickSearchFreeze()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeFreezeAdvancedSearchBtn" onclick="advancedSearchFreeze()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-main" id="degreeFreezeSelectDataBtn" onclick="selectFreezeData()"><span class="icon">☑️</span>选择数据</button>
+          <button class="btn-line" id="degreeFreezeDeleteBtn" onclick="deleteFreezeData()"><span class="icon">🗑️</span>删除</button>
+          <button class="btn-main" id="degreeFreezeFreezeBtn" onclick="freezeData()"><span class="icon">❄️</span>冻结</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeFreezeExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeFreezeExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeFreezeSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeFreezeSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-freeze" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteFreezeRow('444')">删除</button>
+                    <button style="background:none;border:none;color:#fa8c16;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="freezeRow('444')">冻结</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeFreezeSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteFreezeRow('445')">删除</button>
+                    <button style="background:none;border:none;color:#fa8c16;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="freezeRow('445')">冻结</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeFreezeSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-freeze" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteFreezeRow('490')">删除</button>
+                    <button style="background:none;border:none;color:#fa8c16;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="freezeRow('490')">冻结</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定冻结页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeFreezeSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeFreezeSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 解冻页签渲染函数
+    function renderDegreeUnfreezeTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeUnfreezeQuickSearchBtn" onclick="quickSearchUnfreeze()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeUnfreezeAdvancedSearchBtn" onclick="advancedSearchUnfreeze()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-main" id="degreeUnfreezeSelectDataBtn" onclick="selectUnfreezeData()"><span class="icon">☑️</span>选择数据</button>
+          <button class="btn-line" id="degreeUnfreezeDeleteBtn" onclick="deleteUnfreezeData()"><span class="icon">🗑️</span>删除</button>
+          <button class="btn-main" id="degreeUnfreezeUnfreezeBtn" onclick="unfreezeData()"><span class="icon">🔥</span>解冻</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeUnfreezeExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeUnfreezeExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeUnfreezeSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeUnfreezeSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff2e8;color:#fa541c;font-weight:500;font-size:15px;">已冻结</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-unfreeze" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteUnfreezeRow('444')">删除</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="unfreezeRow('444')">解冻</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeUnfreezeSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff2e8;color:#fa541c;font-weight:500;font-size:15px;">已冻结</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteUnfreezeRow('445')">删除</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="unfreezeRow('445')">解冻</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeUnfreezeSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff2e8;color:#fa541c;font-weight:500;font-size:15px;">已冻结</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-unfreeze" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteUnfreezeRow('490')">删除</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="unfreezeRow('490')">解冻</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定解冻页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeUnfreezeSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeUnfreezeSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 审核页签渲染函数
+    function renderDegreeAuditTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeAuditQuickSearchBtn" onclick="quickSearchAudit()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeAuditAdvancedSearchBtn" onclick="advancedSearchAudit()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-line" id="degreeAuditRejectBtn" onclick="rejectAuditData()"><span class="icon">❌</span>驳回</button>
+          <button class="btn-main" id="degreeAuditApproveBtn" onclick="approveAuditData()"><span class="icon">✅</span>通过</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeAuditExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeAuditExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeAuditSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeAuditSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待审核</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-audit" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="rejectAuditRow('444')">驳回</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="approveAuditRow('444')">通过</button>
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showChangeInfo('444')">变更信息</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeAuditSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待审核</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="rejectAuditRow('445')">驳回</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="approveAuditRow('445')">通过</button>
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showChangeInfo('445')">变更信息</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeAuditSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待审核</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-audit" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="rejectAuditRow('490')">驳回</button>
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="approveAuditRow('490')">通过</button>
+                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showChangeInfo('490')">变更信息</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定审核页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeAuditSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeAuditSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 归档页签渲染函数
+    function renderDegreeArchiveTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeArchiveQuickSearchBtn" onclick="quickSearchArchive()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeArchiveAdvancedSearchBtn" onclick="advancedSearchArchive()"><span class="icon">📄</span>高级查询</button>
+          <button class="btn-main" id="degreeArchiveSelectDataBtn" onclick="selectArchiveData()"><span class="icon">☑️</span>选择数据</button>
+          <button class="btn-line" id="degreeArchiveDeleteBtn" onclick="deleteArchiveData()"><span class="icon">🗑️</span>删除</button>
+          <button class="btn-main" id="degreeArchiveArchiveBtn" onclick="archiveData()"><span class="icon">📦</span>归档</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeArchiveExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeArchiveExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeArchiveSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeArchiveSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f6ffed;color:#52c41a;font-weight:500;font-size:15px;">已归档</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-archive" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="archiveRow('444')">归档</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteArchiveRow('444')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeArchiveSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f6ffed;color:#52c41a;font-weight:500;font-size:15px;">已归档</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="archiveRow('445')">归档</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteArchiveRow('445')">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeArchiveSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f6ffed;color:#52c41a;font-weight:500;font-size:15px;">已归档</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-archive" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="archiveRow('490')">归档</button>
+                    <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteArchiveRow('490')">删除</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定归档页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeArchiveSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeArchiveSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    // 检索页签渲染函数
+    function renderDegreeSearchTab() {
+      const tabContent = document.getElementById('degreeTabContent');
+      tabContent.innerHTML = `
+        <div class="action-bar">
+          <button class="btn-main" id="degreeSearchQuickSearchBtn" onclick="quickSearchSearch()"><span class="icon">🔍</span>快速查询</button>
+          <button class="btn-line" id="degreeSearchAdvancedSearchBtn" onclick="advancedSearchSearch()"><span class="icon">📄</span>高级查询</button>
+          <div class="export-dropdown">
+            <button class="btn-main" id="degreeSearchExportBtn" style="display:flex;align-items:center;gap:4px;">
+              <span class="icon">📤</span>导出
+              <span style="font-size:12px;">▼</span>
+            </button>
+            <div id="degreeSearchExportMenu" class="export-menu">
+              <div class="export-menu-item" data-export-type="selected">
+                <span class="icon">☑️</span>导出勾选数据
+              </div>
+              <div class="export-menu-item" data-export-type="all">
+                <span class="icon">📋</span>导出全部数据
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="degreeSearchSelectAll"></th>
+                <th>状态</th>
+                <th>代码</th>
+                <th>学位描述</th>
+                <th>数据版本</th>
+                <th>错误提示</th>
+                <th>创建人</th>
+                <th>创建人单位</th>
+                <th>创建时间</th>
+                <th>审核人</th>
+                <th>发布人单位</th>
+                <th>发布时间</th>
+                <th style="text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSearchSelect" value="444"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">444</td>
+                <td>建筑学学士</td>
+                <td><a href="#" class="version-link-search" data-code="444" style="color:#2176c7;text-decoration:none;font-weight:500;">2</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('444', '建筑学学士')">查看详情</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSearchSelect" value="445"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">445</td>
+                <td>艺术学学士</td>
+                <td>1</td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('445', '艺术学学士')">查看详情</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox" name="degreeSearchSelect" value="490"></td>
+                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                <td style="font-weight:600;">490</td>
+                <td>政治经济学...</td>
+                <td><a href="#" class="version-link-search" data-code="490" style="color:#2176c7;text-decoration:none;font-weight:500;">3</a></td>
+                <td></td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td>李春阳</td>
+                <td>北京化学...</td>
+                <td>2025-06-12</td>
+                <td style="text-align:center;">
+                  <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showDegreeDetail('490', '政治经济学')">查看详情</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+            <button class="btn-line">上一页</button>
+            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+            <button class="btn-main">下一页</button>
+          </div>
+        </div>
+      `;
+      
+      // 绑定检索页签的全选功能
+      const selectAllCheckbox = document.getElementById('degreeSearchSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.onchange = function() {
+          const checkboxes = document.querySelectorAll('input[name="degreeSearchSelect"]');
+          checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+      }
+    }
+
+    function bindDegreeTabEvents() {
+      document.querySelectorAll('.model-tab').forEach(tab => {
+        tab.onclick = function() {
+          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          const tabName = this.getAttribute('data-tab');
+          
+          // 根据页签名称渲染不同的内容
+          switch(tabName) {
+            case 'query':
+              renderDegreeQueryTab();
+              bindVersionEvents('query');
+              bindExportEvents('query');
+              break;
+            case 'apply':
+              renderDegreeApplyTab();
+              bindVersionEvents('apply');
+              bindExportEvents('apply');
+              break;
+            case 'edit':
+              renderDegreeEditTab();
+              bindVersionEvents('edit');
+              bindExportEvents('edit');
+              break;
+            case 'freeze':
+              renderDegreeFreezeTab();
+              bindVersionEvents('freeze');
+              bindExportEvents('freeze');
+              break;
+            case 'unfreeze':
+              renderDegreeUnfreezeTab();
+              bindVersionEvents('unfreeze');
+              bindExportEvents('unfreeze');
+              break;
+            case 'audit':
+              renderDegreeAuditTab();
+              bindVersionEvents('audit');
+              bindExportEvents('audit');
+              break;
+            case 'archive':
+              renderDegreeArchiveTab();
+              bindVersionEvents('archive');
+              bindExportEvents('archive');
+              break;
+            case 'search':
+              renderDegreeSearchTab();
+              bindVersionEvents('search');
+              bindExportEvents('search');
+              break;
+          }
+        };
+      });
+    }
+
+    function bindVersionEvents() {
+      // 绑定版本链接点击事件
+      document.querySelectorAll('.version-link').forEach(link => {
+        link.onclick = function(e) {
+          e.preventDefault();
+          const code = this.getAttribute('data-code');
+          const version = this.textContent;
+          openVersionModal(code, version);
+        };
+      });
+      
+      // 绑定快速查询
+      const quickInput = document.getElementById('versionQuickSearchInput');
+      const quickBtn = document.getElementById('versionQuickSearchBtn');
+      if (quickInput && quickBtn) {
+        quickBtn.onclick = function() {
+          const val = quickInput.value.trim();
+          filterVersionTable(val);
+        };
+        quickInput.onkeydown = function(e) {
+          if (e.key === 'Enter') quickBtn.click();
+        };
+      }
+    }
+
+    function bindExportEvents() {
+      // 导出按钮点击事件
+      const exportBtn = document.getElementById('degreeExportBtn');
+      const exportMenu = document.getElementById('degreeExportMenu');
+      
+      if (exportBtn && exportMenu) {
+        exportBtn.onclick = function(e) {
+          e.stopPropagation();
+          exportMenu.style.display = exportMenu.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // 点击其他地方关闭菜单
+        document.addEventListener('click', function(e) {
+          if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target)) {
+            exportMenu.style.display = 'none';
+          }
+        });
+
+        // 导出菜单项点击事件
+        document.querySelectorAll('.export-menu-item').forEach(item => {
+          item.onclick = function() {
+            const exportType = this.getAttribute('data-export-type');
+            handleDegreeExport(exportType);
+            exportMenu.style.display = 'none';
+          };
+        });
+
+        // 全选功能
+        const selectAllCheckbox = document.getElementById('degreeSelectAll');
+        if (selectAllCheckbox) {
+          selectAllCheckbox.onchange = function() {
+            const checkboxes = document.querySelectorAll('input[name="degreeSelect"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+          };
+        }
+      }
+    }
+
+    function handleDegreeExport(exportType) {
+      if (exportType === 'selected') {
+        // 导出勾选数据
+        const selectedRows = document.querySelectorAll('input[name="degreeSelect"]:checked');
+        if (selectedRows.length === 0) {
+          alert('请先勾选要导出的数据');
+          return;
+        }
+        
+        const selectedData = [];
+        selectedRows.forEach(checkbox => {
+          const row = checkbox.closest('tr');
+          const cells = row.querySelectorAll('td');
+          selectedData.push({
+            status: cells[1].textContent.trim(),
+            code: cells[2].textContent.trim(),
+            description: cells[3].textContent.trim(),
+            version: cells[4].textContent.trim(),
+            error: cells[5].textContent.trim(),
+            creator: cells[6].textContent.trim(),
+            creatorOrg: cells[7].textContent.trim(),
+            createTime: cells[8].textContent.trim(),
+            reviewer: cells[9].textContent.trim(),
+            publishOrg: cells[10].textContent.trim(),
+            publishTime: cells[11].textContent.trim()
+          });
+        });
+        
+        console.log('导出勾选数据:', selectedData);
+        alert(`已导出 ${selectedData.length} 条勾选数据`);
+        
+      } else if (exportType === 'all') {
+        // 导出全部数据
+        const allRows = document.querySelectorAll('.model-table tbody tr');
+        const allData = [];
+        
+        allRows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+          allData.push({
+            status: cells[1].textContent.trim(),
+            code: cells[2].textContent.trim(),
+            description: cells[3].textContent.trim(),
+            version: cells[4].textContent.trim(),
+            error: cells[5].textContent.trim(),
+            creator: cells[6].textContent.trim(),
+            creatorOrg: cells[7].textContent.trim(),
+            createTime: cells[8].textContent.trim(),
+            reviewer: cells[9].textContent.trim(),
+            publishOrg: cells[10].textContent.trim(),
+            publishTime: cells[11].textContent.trim()
+          });
+        });
+        
+        console.log('导出全部数据:', allData);
+        alert(`已导出全部 ${allData.length} 条数据`);
+      }
+    }
+
+    function openVersionModal(code, version) {
+      const modal = document.getElementById('versionModal');
+      const title = document.getElementById('versionModalTitle');
+      
+      // 根据代码设置标题
+      const codeMap = {
+        '444': '建筑学学士',
+        '490': '政治经济学'
+      };
+      title.textContent = codeMap[code] || `代码${code}`;
+      
+      // 显示对话框
+      modal.style.display = 'flex';
+      
+      // 绑定关闭事件
+      document.getElementById('versionModalClose').onclick = closeVersionModal;
+      modal.onclick = function(e) {
+        if (e.target === modal) closeVersionModal();
+      };
+      
+      // 绑定版本比较按钮事件
+      document.getElementById('versionCompareBtn').onclick = function() {
+        const selectedVersions = Array.from(document.querySelectorAll('input[name="versionSelect"]:checked')).map(cb => cb.value);
+        if (selectedVersions.length !== 2) {
+          alert('请选择两个版本进行比较');
+          return;
+        }
+        compareVersions(selectedVersions[0], selectedVersions[1]);
+      };
+      
+      // 绑定全选事件
+      document.getElementById('versionSelectAll').onchange = function() {
+        const checkboxes = document.querySelectorAll('input[name="versionSelect"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+      };
+      
+      // 渲染版本数据
+      renderVersionTable(code);
+    }
+
+    function renderVersionTable(code) {
+      const tbody = document.getElementById('versionTableBody');
+      const versionData = {
+        '444': [
+          { version: '3', status: '正常', code: '444', description: '建筑学学士', error: '', creator: '李春阳', creatorOrg: '北京化学...', createTime: '2025-01-20', reviewer: '李春阳', publishOrg: '北京化学...', publishTime: '2025-01-20 14:30:25' },
+          { version: '2', status: '正常', code: '444', description: '建筑学学士', error: '', creator: '王五', creatorOrg: '北京化学...', createTime: '2025-01-15', reviewer: '王五', publishOrg: '北京化学...', publishTime: '2025-01-15 10:20:15' }
+        ],
+        '490': [
+          { version: '3', status: '正常', code: '490', description: '政治经济学', error: '', creator: '李春阳', creatorOrg: '北京化学...', createTime: '2025-01-20', reviewer: '李春阳', publishOrg: '北京化学...', publishTime: '2025-01-20 14:30:25' }
+        ]
+      };
+      
+      const data = versionData[code] || [];
+      tbody.innerHTML = data.map(item => `
+        <tr>
+          <td class="checkbox-cell"><input type="checkbox" name="versionSelect" value="${item.version}"></td>
+          <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">${item.status}</span></td>
+          <td style="font-weight:600;">${item.code}</td>
+          <td>${item.description}</td>
+          <td>${item.version}</td>
+          <td>${item.error}</td>
+          <td>${item.creator}</td>
+          <td>${item.creatorOrg}</td>
+          <td>${item.createTime}</td>
+          <td>${item.reviewer}</td>
+          <td>${item.publishOrg}</td>
+          <td>${item.publishTime}</td>
+          <td style="text-align:center;">
+            <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;">查看</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function closeVersionModal() {
+      document.getElementById('versionModal').style.display = 'none';
+    }
+
+    function filterVersionTable(keyword) {
+      const rows = document.querySelectorAll('#versionTableBody tr');
+      rows.forEach(row => {
+        const text = row.innerText;
+        if (!keyword || text.indexOf(keyword) !== -1) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function compareVersions(version1, version2) {
+      alert(`正在比较版本 ${version1} 和版本 ${version2}`);
+    }
+
+    function showDegreeDetail(code, description) {
+      const mask = document.getElementById('degreeDetailDrawerMask');
+      const content = document.getElementById('degreeDetailContent');
+      
+      // 填充详情内容
+      content.innerHTML = `
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #2176c7; margin-bottom: 16px;">学位基本信息</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-weight: 500; color: #666;">学位代码：</label>
+              <span style="margin-left: 8px;">${code}</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">学位描述：</label>
+              <span style="margin-left: 8px;">${description}</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">状态：</label>
+              <span style="margin-left: 8px; color: #13c2c2;">正常</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">数据版本：</label>
+              <span style="margin-left: 8px;">2</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #2176c7; margin-bottom: 16px;">创建信息</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-weight: 500; color: #666;">创建人：</label>
+              <span style="margin-left: 8px;">李春阳</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">创建人单位：</label>
+              <span style="margin-left: 8px;">北京化学...</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">创建时间：</label>
+              <span style="margin-left: 8px;">2025-06-12</span>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h3 style="color: #2176c7; margin-bottom: 16px;">发布信息</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-weight: 500; color: #666;">审核人：</label>
+              <span style="margin-left: 8px;">李春阳</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">发布人单位：</label>
+              <span style="margin-left: 8px;">北京化学...</span>
+            </div>
+            <div>
+              <label style="font-weight: 500; color: #666;">发布时间：</label>
+              <span style="margin-left: 8px;">2025-06-12</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 显示抽屉
+      mask.style.display = 'block';
+      
+      // 绑定关闭事件
+      document.getElementById('degreeDetailDrawerClose').onclick = function() {
+        mask.style.display = 'none';
+      };
+      
+      mask.onclick = function(e) {
+        if (e.target === mask) {
+          mask.style.display = 'none';
+        }
+      };
+    }
+
+    // 申请页签相关函数
+    function addDegreeApply() {
+      // 设置抽屉标题
+      document.getElementById('degreeApplyDrawerTitle').textContent = '新增学位申请';
+      
+      // 清空表单
+      document.getElementById('degreeApplyForm').reset();
+      
+      // 显示抽屉
+      document.getElementById('degreeApplyDrawerMask').style.display = 'block';
+      
+      // 绑定事件
+      bindDegreeApplyDrawerEvents();
+    }
+
+    function deleteDegreeApply() {
+      const selectedRows = document.querySelectorAll('input[name="degreeApplySelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要删除的数据');
+        return;
+      }
+      if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function exportApplyTemplate() {
+      alert('申请模版导出成功');
+    }
+
+    function importApplyData() {
+      alert('批量申请导入功能');
+    }
+
+    function exportApplyData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeApplySelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要导出的数据');
+        return;
+      }
+      alert(`导出 ${selectedRows.length} 条申请数据成功`);
+    }
+
+    function submitDegreeApply() {
+      const selectedRows = document.querySelectorAll('input[name="degreeApplySelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要提交的数据');
+        return;
+      }
+      if (confirm(`确定要提交选中的 ${selectedRows.length} 条申请数据吗？`)) {
+        alert('提交成功');
+      }
+    }
+
+    function copyDegreeApply() {
+      const selectedRows = document.querySelectorAll('input[name="degreeApplySelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要复制的数据');
+        return;
+      }
+      alert(`复制 ${selectedRows.length} 条申请数据成功`);
+    }
+
+    function editDegreeApply(code) {
+      // 设置抽屉标题
+      document.getElementById('degreeApplyDrawerTitle').textContent = '编辑学位申请';
+      
+      // 填充表单数据（模拟数据）
+      const mockData = {
+        '444': { code: '444', description: '建筑学学士', englishName: 'Bachelor of Architecture', type: '学士', category: '工学', subject: '建筑学', isValid: '1', sortOrder: '1', remarks: '建筑学专业学士学位' },
+        '445': { code: '445', description: '艺术学学士', englishName: 'Bachelor of Arts', type: '学士', category: '艺术学', subject: '艺术学', isValid: '1', sortOrder: '2', remarks: '艺术学专业学士学位' },
+        '490': { code: '490', description: '政治经济学', englishName: 'Political Economy', type: '硕士', category: '经济学', subject: '理论经济学', isValid: '1', sortOrder: '3', remarks: '政治经济学专业硕士学位' }
+      };
+      
+      const data = mockData[code] || {};
+      
+      // 填充表单
+      document.getElementById('degreeCode').value = data.code || '';
+      document.getElementById('degreeDescription').value = data.description || '';
+      document.getElementById('degreeEnglishName').value = data.englishName || '';
+      document.getElementById('degreeType').value = data.type || '';
+      document.getElementById('subjectCategory').value = data.category || '';
+      document.getElementById('firstLevelSubject').value = data.subject || '';
+      document.getElementById('isValid').value = data.isValid || '1';
+      document.getElementById('sortOrder').value = data.sortOrder || '';
+      document.getElementById('remarks').value = data.remarks || '';
+      
+      // 显示抽屉
+      document.getElementById('degreeApplyDrawerMask').style.display = 'block';
+      
+      // 绑定事件
+      bindDegreeApplyDrawerEvents();
+    }
+
+    function deleteDegreeApplyRow(code) {
+      if (confirm(`确定要删除代码为 ${code} 的申请数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    // 绑定申请抽屉事件
+    function bindDegreeApplyDrawerEvents() {
+      const mask = document.getElementById('degreeApplyDrawerMask');
+      const closeBtn = document.getElementById('degreeApplyDrawerClose');
+      const cancelBtn = document.getElementById('degreeApplyCancelBtn');
+      const form = document.getElementById('degreeApplyForm');
+      
+      // 关闭按钮事件
+      closeBtn.onclick = closeDegreeApplyDrawer;
+      
+      // 取消按钮事件
+      cancelBtn.onclick = closeDegreeApplyDrawer;
+      
+      // 点击遮罩关闭
+      mask.onclick = function(e) {
+        if (e.target === mask) {
+          closeDegreeApplyDrawer();
+        }
+      };
+      
+      // 表单提交事件
+      form.onsubmit = function(e) {
+        e.preventDefault();
+        saveDegreeApply();
+      };
+      
+      // 学科门类变化时更新一级学科选项
+      document.getElementById('subjectCategory').onchange = function() {
+        updateFirstLevelSubjects(this.value);
+      };
+    }
+
+    // 关闭申请抽屉
+    function closeDegreeApplyDrawer() {
+      document.getElementById('degreeApplyDrawerMask').style.display = 'none';
+    }
+
+    // 保存申请数据
+    function saveDegreeApply() {
+      const formData = new FormData(document.getElementById('degreeApplyForm'));
+      const data = Object.fromEntries(formData.entries());
+      
+      // 验证必填字段
+      if (!data.degreeCode || !data.degreeDescription) {
+        alert('请填写必填字段');
+        return;
+      }
+      
+      // 模拟保存
+      console.log('保存数据:', data);
+      alert('保存成功');
+      closeDegreeApplyDrawer();
+    }
+
+    // 更新一级学科选项
+    function updateFirstLevelSubjects(category) {
+      const subjectSelect = document.getElementById('firstLevelSubject');
+      const subjects = {
+        '哲学': ['哲学'],
+        '经济学': ['理论经济学', '应用经济学'],
+        '法学': ['法学', '政治学', '社会学', '民族学', '马克思主义理论'],
+        '教育学': ['教育学', '心理学', '体育学'],
+        '文学': ['中国语言文学', '外国语言文学', '新闻传播学'],
+        '历史学': ['考古学', '中国史', '世界史'],
+        '理学': ['数学', '物理学', '化学', '天文学', '地理学', '大气科学', '海洋科学', '地球物理学', '生物科学', '系统科学', '科学技术史', '生态学', '统计学'],
+        '工学': ['力学', '机械工程', '光学工程', '仪器科学与技术', '材料科学与工程', '冶金工程', '动力工程及工程热物理', '电气工程', '电子科学与技术', '信息与通信工程', '控制科学与工程', '计算机科学与技术', '建筑学', '土木工程', '水利工程', '测绘科学与技术', '化学工程与技术', '地质资源与地质工程', '矿业工程', '石油与天然气工程', '纺织科学与工程', '轻工技术与工程', '交通运输工程', '船舶与海洋工程', '航空宇航科学与技术', '兵器科学与技术', '核科学与技术', '农业工程', '林业工程', '环境科学与工程', '生物医学工程', '食品科学与工程', '城乡规划学', '风景园林学', '软件工程', '生物工程', '安全科学与工程', '公安技术'],
+        '农学': ['作物学', '园艺学', '农业资源与环境', '植物保护', '畜牧学', '兽医学', '林学', '水产', '草学'],
+        '医学': ['基础医学', '临床医学', '口腔医学', '公共卫生与预防医学', '中医学', '中西医结合', '药学', '中药学', '特种医学', '医学技术', '护理学'],
+        '管理学': ['管理科学与工程', '工商管理', '农林经济管理', '公共管理', '图书情报与档案管理'],
+        '艺术学': ['艺术学理论', '音乐与舞蹈学', '戏剧与影视学', '美术学', '设计学']
+      };
+      
+      // 清空现有选项
+      subjectSelect.innerHTML = '<option value="">请选择一级学科</option>';
+      
+      // 添加新选项
+      if (category && subjects[category]) {
+        subjects[category].forEach(subject => {
+          const option = document.createElement('option');
+          option.value = subject;
+          option.textContent = subject;
+          subjectSelect.appendChild(option);
+        });
+      }
+    }
+
+    // 修改页签相关函数
+    function selectEditData() {
+      alert('选择修改数据');
+    }
+
+    function deleteEditData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeEditSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要删除的数据');
+        return;
+      }
+      if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function exportEditTemplate() {
+      alert('批量修改模版导出成功');
+    }
+
+    function importEditData() {
+      alert('批量修改导入功能');
+    }
+
+    function exportEditData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeEditSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要导出的数据');
+        return;
+      }
+      alert(`导出 ${selectedRows.length} 条修改数据成功`);
+    }
+
+    function submitEditData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeEditSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要提交的数据');
+        return;
+      }
+      if (confirm(`确定要提交选中的 ${selectedRows.length} 条修改数据吗？`)) {
+        alert('提交成功');
+      }
+    }
+
+    function editDegreeEdit(code) {
+      // 设置抽屉标题
+      document.getElementById('degreeApplyDrawerTitle').textContent = '编辑学位修改';
+      
+      // 填充表单数据（模拟数据）
+      const mockData = {
+        '444': { code: '444', description: '建筑学学士', englishName: 'Bachelor of Architecture', type: '学士', category: '工学', subject: '建筑学', isValid: '1', sortOrder: '1', remarks: '建筑学专业学士学位' },
+        '445': { code: '445', description: '艺术学学士', englishName: 'Bachelor of Arts', type: '学士', category: '艺术学', subject: '艺术学', isValid: '1', sortOrder: '2', remarks: '艺术学专业学士学位' },
+        '490': { code: '490', description: '政治经济学', englishName: 'Political Economy', type: '硕士', category: '经济学', subject: '理论经济学', isValid: '1', sortOrder: '3', remarks: '政治经济学专业硕士学位' }
+      };
+      
+      const data = mockData[code] || {};
+      
+      // 填充表单
+      document.getElementById('degreeCode').value = data.code || '';
+      document.getElementById('degreeDescription').value = data.description || '';
+      document.getElementById('degreeEnglishName').value = data.englishName || '';
+      document.getElementById('degreeType').value = data.type || '';
+      document.getElementById('subjectCategory').value = data.category || '';
+      document.getElementById('firstLevelSubject').value = data.subject || '';
+      document.getElementById('isValid').value = data.isValid || '1';
+      document.getElementById('sortOrder').value = data.sortOrder || '';
+      document.getElementById('remarks').value = data.remarks || '';
+      
+      // 显示抽屉
+      document.getElementById('degreeApplyDrawerMask').style.display = 'block';
+      
+      // 绑定事件
+      bindDegreeApplyDrawerEvents();
+    }
+
+    function deleteDegreeEditRow(code) {
+      if (confirm(`确定要删除代码为 ${code} 的修改数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function quickSearchEdit() {
+      alert('快速查询修改数据');
+    }
+
+    function advancedSearchEdit() {
+      alert('高级查询修改数据');
+    }
+
+    // 查询页签相关函数
+    function quickSearchQuery() {
+      alert('快速查询查询数据');
+    }
+
+    function advancedSearchQuery() {
+      alert('高级查询查询数据');
+    }
+
+    // 申请页签相关函数
+    function quickSearchApply() {
+      alert('快速查询申请数据');
+    }
+
+    function advancedSearchApply() {
+      alert('高级查询申请数据');
+    }
+
+    // 冻结页签相关函数
+    function quickSearchFreeze() {
+      alert('快速查询冻结数据');
+    }
+
+    function advancedSearchFreeze() {
+      alert('高级查询冻结数据');
+    }
+
+    function selectFreezeData() {
+      alert('选择冻结数据');
+    }
+
+    function deleteFreezeData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeFreezeSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要删除的数据');
+        return;
+      }
+      if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function freezeData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeFreezeSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要冻结的数据');
+        return;
+      }
+      if (confirm(`确定要冻结选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('冻结成功');
+      }
+    }
+
+    function deleteFreezeRow(code) {
+      if (confirm(`确定要删除代码为 ${code} 的冻结数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function freezeRow(code) {
+      if (confirm(`确定要冻结代码为 ${code} 的数据吗？`)) {
+        alert('冻结成功');
+      }
+    }
+
+    // 解冻页签相关函数
+    function quickSearchUnfreeze() {
+      alert('快速查询解冻数据');
+    }
+
+    function advancedSearchUnfreeze() {
+      alert('高级查询解冻数据');
+    }
+
+    function selectUnfreezeData() {
+      alert('选择解冻数据');
+    }
+
+    function deleteUnfreezeData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeUnfreezeSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要删除的数据');
+        return;
+      }
+      if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function unfreezeData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeUnfreezeSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要解冻的数据');
+        return;
+      }
+      if (confirm(`确定要解冻选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('解冻成功');
+      }
+    }
+
+    function deleteUnfreezeRow(code) {
+      if (confirm(`确定要删除代码为 ${code} 的解冻数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function unfreezeRow(code) {
+      if (confirm(`确定要解冻代码为 ${code} 的数据吗？`)) {
+        alert('解冻成功');
+      }
+    }
+
+    // 审核页签相关函数
+    function quickSearchAudit() {
+      alert('快速查询审核数据');
+    }
+
+    function advancedSearchAudit() {
+      alert('高级查询审核数据');
+    }
+
+    function rejectAuditData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeAuditSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要驳回的数据');
+        return;
+      }
+      if (confirm(`确定要驳回选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('驳回成功');
+      }
+    }
+
+    function approveAuditData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeAuditSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要通过的数据');
+        return;
+      }
+      if (confirm(`确定要通过选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('审核通过成功');
+      }
+    }
+
+    function rejectAuditRow(code) {
+      if (confirm(`确定要驳回代码为 ${code} 的审核数据吗？`)) {
+        alert('驳回成功');
+      }
+    }
+
+    function approveAuditRow(code) {
+      if (confirm(`确定要通过代码为 ${code} 的审核数据吗？`)) {
+        alert('审核通过成功');
+      }
+    }
+
+    function showChangeInfo(code) {
+      alert(`显示代码为 ${code} 的变更信息`);
+    }
+
+    // 归档页签相关函数
+    function quickSearchArchive() {
+      alert('快速查询归档数据');
+    }
+
+    function advancedSearchArchive() {
+      alert('高级查询归档数据');
+    }
+
+    function selectArchiveData() {
+      alert('选择归档数据');
+    }
+
+    function deleteArchiveData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeArchiveSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要删除的数据');
+        return;
+      }
+      if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    function archiveData() {
+      const selectedRows = document.querySelectorAll('input[name="degreeArchiveSelect"]:checked');
+      if (selectedRows.length === 0) {
+        alert('请先勾选要归档的数据');
+        return;
+      }
+      if (confirm(`确定要归档选中的 ${selectedRows.length} 条数据吗？`)) {
+        alert('归档成功');
+      }
+    }
+
+    function archiveRow(code) {
+      if (confirm(`确定要归档代码为 ${code} 的数据吗？`)) {
+        alert('归档成功');
+      }
+    }
+
+    function deleteArchiveRow(code) {
+      if (confirm(`确定要删除代码为 ${code} 的归档数据吗？`)) {
+        alert('删除成功');
+      }
+    }
+
+    // 检索页签相关函数
+    function quickSearchSearch() {
+      alert('快速查询检索数据');
+    }
+
+    function advancedSearchSearch() {
+      alert('高级查询检索数据');
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+</body>
+</html> 

@@ -74,6 +74,14 @@
       border-radius: 50%;
     }
 
+    /* 导出下拉菜单样式 */
+    .export-menu-item:hover {
+      background: #f0f6fd;
+    }
+    .export-menu-item .icon {
+      margin-right: 8px;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
@@ -406,7 +414,7 @@
       background: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
-      padding: 18px 0 0 0;
+      padding: 20px;
       overflow-x: auto;
     }
     table.model-table {
@@ -494,7 +502,11 @@
       display: flex;
       gap: 8px;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 18px;
+      padding: 16px 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
     }
     .btn-main {
       background: #4db6ac;
@@ -1090,6 +1102,28 @@
               <li class="submenu-item" data-content="model-query" data-url="model_query.html">数据模型管理</li>
             </ul>
           </li>
+          <li class="menu-item" data-menu-id="model-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 8h8v8H8z"/></svg>
+              </span>
+              <span>模型管理(补充）</span>
+              <span class="favorite-icon" data-menu-id="model-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-content="model-compare" data-url="modal_compare.html">模型版本比较</li>
+              <li class="submenu-item" data-content="model-detail" data-url="modal_detail.html">模型详情查看</li>
+              <li class="submenu-item" data-content="model-add" data-url="modal_detail_new.html">数据模型新增</li>
+              <li class="submenu-item" data-content="condition-new" data-url="condition_new.html">筛选条件</li>
+              <li class="submenu-item" data-content="expression" data-url="expression.html">表达式</li>
+              <li class="submenu-item" data-content="business-rule" data-url="businessrule.html">业务规则</li>
+              <li class="submenu-item" data-content="data-coderule" data-url="data_coderule.html">编码规则</li>
+              <li class="submenu-item" data-content="page-setup" data-url="page_setup.html">页面布局配置</li>
+              <li class="submenu-item" data-content="page-setup-tree" data-url="page_setup_tree.html">引用分类页面布局</li>
+              <li class="submenu-item" data-content="data-preview" data-url="data_preview.html">布局预览</li>
+            </ul>
+          </li>
           <li class="menu-item" data-menu-id="data-info-management">
             <div class="menu-item-header">
               <span class="favorite-arrow"></span>
@@ -1102,6 +1136,22 @@
             </div>
             <ul class="submenu">
               <li class="submenu-item" data-item-id="degree">学位</li>
+              <li class="submenu-item" data-item-id="vendor">供应商管理</li>
+              <li class="submenu-item" data-content="accounting-subject" data-url="Classification.html">会计科目</li>
+            </ul>
+          </li>
+          <li class="menu-item" data-menu-id="data-management">
+            <div class="menu-item-header">
+              <span class="favorite-arrow"></span>
+              <span class="menu-item-icon">
+                <!-- Icon for Data Management -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-database"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+              </span>
+              <span>数据管理（补充）</span>
+              <span class="favorite-icon" data-menu-id="data-management">★</span>
+            </div>
+            <ul class="submenu">
+              <li class="submenu-item" data-content="data-compare" data-url="data_compare.html">数据版本比较</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="data-flow-management">
@@ -1199,23 +1249,6 @@
               <li class="submenu-item" data-item-id="data-perm">数据权限</li>
               <li class="submenu-item" data-item-id="sys-setting">系统设置</li>
               <li class="submenu-item"><a href="attachmant.html" target="_blank" style="color:inherit;text-decoration:none;display:block;width:100%;height:100%;">批量附件上传</a></li>
-            </ul>
-          </li>
-          <li class="menu-item" data-menu-id="prototype-reference">
-            <div class="menu-item-header">
-              <span class="menu-item-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 8h8v8H8z"/></svg>
-              </span>
-              <span>补充（非菜单）</span>
-            </div>
-            <ul class="submenu">
-              <li class="submenu-item" data-content="model-compare" data-url="modal_compare.html">模型版本比较</li>
-              <li class="submenu-item" data-content="model-detail" data-url="modal_detail.html">模型详情查看</li>
-              <li class="submenu-item" data-content="model-add" data-url="modal_detail_new.html">数据模型新增</li>
-              <li class="submenu-item" data-content="condition-new" data-url="condition_new.html">筛选条件</li>
-              <li class="submenu-item" data-content="expression" data-url="expression.html">表达式</li>
-              <li class="submenu-item" data-content="business-rule" data-url="businessrule.html">业务规则</li>
-              <li class="submenu-item" data-content="data-coderule" data-url="data_coderule.html">编码规则</li>
             </ul>
           </li>
         </ul>
@@ -1670,7 +1703,10 @@
         else if (this.dataset.itemId === 'push-config') showDataPushConfigPage();
         else if (this.dataset.itemId === 'push-log') showPushLogTabs();
         else if (this.dataset.itemId === 'degree') {
-          showDegreeListTable();
+          window.open('degree.html', '_blank');
+        }
+        else if (this.dataset.itemId === 'vendor') {
+          window.open('vendor.html', '_blank');
         }
         else if (this.dataset.itemId === 'sys-dict') {
           document.getElementById('mainContent').innerHTML = `<iframe src="data_dict.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
@@ -1695,6 +1731,16 @@
             document.getElementById('mainContent').innerHTML = `<iframe src="businessrule.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else if (content === 'data-coderule') {
             document.getElementById('mainContent').innerHTML = `<iframe src="data_coderule.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'page-setup') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="page_setup.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'page-setup-tree') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="page_setup_tree.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'data-preview') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="data_preview.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'data-compare') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="data_compare.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'accounting-subject') {
+            window.open('Classification.html', '_blank');
           } else {
             document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
           }
@@ -2498,11 +2544,506 @@
             </div>
           `;
     }
-    function renderModelApplyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型申请功能暂未实现</div>`; }
-    function renderModelModifyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型修改功能暂未实现</div>`; }
-    function renderModelFreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型冻结功能暂未实现</div>`; }
-    function renderModelUnfreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型解冻功能暂未实现</div>`; }
-    function renderModelSearchTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型检索功能暂未实现</div>`; }
+    // 全局变量保存各页签的快速查询显示状态
+    let modelApplyShowQueryBar = false;
+    let modelModifyShowQueryBar = false;
+    let modelFreezeShowQueryBar = false;
+    let modelUnfreezeShowQueryBar = false;
+    let modelAuditShowQueryBar = false;
+    let modelArchiveShowQueryBar = false;
+    let modelSearchShowQueryBar = false;
+
+    function renderModelApplyTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelApplyQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>申请理由</th>
+                <th>申请人</th>
+                <th>申请时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='层级展示' style='width:98%;'></td>
+              <td><input type='text' placeholder='申请理由' style='width:98%;'></td>
+              <td><input type='text' placeholder='申请人' style='width:98%;'></td>
+              <td><input type='text' placeholder='申请时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">新模型申请</a></td>
+                <td>new_model_001</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>业务需要新增模型</td>
+                <td>张三</td>
+                <td>2025-01-15</td>
+                <td>待审核</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelModifyTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelModifyQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>修改内容</th>
+                <th>修改理由</th>
+                <th>修改人</th>
+                <th>修改时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='修改内容' style='width:98%;'></td>
+              <td><input type='text' placeholder='修改理由' style='width:98%;'></td>
+              <td><input type='text' placeholder='修改人' style='width:98%;'></td>
+              <td><input type='text' placeholder='修改时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统字典表</td>
+                <td>字段修改</td>
+                <td>业务需求变更</td>
+                <td>李四</td>
+                <td>2025-01-16</td>
+                <td>待审核</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelFreezeTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelFreezeQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>冻结理由</th>
+                <th>冻结人</th>
+                <th>冻结时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='冻结理由' style='width:98%;'></td>
+              <td><input type='text' placeholder='冻结人' style='width:98%;'></td>
+              <td><input type='text' placeholder='冻结时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">旧模型</a></td>
+                <td>old_model_001</td>
+                <td>字典表</td>
+                <td>模型已废弃</td>
+                <td>王五</td>
+                <td>2025-01-17</td>
+                <td>待审核</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelUnfreezeTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelUnfreezeQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>解冻理由</th>
+                <th>解冻人</th>
+                <th>解冻时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='解冻理由' style='width:98%;'></td>
+              <td><input type='text' placeholder='解冻人' style='width:98%;'></td>
+              <td><input type='text' placeholder='解冻时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">临时冻结模型</a></td>
+                <td>temp_frozen_model</td>
+                <td>主数据</td>
+                <td>业务恢复需要</td>
+                <td>赵六</td>
+                <td>2025-01-18</td>
+                <td>待审核</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelAuditTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelAuditQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>操作类型</th>
+                <th>申请人</th>
+                <th>申请时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择操作类型</option>
+                  <option value="申请">申请</option>
+                  <option value="修改">修改</option>
+                  <option value="冻结">冻结</option>
+                  <option value="解冻">解冻</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='申请人' style='width:98%;'></td>
+              <td><input type='text' placeholder='申请时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">新模型申请</a></td>
+                <td>new_model_001</td>
+                <td>主数据</td>
+                <td>申请</td>
+                <td>张三</td>
+                <td>2025-01-15</td>
+                <td>待审核</td>
+                <td>审核员A</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelArchiveTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelArchiveQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>归档理由</th>
+                <th>归档人</th>
+                <th>归档时间</th>
+                <th>状态</th>
+                <th>审核人</th>
+                <th>审核时间</th>
+                <th>审核意见</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='归档理由' style='width:98%;'></td>
+              <td><input type='text' placeholder='归档人' style='width:98%;'></td>
+              <td><input type='text' placeholder='归档时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核意见' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">历史模型</a></td>
+                <td>history_model_001</td>
+                <td>字典表</td>
+                <td>历史数据归档</td>
+                <td>孙七</td>
+                <td>2025-01-19</td>
+                <td>待审核</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderModelSearchTab(showQueryBar = false) {
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelSearchQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+              </tr>
+            </thead>
+            ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
+              <td class='checkbox-cell'></td>
+              <td><input type='text' placeholder='模型名称' style='width:98%;'></td>
+              <td><input type='text' placeholder='模型编码' style='width:98%;'></td>
+              <td>
+                <select class="form-select" style="width:98%;">
+                  <option value="">请选择类型</option>
+                  <option value="系统字典表">系统字典表</option>
+                  <option value="字典表">字典表</option>
+                  <option value="主数据">主数据</option>
+                </select>
+              </td>
+              <td><input type='text' placeholder='层级展示' style='width:98%;'></td>
+              <td><input type='text' placeholder='创建人' style='width:98%;'></td>
+              <td><input type='text' placeholder='创建时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='当前修改人' style='width:98%;'></td>
+              <td><input type='text' placeholder='最后修改人' style='width:98%;'></td>
+              <td><input type='text' placeholder='最后修改时间' style='width:98%;'></td>
+              <td><input type='text' placeholder='版本' style='width:98%;'></td>
+              <td><input type='text' placeholder='审核人' style='width:98%;'></td>
+              <td><input type='text' placeholder='状态' style='width:98%;'></td>
+              <td><input type='text' placeholder='语言' style='width:98%;'></td>
+            </tr>` : ''}
+            <tbody>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#">检索模型</a></td>
+                <td>search_model_001</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>周八</td>
+                <td>2025-01-20</td>
+                <td>周八</td>
+                <td>周八</td>
+                <td>2025-01-20</td>
+                <td>1</td>
+                <td>审核员B</td>
+                <td>正常</td>
+                <td>中文</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
     // 主题设置下拉菜单逻辑
     const settingBtn = document.getElementById('settingBtn');
@@ -3073,115 +3614,9 @@
       closeSearchModal();
     };
 
-    function showDegreeListTable() {
-      document.getElementById('mainContent').innerHTML = `
-        <div class="model-tabs-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
-          <div class="model-tab active" data-tab="query" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">查询</div>
-          <div class="model-tab" data-tab="apply" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">申请</div>
-          <div class="model-tab" data-tab="edit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">修改</div>
-          <div class="model-tab" data-tab="freeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">冻结</div>
-          <div class="model-tab" data-tab="unfreeze" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">解冻</div>
-          <div class="model-tab" data-tab="audit" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">审核</div>
-          <div class="model-tab" data-tab="archive" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">归档</div>
-          <div class="model-tab" data-tab="search" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">检索</div>
-        </div>
-        <div class="model-tab-content" id="degreeTabContent">
-          ${renderDegreeQueryTab()}
-        </div>
-      `;
-      bindDegreeTabEvents();
-    }
-    function renderDegreeQueryTab(showQueryBar = false) {
-      return `
-        <div class="action-bar">
-          <button class="btn-main" id="degreeQuickSearchBtn"><span class="icon">🔍</span>快速查询</button>
-          <button class="btn-line"><span class="icon">📄</span>高级查询</button>
-          <button class="btn-line"><span class="icon">🕒</span>版本查看</button>
-          <button class="btn-line"><span class="icon">📋</span>查看详情</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>状态</th>
-                <th>代码</th>
-                <th>学位描述</th>
-                <th>错误提示</th>
-                <th>创建人</th>
-                <th>创建人单位</th>
-                <th>创建时间</th>
-                <th>审核人</th>
-                <th>发布人单位</th>
-                <th>发布时间</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
-                <td style="font-weight:600;">444</td>
-                <td>建筑学学士</td>
-                <td></td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
-                <td style="font-weight:600;">445</td>
-                <td>艺术学学士</td>
-                <td></td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-              </tr>
-              <tr>
-                <td class="checkbox-cell"><input type="checkbox"></td>
-                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
-                <td style="font-weight:600;">490</td>
-                <td>政治经济学...</td>
-                <td></td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-                <td>李春阳</td>
-                <td>北京化学...</td>
-                <td>2025-06-12</td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;">
-            <button class="btn-line">上一页</button>
-            <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
-            <button class="btn-main">下一页</button>
-          </div>
-        </div>
-      `;
-    }
-    function bindDegreeTabEvents() {
-      document.querySelectorAll('.model-tab').forEach(tab => {
-        tab.onclick = function() {
-          document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          const tabName = this.getAttribute('data-tab');
-          const tabContent = document.getElementById('degreeTabContent');
-          if (tabName === 'query') {
-            tabContent.innerHTML = renderDegreeQueryTab();
-          } else {
-            tabContent.innerHTML = `<div style='padding:32px;font-size:18px;color:#888;'>暂未实现</div>`;
-          }
-        };
-      });
-      // 可选：绑定快速查询等按钮事件
-    }
+
+
+
     // JS联动逻辑
     // 权限范围弹窗相关
     document.getElementById('noticePermInput').onclick = openPermModal;
@@ -3244,8 +3679,13 @@
         <div class="model-tab-content" id="modelTabContent"></div>
       `;
     }
+
+
+    
+
   </script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+
 </body>
 </html> 

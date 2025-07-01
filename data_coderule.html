@@ -109,6 +109,7 @@
             <th>规则名称</th>
             <th>编码类型</th>
             <th>编码字段</th>
+            <th>状态</th>
             <th style="text-align:center;">操作</th>
           </tr>
         </thead>
@@ -247,7 +248,7 @@
       if (data.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="empty-state">
                 <div class="icon">📋</div>
                 <div class="text">暂无编码规则</div>
@@ -263,9 +264,15 @@
         <tr>
           <td class="checkbox-cell"><input type="checkbox" class="rowCheck" data-idx="${idx}"></td>
           <td>${item.code}</td>
-          <td>${item.name}</td>
+          <td>供应商编码规则${idx+1}</td>
           <td>${item.type}</td>
-          <td>${item.field}</td>
+          <td>code</td>
+          <td class="center">
+            <label class="switch" style="vertical-align:middle;">
+              <input type="checkbox" class="row-status-switch" data-idx="${idx}" ${item.status === '启用' ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+          </td>
           <td class="center">
             <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:0 8px;">编辑</button>
             <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:0 8px;">删除</button>

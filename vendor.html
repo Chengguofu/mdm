@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商管理 - 主数据管理平台</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --theme-bg: #f7faff;
+            --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+            --theme-sidebar: #fff;
+            --theme-content: #f4f8fb;
+            --theme-topbar-font: #fff;
+            --theme-menu-active: #2176c7;
+            --theme-menu-hover: #185a99;
+            --theme-table-header: #f4f8fb;
+            --theme-table-header-font: #2176c7;
+            --theme-table-row-hover: #f0f6fd;
+            --theme-table-border: #e3eaf3;
+            --theme-btn: #2176c7;
+            --theme-btn-hover: #185a99;
+            --theme-avatar-bg: #eaf3fb;
+            --theme-avatar-font: #2176c7;
+            --theme-content-text: #185a99;
+            --theme-shadow-color: rgba(33, 118, 199, 0.06);
+        }
+        body { margin: 0; font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; background: var(--theme-bg); color: #222; }
+        .layout { display: flex; height: 100vh; flex-direction: column; }
+        .topbar { height: 56px; background: var(--theme-topbar); color: var(--theme-topbar-font); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; font-size: 20px; font-weight: 600; letter-spacing: 1px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08); z-index: 10; position: relative; }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+        .logo { width: 120px; height: 36px; background: transparent; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #2176c7; font-weight: bold; margin-right: 8px; }
+        .topbar-title { font-size: 20px; font-weight: 600; color: var(--theme-topbar-font); letter-spacing: 1px; }
+        .topbar-right { display: flex; align-items: center; gap: 4px; font-size: 15px; }
+        .back-btn { background: rgba(255,255,255,0.13); border: none; border-radius: 16px; padding: 2px 18px; font-size: 15px; color: #fff; margin-right: 4px; letter-spacing: 1px; font-weight: 500; display: flex; align-items: center; height: 32px; cursor: pointer; transition: background 0.18s; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+        .content { flex: 1; padding: 24px; overflow-y: auto; }
+        .model-tabs-bar { display: flex; gap: 2px; border-bottom: 1.5px solid #e3eaf3; margin-bottom: 18px; }
+        .model-tab { padding: 12px 28px; cursor: pointer; font-size: 16px; font-weight: 500; color: #185a99; transition: all 0.2s; }
+        .model-tab.active { color: #2176c7; border-bottom: 2px solid #2176c7; }
+        .model-tab:hover:not(.active) { background: #f0f6fd; }
+        .action-bar { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; }
+        .btn-main { background: var(--theme-btn); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.18s; display: flex; align-items: center; gap: 4px; }
+        .btn-main:hover { background: var(--theme-btn-hover); }
+        .btn-line { background: #fff; color: var(--theme-btn); border: 1px solid var(--theme-btn); border-radius: 6px; padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 4px; }
+        .btn-line:hover { background: var(--theme-btn); color: #fff; }
+        .export-dropdown { position: relative; display: inline-block; }
+        .export-menu { display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #e3eaf3; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 140px; margin-top: 4px; }
+        .export-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; transition: background 0.2s; }
+        .export-menu-item:hover { background: #f0f6fd; }
+        .export-menu-item:last-child { border-bottom: none; }
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08); overflow: hidden; }
+        .model-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .model-table th { background: var(--theme-table-header); color: var(--theme-table-header-font); font-weight: 600; padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--theme-table-border); font-size: 14px; }
+        .model-table td { padding: 12px 16px; border-bottom: 1px solid var(--theme-table-border); color: #333; }
+        .model-table tbody tr:hover { background: var(--theme-table-row-hover); }
+        .checkbox-cell { width: 36px; text-align: center; }
+        .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; }
+        .drawer-mask { display: none; position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 4000; background: rgba(0,0,0,0.10); }
+        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 98vw; background: #fff; box-shadow: -2px 0 16px rgba(33,118,199,0.18); z-index: 4100; display: flex; flex-direction: column; animation: drawerIn .25s; }
+        @keyframes drawerIn { from { right: -440px; opacity: 0; } to { right: 0; opacity: 1; } }
+        .icon { display: inline-block; vertical-align: middle; }
+        .drawer-content-small { width: 792px !important; }
+        .drawer-content-small * { font-size: 13px !important; }
+        .drawer-content-small .btn-main, .drawer-content-small .btn-line { font-size: 13px !important; padding: 6px 12px !important; }
+        .drawer-content-small .row-actions { display: flex !important; flex-wrap: nowrap !important; gap: 6px !important; white-space: nowrap !important; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="logo">主数据管理平台</div>
+                <div class="topbar-title">供应商管理</div>
+            </div>
+            <div class="topbar-right">
+                <button class="back-btn" onclick="goBack()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    返回首页
+                </button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="model-tabs-bar">
+                <div class="model-tab active" data-tab="query">查询</div>
+                <div class="model-tab" data-tab="apply">申请</div>
+                <div class="model-tab" data-tab="edit">修改</div>
+                <div class="model-tab" data-tab="freeze">冻结</div>
+                <div class="model-tab" data-tab="unfreeze">解冻</div>
+                <div class="model-tab" data-tab="audit">审核</div>
+                <div class="model-tab" data-tab="archive">归档</div>
+                <div class="model-tab" data-tab="search">检索</div>
+            </div>
+            <div class="model-tab-content" id="vendorTabContent"></div>
+        </div>
+    </div>
+    <!-- 供应商详情抽屉 -->
+    <div id="vendorDetailDrawerMask" class="drawer-mask">
+        <div class="drawer">
+            <div style="padding:18px 24px;font-size:18px;font-weight:600;color:#2176c7;border-bottom:1px solid #e3eaf3;display:flex;align-items:center;justify-content:space-between;">
+                供应商详情
+                <button id="vendorDetailDrawerClose" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+            </div>
+            <div id="vendorDetailContent" style="flex:1;padding:24px;overflow-y:auto;font-size:16px;color:#222;"></div>
+        </div>
+    </div>
+    <!-- 新增供应商抽屉 -->
+    <div id="vendorAddDrawerMask" class="drawer-mask">
+        <div class="drawer drawer-content-small" style="max-width:98vw;display:flex;flex-direction:column;">
+            <div style="padding:18px 24px;font-size:18px;font-weight:600;color:#2176c7;border-bottom:1px solid #e3eaf3;display:flex;align-items:center;justify-content:space-between;">
+                新增供应商
+                <button id="vendorAddDrawerClose" style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;">×</button>
+            </div>
+            <div style="flex:1;padding:0 24px 24px 24px;overflow-y:auto;font-size:16px;color:#222;">
+
+                <!-- 上半部分多页签 -->
+                <div style="margin-top:18px;">
+                    <div id="vendorAddTabsBar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
+                        <div class="model-tab active" data-tab="base" style="padding:10px 24px;">基本视图</div>
+                        <div class="model-tab" data-tab="finance" id="financeTab" style="padding:10px 24px;display:none;">财务视图</div>
+                    </div>
+                    <div id="vendorAddTabsContent">
+                        <!-- 基本视图 -->
+                        <div data-content="base">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div>
+                                    <label style="font-weight:500;color:#666;">供应商编码</label>
+                                    <input type="text" id="addVendorCode" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;font-size:14px;" placeholder="请输入供应商编码">
+                                </div>
+                                <div>
+                                    <label style="font-weight:500;color:#666;">供应商名称</label>
+                                    <input type="text" id="addVendorName" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;font-size:14px;" placeholder="请输入供应商名称">
+                                </div>
+                                <div style="grid-column:1/3;">
+                                    <label style="font-weight:500;color:#666;">供应商地址</label>
+                                    <input type="text" id="addVendorAddress" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;font-size:14px;" placeholder="请输入供应商地址">
+                                </div>
+                            </div>
+                            <!-- 开关控制区 -->
+                            <div id="vendorAddSwitches" style="display:flex;gap:32px;margin-top:24px;align-items:center;">
+                                <label style="display:flex;align-items:center;gap:6px;font-size:14px;">
+                                    <input type="checkbox" id="switchFinance" onchange="toggleVendorAddSection('finance')">
+                                    <span>财务视图</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:14px;">
+                                    <input type="checkbox" id="switchContact" onchange="toggleVendorAddSection('contact')">
+                                    <span>联系人信息</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;font-size:14px;">
+                                    <input type="checkbox" id="switchAccount" onchange="toggleVendorAddSection('account')">
+                                    <span>账户信息</span>
+                                </label>
+                            </div>
+                        </div>
+                        <!-- 财务视图 -->
+                        <div data-content="finance" id="vendorAddFinanceSection" style="display:none;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div>
+                                    <label style="font-weight:500;color:#666;">法人信息</label>
+                                    <input type="text" id="addVendorLegal" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;font-size:14px;" placeholder="请输入法人信息">
+                                </div>
+                                <div>
+                                    <label style="font-weight:500;color:#666;">统一社会信用代码</label>
+                                    <input type="text" id="addVendorCreditCode" style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:4px;font-size:14px;" placeholder="请输入统一社会信用代码">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 下半部分多页签 -->
+                <div style="margin-top:32px;">
+                    <div id="vendorAddSubTabsBar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;margin-bottom:18px;">
+                        <div class="model-tab active" data-tab="contact" id="contactTab" style="padding:10px 24px;display:none;">联系人信息</div>
+                        <div class="model-tab" data-tab="account" id="accountTab" style="padding:10px 24px;display:none;">账户信息</div>
+                    </div>
+                    <div id="vendorAddSubTabsContent">
+                        <!-- 联系人信息 -->
+                        <div data-content="contact" id="vendorAddContactSection" style="display:none;">
+                            <div style="margin-bottom:6px;text-align:right;display:flex;gap:8px;justify-content:flex-end;">
+                                <button class="btn-main" type="button" onclick="selectContactRow()">选择</button>
+                                <button class="btn-main" type="button" onclick="freezeContactRow()">冻结</button>
+                                <button class="btn-main" type="button" onclick="unfreezeContactRow()">解冻</button>
+                                <button class="btn-main" type="button" onclick="addContactRow()">新增</button>
+                            </div>
+                            <table class="model-table" id="contactTable">
+                                <thead><tr><th>姓名</th><th>职位</th><th>邮箱</th><th>操作</th></tr></thead>
+                                <tbody id="contactTableBody">
+                                    <tr>
+                                        <td>张三</td>
+                                        <td>经理</td>
+                                        <td>zhangsan@example.com</td>
+                                        <td>
+                                            <div class="row-actions">
+                                                <button class="btn-line" type="button" onclick="editContactRow(this)">编辑</button>
+                                                <button class="btn-line" type="button" onclick="deleteContactRow(this)">删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 账户信息 -->
+                        <div data-content="account" id="vendorAddAccountSection" style="display:none;">
+                            <div style="margin-bottom:6px;text-align:right;display:flex;gap:8px;justify-content:flex-end;">
+                                <button class="btn-main" type="button" onclick="selectAccountRow()">选择</button>
+                                <button class="btn-main" type="button" onclick="freezeAccountRow()">冻结</button>
+                                <button class="btn-main" type="button" onclick="unfreezeAccountRow()">解冻</button>
+                                <button class="btn-main" type="button" onclick="addAccountRow()">新增</button>
+                            </div>
+                            <table class="model-table" id="accountTable">
+                                <thead><tr><th>开户银行</th><th>银行账号</th><th>账户名称</th><th>操作</th></tr></thead>
+                                <tbody id="accountTableBody">
+                                    <tr>
+                                        <td>招商银行</td>
+                                        <td>6225888888888888</td>
+                                        <td>张三</td>
+                                        <td>
+                                            <div class="row-actions">
+                                                <button class="btn-line" type="button" onclick="editAccountRow(this)">编辑</button>
+                                                <button class="btn-line" type="button" onclick="deleteAccountRow(this)">删除</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="vendorAddDrawerFooter" style="position:sticky;bottom:0;left:0;right:0;background:#fff;padding:16px 24px;border-top:1px solid #e3eaf3;display:flex;justify-content:flex-end;gap:12px;z-index:10;">
+                <button class="btn-main" onclick="saveVendorAdd()">保存</button>
+                <button class="btn-line" onclick="tempSaveVendorAdd()">暂存</button>
+                <button class="btn-line" onclick="closeVendorAddDrawer()">取消</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            renderVendorQueryTab();
+            bindVendorTabEvents();
+            // 新增供应商抽屉tab切换
+            document.body.addEventListener('click', function(e) {
+                if (e.target.closest('#vendorAddTabsBar .model-tab')) {
+                    let tab = e.target.closest('.model-tab');
+                    let tabName = tab.getAttribute('data-tab');
+                    tab.parentNode.querySelectorAll('.model-tab').forEach(t=>t.classList.remove('active'));
+                    tab.classList.add('active');
+                    let contents = document.querySelectorAll('#vendorAddTabsContent > div');
+                    contents.forEach(c=>c.style.display = c.getAttribute('data-content')===tabName?'block':'none');
+                }
+                if (e.target.closest('#vendorAddSubTabsBar .model-tab')) {
+                    let tab = e.target.closest('.model-tab');
+                    let tabName = tab.getAttribute('data-tab');
+                    tab.parentNode.querySelectorAll('.model-tab').forEach(t=>t.classList.remove('active'));
+                    tab.classList.add('active');
+                    let contents = document.querySelectorAll('#vendorAddSubTabsContent > div');
+                    contents.forEach(c=>c.style.display = c.getAttribute('data-content')===tabName?'block':'none');
+                }
+                if (e.target.id==='vendorAddDrawerClose') closeVendorAddDrawer();
+                if (e.target===document.getElementById('vendorAddDrawerMask')) closeVendorAddDrawer();
+            });
+        });
+        function goBack() { window.history.back(); }
+        function renderVendorQueryTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorQueryQuickSearchBtn" onclick="quickSearchQuery()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorQueryAdvancedSearchBtn" onclick="advancedSearchQuery()"><span class="icon">📄</span>高级查询</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorQueryExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorQueryExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected"><span class="icon">☑️</span>导出勾选数据</div>
+                            <div class="export-menu-item" data-export-type="all"><span class="icon">📋</span>导出全部数据</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorQuerySelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorQuerySelect" value="V001"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                                <td style="font-weight:600;">V001</td>
+                                <td>北京华信供应链</td>
+                                <td>生产型</td>
+                                <td>wangwei@huaxin.com</td>
+                                <td>北京市朝阳区XX路</td>
+                                <td>2024-06-01</td>
+                                <td style="text-align:center;">
+                                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showVendorDetail('V001')">查看详情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorQuerySelect" value="V002"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                                <td style="font-weight:600;">V002</td>
+                                <td>上海盛达贸易</td>
+                                <td>贸易型</td>
+                                <td>zhangqiang@shengda.com</td>
+                                <td>上海市浦东新区XX路</td>
+                                <td>2024-06-02</td>
+                                <td style="text-align:center;">
+                                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showVendorDetail('V002')">查看详情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorQuerySelect" value="V003"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f0f0f0;color:#909399;font-weight:500;font-size:15px;">停用</span></td>
+                                <td style="font-weight:600;">V003</td>
+                                <td>深圳市新科电子</td>
+                                <td>服务型</td>
+                                <td>liuyang@xinke.com</td>
+                                <td>深圳市南山区XX路</td>
+                                <td>2024-06-03</td>
+                                <td style="text-align:center;">
+                                    <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showVendorDetail('V003')">查看详情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorQueryPrevPage" onclick="alert('查询页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+                        <button class="btn-main" id="vendorQueryNextPage" onclick="alert('查询页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定查询页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorQuerySelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorQuerySelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 查询页签的导出菜单
+            const exportBtn = document.getElementById('vendorQueryExportBtn');
+            const exportMenu = document.getElementById('vendorQueryExportMenu');
+            if (exportBtn && exportMenu) {
+                exportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    exportMenu.style.display = exportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target)) {
+                        exportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorQueryExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorQueryExport(exportType);
+                        exportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        function bindVendorTabEvents() {
+            document.querySelectorAll('.model-tab').forEach(tab => {
+                tab.onclick = function() {
+                    document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName === 'query') renderVendorQueryTab();
+                    else if (tabName === 'apply') renderVendorApplyTab();
+                    else if (tabName === 'edit') renderVendorEditTab();
+                    else if (tabName === 'freeze') renderVendorFreezeTab();
+                    else if (tabName === 'unfreeze') renderVendorUnfreezeTab();
+                    else if (tabName === 'audit') renderVendorAuditTab();
+                    else if (tabName === 'archive') renderVendorArchiveTab();
+                    else if (tabName === 'search') renderVendorSearchTab();
+                };
+            });
+        }
+        function handleVendorQueryExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorQuerySelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`查询页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`查询页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        
+        function handleVendorFreezeExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorFreezeSelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`冻结页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`冻结页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        
+        function handleVendorUnfreezeExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorUnfreezeSelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`解冻页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`解冻页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        
+        function handleVendorAuditExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorAuditSelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`审核页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`审核页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        
+        function handleVendorArchiveExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorArchiveSelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`归档页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`归档页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        
+        function handleVendorSearchExport(exportType) {
+            if (exportType === 'selected') {
+                const selectedRows = document.querySelectorAll('input[name="vendorSearchSelect"]:checked');
+                if (selectedRows.length === 0) { alert('请先勾选要导出的数据'); return; }
+                alert(`检索页签 - 已导出 ${selectedRows.length} 条勾选数据`);
+            } else if (exportType === 'all') {
+                const allRows = document.querySelectorAll('.model-table tbody tr');
+                alert(`检索页签 - 已导出全部 ${allRows.length} 条数据`);
+            }
+        }
+        function showVendorDetail(code) {
+            const mask = document.getElementById('vendorDetailDrawerMask');
+            const content = document.getElementById('vendorDetailContent');
+            // 模拟数据
+            const vendorMap = {
+                'V001': { code: 'V001', name: '北京华信供应链', status: '正常', type: '生产型', contact: '王伟', phone: '13800001111', email: 'wangwei@huaxin.com', address: '北京市朝阳区XX路', createTime: '2024-06-01' },
+                'V002': { code: 'V002', name: '上海盛达贸易', status: '正常', type: '贸易型', contact: '张强', phone: '13900003333', email: 'zhangqiang@shengda.com', address: '上海市浦东新区XX路', createTime: '2024-06-02' },
+                'V003': { code: 'V003', name: '深圳市新科电子', status: '停用', type: '服务型', contact: '刘洋', phone: '13700004444', email: 'liuyang@xinke.com', address: '深圳市南山区XX路', createTime: '2024-06-03' }
+            };
+            const v = vendorMap[code];
+            content.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #2176c7; margin-bottom: 16px;">供应商基本信息</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div><label style="font-weight: 500; color: #666;">供应商编号：</label><span style="margin-left: 8px;">${v.code}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">供应商名称：</label><span style="margin-left: 8px;">${v.name}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">状态：</label><span style="margin-left: 8px; color: #13c2c2;">${v.status}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">类型：</label><span style="margin-left: 8px;">${v.type}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">联系人：</label><span style="margin-left: 8px;">${v.contact}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">联系电话：</label><span style="margin-left: 8px;">${v.phone}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">邮箱：</label><span style="margin-left: 8px;">${v.email}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">地址：</label><span style="margin-left: 8px;">${v.address}</span></div>
+                        <div><label style="font-weight: 500; color: #666;">创建时间：</label><span style="margin-left: 8px;">${v.createTime}</span></div>
+                    </div>
+                </div>
+            `;
+            mask.style.display = 'block';
+            document.getElementById('vendorDetailDrawerClose').onclick = function() { mask.style.display = 'none'; };
+            mask.onclick = function(e) { if (e.target === mask) { mask.style.display = 'none'; } };
+        }
+        function renderVendorApplyTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorApplyQuickSearchBtn" onclick="quickSearchApply()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorApplyAdvancedSearchBtn" onclick="advancedSearchApply()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-main" id="vendorApplyAddBtn" onclick="addVendorApply()"><span class="icon">➕</span>新增</button>
+                    <button class="btn-line" id="vendorApplyDeleteBtn" onclick="deleteVendorApply()"><span class="icon">🗑️</span>删除</button>
+                    <button class="btn-line" id="vendorApplyTemplateBtn" onclick="exportApplyTemplate()"><span class="icon">📋</span>申请模版导出</button>
+                    <button class="btn-line" id="vendorApplyImportBtn" onclick="importApplyData()"><span class="icon">📥</span>批量申请导入</button>
+                    <button class="btn-line" id="vendorApplyExportBtn" onclick="exportApplyData()"><span class="icon">📤</span>数据导出</button>
+                    <button class="btn-main" id="vendorApplySubmitBtn" onclick="submitVendorApply()"><span class="icon">✅</span>提交</button>
+                    <button class="btn-line" id="vendorApplyCopyBtn" onclick="copyVendorApply()"><span class="icon">📋</span>复制</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorApplySelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorApplySelect" value="V001"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                                <td style="font-weight:600;">V001</td>
+                                <td>北京华信供应链</td>
+                                <td>生产型</td>
+                                <td>wangwei@huaxin.com</td>
+                                <td>北京市朝阳区XX路</td>
+                                <td>2024-06-01</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editVendorApply('V001')">编辑</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteVendorApplyRow('V001')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorApplySelect" value="V002"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                                <td style="font-weight:600;">V002</td>
+                                <td>上海盛达贸易</td>
+                                <td>贸易型</td>
+                                <td>zhangqiang@shengda.com</td>
+                                <td>上海市浦东新区XX路</td>
+                                <td>2024-06-02</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editVendorApply('V002')">编辑</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteVendorApplyRow('V002')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorApplySelect" value="V003"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待申请</span></td>
+                                <td style="font-weight:600;">V003</td>
+                                <td>深圳市新科电子</td>
+                                <td>服务型</td>
+                                <td>liuyang@xinke.com</td>
+                                <td>深圳市南山区XX路</td>
+                                <td>2024-06-03</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editVendorApply('V003')">编辑</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteVendorApplyRow('V003')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorApplyPrevPage" onclick="alert('申请页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 3 页</span>
+                        <button class="btn-main" id="vendorApplyNextPage" onclick="alert('申请页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定申请页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorApplySelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorApplySelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+
+        }
+        // 申请tab按钮事件
+        function openVendorAddDrawer() {
+            document.getElementById('vendorAddDrawerMask').style.display = 'block';
+            // 默认tab
+            switchVendorAddTab('base');
+            // 新增：开关全部关闭，页签全部隐藏
+            document.getElementById('switchFinance').checked = false;
+            document.getElementById('switchContact').checked = false;
+            document.getElementById('switchAccount').checked = false;
+            document.getElementById('financeTab').style.display = 'none';
+            document.getElementById('contactTab').style.display = 'none';
+            document.getElementById('accountTab').style.display = 'none';
+        }
+        function closeVendorAddDrawer() {
+            document.getElementById('vendorAddDrawerMask').style.display = 'none';
+        }
+        function switchVendorAddTab(tab) {
+            let tabs = document.querySelectorAll('#vendorAddTabsBar .model-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`#vendorAddTabsBar .model-tab[data-tab="${tab}"]`).classList.add('active');
+            let contents = document.querySelectorAll('#vendorAddTabsContent > div');
+            contents.forEach(c => c.style.display = c.getAttribute('data-content') === tab ? 'block' : 'none');
+        }
+        function switchVendorAddSubTab(tab) {
+            let tabs = document.querySelectorAll('#vendorAddSubTabsBar .model-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`#vendorAddSubTabsBar .model-tab[data-tab="${tab}"]`).classList.add('active');
+            let contents = document.querySelectorAll('#vendorAddSubTabsContent > div');
+            contents.forEach(c => c.style.display = c.getAttribute('data-content') === tab ? 'block' : 'none');
+        }
+        function saveVendorAdd() {
+            // 校验：只校验已显示区域
+            let err = [];
+            // 基本视图始终校验
+            if(!document.getElementById('addVendorCode').value.trim()) err.push('供应商编码');
+            if(!document.getElementById('addVendorName').value.trim()) err.push('供应商名称');
+            if(!document.getElementById('addVendorAddress').value.trim()) err.push('供应商地址');
+            // 财务视图
+            if(document.getElementById('switchFinance').checked) {
+                if(!document.getElementById('addVendorLegal').value.trim()) err.push('法人信息');
+                if(!document.getElementById('addVendorCreditCode').value.trim()) err.push('统一社会信用代码');
+            }
+            // 联系人信息
+            if(document.getElementById('switchContact').checked) {
+                // 至少有一行
+                let rows = document.querySelectorAll('#contactTableBody tr');
+                if(rows.length===0) err.push('联系人信息至少一行');
+            }
+            // 账户信息
+            if(document.getElementById('switchAccount').checked) {
+                let rows = document.querySelectorAll('#accountTableBody tr');
+                if(rows.length===0) err.push('账户信息至少一行');
+            }
+            if(err.length>0) {
+                alert('请完善以下必填项：\n'+err.join('、'));
+                return;
+            }
+            alert('保存成功（模拟）');
+            closeVendorAddDrawer();
+        }
+        function editVendorApply(code) { alert(`编辑供应商申请，编号：${code}`); }
+
+
+        function addContactRow() {
+            const tbody = document.getElementById('contactTableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;"></td><td><button class="btn-line" type="button" onclick="deleteContactRow(this)">删除</button></td>`;
+            tbody.appendChild(tr);
+        }
+        function deleteContactRow(btn) {
+            const tr = btn.closest('tr');
+            tr.parentNode.removeChild(tr);
+        }
+        function addAccountRow() {
+            const tbody = document.getElementById('accountTableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;"></td><td><button class="btn-line" type="button" onclick="deleteAccountRow(this)">删除</button></td>`;
+            tbody.appendChild(tr);
+        }
+        function deleteAccountRow(btn) {
+            const tr = btn.closest('tr');
+            tr.parentNode.removeChild(tr);
+        }
+        function tempSaveVendorAdd() { alert('暂存成功（模拟）'); closeVendorAddDrawer(); }
+        
+        // 修改页签
+        function renderVendorEditTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorEditQuickSearchBtn" onclick="quickSearchEdit()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorEditAdvancedSearchBtn" onclick="advancedSearchEdit()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-main" id="vendorEditSelectDataBtn" onclick="selectEditData()"><span class="icon">☑️</span>选择数据</button>
+                    <button class="btn-line" id="vendorEditDeleteBtn" onclick="deleteEditData()"><span class="icon">🗑️</span>删除</button>
+                    <button class="btn-line" id="vendorEditTemplateBtn" onclick="exportEditTemplate()"><span class="icon">📋</span>批量修改模版导出</button>
+                    <button class="btn-line" id="vendorEditImportBtn" onclick="importEditData()"><span class="icon">📥</span>批量修改导入</button>
+                    <button class="btn-line" id="vendorEditExportBtn" onclick="exportEditData()"><span class="icon">📤</span>数据导出</button>
+                    <button class="btn-main" id="vendorEditSubmitBtn" onclick="submitEditData()"><span class="icon">✅</span>提交</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorEditSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorEditSelect" value="V001"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                                <td style="font-weight:600;">V001</td>
+                                <td>北京华信供应链</td>
+                                <td>生产型</td>
+                                <td>wangwei@huaxin.com</td>
+                                <td>北京市朝阳区XX路</td>
+                                <td>2024-06-01</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="editVendorData('V001')">编辑</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteVendorEditRow('V001')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorEditPrevPage" onclick="alert('修改页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorEditNextPage" onclick="alert('修改页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定修改页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorEditSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorEditSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+
+        }
+        
+        // 冻结页签
+        function renderVendorFreezeTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorFreezeQuickSearchBtn" onclick="quickSearchFreeze()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorFreezeAdvancedSearchBtn" onclick="advancedSearchFreeze()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-main" id="vendorFreezeSelectDataBtn" onclick="selectFreezeData()"><span class="icon">☑️</span>选择数据</button>
+                    <button class="btn-line" id="vendorFreezeDeleteBtn" onclick="deleteFreezeData()"><span class="icon">🗑️</span>删除</button>
+                    <button class="btn-main" id="vendorFreezeFreezeBtn" onclick="freezeData()"><span class="icon">❄️</span>冻结</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorFreezeExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorFreezeExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected">
+                                <span class="icon">☑️</span>导出勾选数据
+                            </div>
+                            <div class="export-menu-item" data-export-type="all">
+                                <span class="icon">📋</span>导出全部数据
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorFreezeSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorFreezeSelect" value="V001"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                                <td style="font-weight:600;">V001</td>
+                                <td>北京华信供应链</td>
+                                <td>生产型</td>
+                                <td>wangwei@huaxin.com</td>
+                                <td>北京市朝阳区XX路</td>
+                                <td>2024-06-01</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteFreezeRow('V001')">删除</button>
+                                        <button style="background:none;border:none;color:#fa8c16;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="freezeRow('V001')">冻结</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorFreezePrevPage" onclick="alert('冻结页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorFreezeNextPage" onclick="alert('冻结页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定冻结页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorFreezeSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorFreezeSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 冻结页签的导出菜单
+            const freezeExportBtn = document.getElementById('vendorFreezeExportBtn');
+            const freezeExportMenu = document.getElementById('vendorFreezeExportMenu');
+            if (freezeExportBtn && freezeExportMenu) {
+                freezeExportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    freezeExportMenu.style.display = freezeExportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!freezeExportBtn.contains(e.target) && !freezeExportMenu.contains(e.target)) {
+                        freezeExportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorFreezeExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorFreezeExport(exportType);
+                        freezeExportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        
+        // 解冻页签
+        function renderVendorUnfreezeTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorUnfreezeQuickSearchBtn" onclick="quickSearchUnfreeze()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorUnfreezeAdvancedSearchBtn" onclick="advancedSearchUnfreeze()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-main" id="vendorUnfreezeSelectDataBtn" onclick="selectUnfreezeData()"><span class="icon">☑️</span>选择数据</button>
+                    <button class="btn-line" id="vendorUnfreezeDeleteBtn" onclick="deleteUnfreezeData()"><span class="icon">🗑️</span>删除</button>
+                    <button class="btn-main" id="vendorUnfreezeUnfreezeBtn" onclick="unfreezeData()"><span class="icon">🔥</span>解冻</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorUnfreezeExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorUnfreezeExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected">
+                                <span class="icon">☑️</span>导出勾选数据
+                            </div>
+                            <div class="export-menu-item" data-export-type="all">
+                                <span class="icon">📋</span>导出全部数据
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorUnfreezeSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorUnfreezeSelect" value="V003"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f0f0f0;color:#909399;font-weight:500;font-size:15px;">停用</span></td>
+                                <td style="font-weight:600;">V003</td>
+                                <td>深圳市新科电子</td>
+                                <td>服务型</td>
+                                <td>liuyang@xinke.com</td>
+                                <td>深圳市南山区XX路</td>
+                                <td>2024-06-03</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteUnfreezeRow('V003')">删除</button>
+                                        <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="unfreezeRow('V003')">解冻</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorUnfreezePrevPage" onclick="alert('解冻页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorUnfreezeNextPage" onclick="alert('解冻页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定解冻页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorUnfreezeSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorUnfreezeSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 解冻页签的导出菜单
+            const unfreezeExportBtn = document.getElementById('vendorUnfreezeExportBtn');
+            const unfreezeExportMenu = document.getElementById('vendorUnfreezeExportMenu');
+            if (unfreezeExportBtn && unfreezeExportMenu) {
+                unfreezeExportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    unfreezeExportMenu.style.display = unfreezeExportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!unfreezeExportBtn.contains(e.target) && !unfreezeExportMenu.contains(e.target)) {
+                        unfreezeExportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorUnfreezeExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorUnfreezeExport(exportType);
+                        unfreezeExportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        
+        // 审核页签
+        function renderVendorAuditTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorAuditQuickSearchBtn" onclick="quickSearchAudit()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorAuditAdvancedSearchBtn" onclick="advancedSearchAudit()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-line" id="vendorAuditRejectBtn" onclick="rejectAuditData()"><span class="icon">❌</span>驳回</button>
+                    <button class="btn-main" id="vendorAuditApproveBtn" onclick="approveAuditData()"><span class="icon">✅</span>通过</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorAuditExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorAuditExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected">
+                                <span class="icon">☑️</span>导出勾选数据
+                            </div>
+                            <div class="export-menu-item" data-export-type="all">
+                                <span class="icon">📋</span>导出全部数据
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorAuditSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>申请时间</th>
+                                <th>申请人</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorAuditSelect" value="V004"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#fff7e6;color:#fa8c16;font-weight:500;font-size:15px;">待审核</span></td>
+                                <td style="font-weight:600;">V004</td>
+                                <td>广州科技公司</td>
+                                <td>科技型</td>
+                                <td>2024-06-04</td>
+                                <td>张三</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="rejectAuditRow('V004')">驳回</button>
+                                        <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="approveAuditRow('V004')">通过</button>
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="showChangeInfo('V004')">变更信息</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorAuditPrevPage" onclick="alert('审核页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorAuditNextPage" onclick="alert('审核页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定审核页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorAuditSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorAuditSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 审核页签的导出菜单
+            const auditExportBtn = document.getElementById('vendorAuditExportBtn');
+            const auditExportMenu = document.getElementById('vendorAuditExportMenu');
+            if (auditExportBtn && auditExportMenu) {
+                auditExportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    auditExportMenu.style.display = auditExportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!auditExportBtn.contains(e.target) && !auditExportMenu.contains(e.target)) {
+                        auditExportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorAuditExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorAuditExport(exportType);
+                        auditExportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        
+        // 归档页签
+        function renderVendorArchiveTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorArchiveQuickSearchBtn" onclick="quickSearchArchive()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorArchiveAdvancedSearchBtn" onclick="advancedSearchArchive()"><span class="icon">📄</span>高级查询</button>
+                    <button class="btn-main" id="vendorArchiveSelectDataBtn" onclick="selectArchiveData()"><span class="icon">☑️</span>选择数据</button>
+                    <button class="btn-line" id="vendorArchiveDeleteBtn" onclick="deleteArchiveData()"><span class="icon">🗑️</span>删除</button>
+                    <button class="btn-main" id="vendorArchiveArchiveBtn" onclick="archiveData()"><span class="icon">📦</span>归档</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorArchiveExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorArchiveExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected">
+                                <span class="icon">☑️</span>导出勾选数据
+                            </div>
+                            <div class="export-menu-item" data-export-type="all">
+                                <span class="icon">📋</span>导出全部数据
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorArchiveSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>停用时间</th>
+                                <th>停用原因</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorArchiveSelect" value="V005"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#f0f0f0;color:#909399;font-weight:500;font-size:15px;">已停用</span></td>
+                                <td style="font-weight:600;">V005</td>
+                                <td>杭州贸易公司</td>
+                                <td>贸易型</td>
+                                <td>2024-05-15</td>
+                                <td>业务终止</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#52c41a;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="archiveRow('V005')">归档</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteArchiveRow('V005')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorArchivePrevPage" onclick="alert('归档页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorArchiveNextPage" onclick="alert('归档页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定归档页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorArchiveSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorArchiveSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 归档页签的导出菜单
+            const archiveExportBtn = document.getElementById('vendorArchiveExportBtn');
+            const archiveExportMenu = document.getElementById('vendorArchiveExportMenu');
+            if (archiveExportBtn && archiveExportMenu) {
+                archiveExportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    archiveExportMenu.style.display = archiveExportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!archiveExportBtn.contains(e.target) && !archiveExportMenu.contains(e.target)) {
+                        archiveExportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorArchiveExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorArchiveExport(exportType);
+                        archiveExportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        
+        // 检索页签
+        function renderVendorSearchTab() {
+            const tabContent = document.getElementById('vendorTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button class="btn-main" id="vendorSearchQuickSearchBtn" onclick="quickSearchSearch()"><span class="icon">🔍</span>快速查询</button>
+                    <button class="btn-line" id="vendorSearchAdvancedSearchBtn" onclick="advancedSearchSearch()"><span class="icon">📄</span>高级查询</button>
+                    <div class="export-dropdown">
+                        <button class="btn-main" id="vendorSearchExportBtn" style="display:flex;align-items:center;gap:4px;">
+                            <span class="icon">📤</span>导出
+                            <span style="font-size:12px;">▼</span>
+                        </button>
+                        <div id="vendorSearchExportMenu" class="export-menu">
+                            <div class="export-menu-item" data-export-type="selected">
+                                <span class="icon">☑️</span>导出勾选数据
+                            </div>
+                            <div class="export-menu-item" data-export-type="all">
+                                <span class="icon">📋</span>导出全部数据
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox" id="vendorSearchSelectAll"></th>
+                                <th>状态</th>
+                                <th>供应商编号</th>
+                                <th>供应商名称</th>
+                                <th>类型</th>
+                                <th>邮箱</th>
+                                <th>地址</th>
+                                <th>创建时间</th>
+                                <th style="text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-cell"><input type="checkbox" name="vendorSearchSelect" value="V001"></td>
+                                <td><span style="display:inline-block;padding:2px 14px;border-radius:16px;background:#e6fff5;color:#13c2c2;font-weight:500;font-size:15px;">正常</span></td>
+                                <td style="font-weight:600;">V001</td>
+                                <td>北京华信供应链</td>
+                                <td>生产型</td>
+                                <td>wangwei@huaxin.com</td>
+                                <td>北京市朝阳区XX路</td>
+                                <td>2024-06-01</td>
+                                <td style="text-align:center;">
+                                    <div style="display:flex;gap:8px;justify-content:center;">
+                                        <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="viewVendorSearchDetail('V001')">查看详情</button>
+                                        <button style="background:none;border:none;color:#f5222d;cursor:pointer;font-size:14px;padding:4px 8px;" onclick="deleteSearchRow('V001')">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px;padding: 0 16px 16px;">
+                        <button class="btn-line" id="vendorSearchPrevPage" onclick="alert('检索页签 - 上一页')">上一页</button>
+                        <span style="font-size:15px;color:#333;">第 <b>1</b> / 1 页</span>
+                        <button class="btn-main" id="vendorSearchNextPage" onclick="alert('检索页签 - 下一页')">下一页</button>
+                    </div>
+                </div>
+            `;
+            // 绑定检索页签的全选功能
+            const selectAllCheckbox = document.getElementById('vendorSearchSelectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.onchange = function() {
+                    const checkboxes = document.querySelectorAll('input[name="vendorSearchSelect"]');
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                };
+            }
+            // 检索页签的导出菜单
+            const searchExportBtn = document.getElementById('vendorSearchExportBtn');
+            const searchExportMenu = document.getElementById('vendorSearchExportMenu');
+            if (searchExportBtn && searchExportMenu) {
+                searchExportBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    searchExportMenu.style.display = searchExportMenu.style.display === 'none' ? 'block' : 'none';
+                };
+                document.addEventListener('click', function(e) {
+                    if (!searchExportBtn.contains(e.target) && !searchExportMenu.contains(e.target)) {
+                        searchExportMenu.style.display = 'none';
+                    }
+                });
+                document.querySelectorAll('#vendorSearchExportMenu .export-menu-item').forEach(item => {
+                    item.onclick = function() {
+                        const exportType = this.getAttribute('data-export-type');
+                        handleVendorSearchExport(exportType);
+                        searchExportMenu.style.display = 'none';
+                    };
+                });
+            }
+
+        }
+        
+        // 查询页签函数
+        function quickSearchQuery() { alert('查询页签 - 快速查询'); }
+        function advancedSearchQuery() { alert('查询页签 - 高级查询'); }
+        
+        // 申请页签函数
+        function quickSearchApply() { alert('申请页签 - 快速查询'); }
+        function advancedSearchApply() { alert('申请页签 - 高级查询'); }
+        function addVendorApply() { openVendorAddDrawer(); }
+        function exportApplyTemplate() { alert('申请页签 - 申请模版导出'); }
+        function importApplyData() { alert('申请页签 - 批量申请导入'); }
+        function exportApplyData() { alert('申请页签 - 数据导出'); }
+        function submitVendorApply() {
+            const selectedRows = document.querySelectorAll('input[name="vendorApplySelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要提交的数据'); return; }
+            if (confirm(`确定要提交选中的 ${selectedRows.length} 条申请数据吗？`)) { alert('提交成功'); }
+        }
+        function copyVendorApply() {
+            const selectedRows = document.querySelectorAll('input[name="vendorApplySelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要复制的数据'); return; }
+            alert(`复制 ${selectedRows.length} 条申请数据成功`);
+        }
+        function deleteVendorApplyRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的申请数据吗？`)) { 
+                alert('删除成功'); 
+            } 
+        }
+        function deleteVendorApply() {
+            const selectedRows = document.querySelectorAll('input[name="vendorApplySelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要删除的数据'); return; }
+            if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) { alert('删除成功'); }
+        }
+        
+        // 修改页签函数
+        function quickSearchEdit() { alert('修改页签 - 快速查询'); }
+        function advancedSearchEdit() { alert('修改页签 - 高级查询'); }
+        function selectEditData() { alert('修改页签 - 选择数据'); }
+        function deleteEditData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorEditSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要删除的数据'); return; }
+            if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) { alert('删除成功'); }
+        }
+        function exportEditTemplate() { alert('修改页签 - 批量修改模版导出'); }
+        function importEditData() { alert('修改页签 - 批量修改导入'); }
+        function exportEditData() { alert('修改页签 - 数据导出'); }
+        function submitEditData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorEditSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要提交的数据'); return; }
+            if (confirm(`确定要提交选中的 ${selectedRows.length} 条数据吗？`)) { alert('提交成功'); }
+        }
+        
+        // 冻结页签函数
+        function quickSearchFreeze() { alert('冻结页签 - 快速查询'); }
+        function advancedSearchFreeze() { alert('冻结页签 - 高级查询'); }
+        function selectFreezeData() { alert('冻结页签 - 选择数据'); }
+        function deleteFreezeData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorFreezeSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要删除的数据'); return; }
+            if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) { alert('删除成功'); }
+        }
+        function freezeData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorFreezeSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要冻结的数据'); return; }
+            if (confirm(`确定要冻结选中的 ${selectedRows.length} 条数据吗？`)) { alert('冻结成功'); }
+        }
+        
+        // 解冻页签函数
+        function quickSearchUnfreeze() { alert('解冻页签 - 快速查询'); }
+        function advancedSearchUnfreeze() { alert('解冻页签 - 高级查询'); }
+        function selectUnfreezeData() { alert('解冻页签 - 选择数据'); }
+        function deleteUnfreezeData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorUnfreezeSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要删除的数据'); return; }
+            if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) { alert('删除成功'); }
+        }
+        function unfreezeData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorUnfreezeSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要解冻的数据'); return; }
+            if (confirm(`确定要解冻选中的 ${selectedRows.length} 条数据吗？`)) { alert('解冻成功'); }
+        }
+        
+        // 审核页签函数
+        function quickSearchAudit() { alert('审核页签 - 快速查询'); }
+        function advancedSearchAudit() { alert('审核页签 - 高级查询'); }
+        function rejectAuditData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorAuditSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要驳回的数据'); return; }
+            if (confirm(`确定要驳回选中的 ${selectedRows.length} 条数据吗？`)) { alert('驳回成功'); }
+        }
+        function approveAuditData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorAuditSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要通过的数据'); return; }
+            if (confirm(`确定要通过选中的 ${selectedRows.length} 条数据吗？`)) { alert('通过成功'); }
+        }
+        
+        // 归档页签函数
+        function quickSearchArchive() { alert('归档页签 - 快速查询'); }
+        function advancedSearchArchive() { alert('归档页签 - 高级查询'); }
+        function selectArchiveData() { alert('归档页签 - 选择数据'); }
+        function deleteArchiveData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorArchiveSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要删除的数据'); return; }
+            if (confirm(`确定要删除选中的 ${selectedRows.length} 条数据吗？`)) { alert('删除成功'); }
+        }
+        function archiveData() { 
+            const selectedRows = document.querySelectorAll('input[name="vendorArchiveSelect"]:checked');
+            if (selectedRows.length === 0) { alert('请先勾选要归档的数据'); return; }
+            if (confirm(`确定要归档选中的 ${selectedRows.length} 条数据吗？`)) { alert('归档成功'); }
+        }
+        
+        // 检索页签函数
+        function quickSearchSearch() { alert('检索页签 - 快速查询'); }
+        function advancedSearchSearch() { alert('检索页签 - 高级查询'); }
+        
+        // 行操作函数
+        function editVendorData(code) { alert(`修改页签 - 编辑供应商数据，编号：${code}`); }
+        function deleteVendorEditRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的供应商吗？`)) {
+                alert(`修改页签 - 删除供应商成功，编号：${code}`);
+            }
+        }
+        function deleteFreezeRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的供应商吗？`)) {
+                alert(`冻结页签 - 删除供应商成功，编号：${code}`);
+            }
+        }
+        function freezeRow(code) { 
+            if (confirm(`确定要冻结编号为 ${code} 的供应商吗？`)) {
+                alert(`冻结页签 - 冻结供应商成功，编号：${code}`);
+            }
+        }
+        function deleteUnfreezeRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的供应商吗？`)) {
+                alert(`解冻页签 - 删除供应商成功，编号：${code}`);
+            }
+        }
+        function unfreezeRow(code) { 
+            if (confirm(`确定要解冻编号为 ${code} 的供应商吗？`)) {
+                alert(`解冻页签 - 解冻供应商成功，编号：${code}`);
+            }
+        }
+        function rejectAuditRow(code) { 
+            if (confirm(`确定要驳回编号为 ${code} 的供应商申请吗？`)) {
+                alert(`审核页签 - 驳回供应商申请成功，编号：${code}`);
+            }
+        }
+        function approveAuditRow(code) { 
+            if (confirm(`确定要通过编号为 ${code} 的供应商申请吗？`)) {
+                alert(`审核页签 - 通过供应商申请成功，编号：${code}`);
+            }
+        }
+        function showChangeInfo(code) { 
+            alert(`审核页签 - 显示变更信息，编号：${code}`);
+        }
+        function archiveRow(code) { 
+            if (confirm(`确定要归档编号为 ${code} 的供应商吗？`)) {
+                alert(`归档页签 - 归档供应商成功，编号：${code}`);
+            }
+        }
+        function deleteArchiveRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的供应商吗？`)) {
+                alert(`归档页签 - 删除供应商成功，编号：${code}`);
+            }
+        }
+        function deleteSearchRow(code) { 
+            if (confirm(`确定要删除编号为 ${code} 的供应商吗？`)) {
+                alert(`检索页签 - 删除供应商成功，编号：${code}`);
+            }
+        }
+        function viewVendorSearchDetail(code) { 
+            alert(`检索页签 - 查看供应商详情，编号：${code}`);
+        }
+        function selectContactRow() { alert('联系人信息-选择'); }
+        function freezeContactRow() { alert('联系人信息-冻结'); }
+        function unfreezeContactRow() { alert('联系人信息-解冻'); }
+        function editContactRow(btn) { alert('联系人信息-编辑'); }
+        function selectAccountRow() { alert('账户信息-选择'); }
+        function freezeAccountRow() { alert('账户信息-冻结'); }
+        function unfreezeAccountRow() { alert('账户信息-解冻'); }
+        function editAccountRow(btn) { alert('账户信息-编辑'); }
+        function toggleVendorAddSection(type) {
+            if(type==='finance') {
+                document.getElementById('financeTab').style.display = document.getElementById('switchFinance').checked ? 'block' : 'none';
+                // 只控制页签显示，不控制内容区
+            } else if(type==='contact') {
+                document.getElementById('contactTab').style.display = document.getElementById('switchContact').checked ? 'block' : 'none';
+            } else if(type==='account') {
+                document.getElementById('accountTab').style.display = document.getElementById('switchAccount').checked ? 'block' : 'none';
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+</body>
+</html> 

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>会计科目管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --theme-bg: #f7faff;
+      --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+      --theme-primary: #2176c7;
+      --theme-primary-hover: #185a99;
+      --theme-sidebar: #fff;
+      --theme-content: #f4f8fb;
+      --theme-border: #e3eaf3;
+      --theme-text: #185a99;
+      --theme-text-light: #666;
+      --theme-shadow: rgba(33, 118, 199, 0.08);
+    }
+    body { margin: 0; font-family: 'Microsoft YaHei', Arial, sans-serif; background: var(--theme-bg); font-size: 15px; }
+    
+    .layout {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+    
+    .topbar {
+      height: 56px;
+      background: var(--theme-topbar);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08);
+      z-index: 10;
+      position: relative;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 36px;
+      background: transparent;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #2176c7;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    
+    .topbar-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 15px;
+    }
+    
+    .back-btn {
+      background: rgba(255,255,255,0.13);
+      border: none;
+      border-radius: 16px;
+      padding: 2px 18px;
+      font-size: 15px;
+      color: #fff;
+      margin-right: 4px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      height: 32px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    .container { display: flex; height: calc(100vh - 104px); background: #fff; border-radius: 10px; box-shadow: 0 4px 24px var(--theme-shadow); margin: 0 auto; max-width: 1520px; min-width: 1140px; }
+    .left-panel { width: 262px; background: var(--theme-sidebar); border-right: 1px solid var(--theme-border); display: flex; flex-direction: column; }
+    .tree-header { background: var(--theme-primary); color: #fff; font-size: 22px; font-weight: 600; padding: 18px 16px; }
+    .tree-search { padding: 12px 16px; border-bottom: 1px solid var(--theme-border); }
+    .tree-search input { width: 100%; padding: 7px 32px 7px 10px; border: 1.2px solid #c0d3eb; border-radius: 6px; font-size: 15px; background: #f9fbfd; }
+    .tree-search-icon { position: absolute; right: 28px; top: 20px; color: #bbb; }
+    .tree-list { flex: 1; overflow-y: auto; padding: 0 0 12px 0; background: #f8fafc; }
+    .tree-node { display: flex; align-items: center; padding: 8px 18px; cursor: pointer; border-radius: 6px; margin-bottom: 2px; transition: background 0.2s; font-size: 16px; color: #185a99; }
+    .tree-node.selected { background: #ffe9b3; color: #b07d00; font-weight: 600; }
+    .tree-node .tree-icon { margin-right: 8px; color: #2176c7; }
+    .tree-node .tree-expand { margin-right: 6px; font-size: 13px; color: #bbb; transition: transform 0.2s; }
+    .tree-node.expanded .tree-expand { transform: rotate(90deg); color: #2176c7; }
+    .tree-children { margin-left: 22px; }
+    .right-panel { flex: 1; display: flex; flex-direction: column; background: var(--theme-content); }
+    .toolbar { display: flex; gap: 8px; padding: 18px 24px 0 24px; background: #fff; border-bottom: 1px solid var(--theme-border); }
+    .toolbar button { background: #f4f8fb; color: #2176c7; border: none; border-radius: 4px; padding: 7px 18px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+    .toolbar button.active, .toolbar button:focus { background: #2176c7; color: #fff; }
+    .toolbar button:disabled { background: #eee; color: #bbb; cursor: not-allowed; }
+    .tab-btn { background: #f4f8fb; color: #2176c7; border: none; border-radius: 4px; padding: 7px 18px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+    .tab-btn.active { background: #2176c7; color: #fff; }
+    .tab-btn:hover:not(.active) { background: #e3eaf3; }
+    .query-bar { display: flex; gap: 18px; align-items: center; padding: 18px 24px 0 24px; background: #fff; }
+    .query-bar label { font-size: 15px; color: var(--theme-text); margin-right: 6px; }
+    .query-bar input, .query-bar select { padding: 7px 12px; border: 1.2px solid #c0d3eb; border-radius: 6px; font-size: 15px; background: #f9fbfd; min-width: 100px; }
+    .query-btn-bar { display: flex; gap: 12px; padding: 0 24px 12px 24px; background: #fff; }
+    .query-btn-bar button { background: var(--theme-primary); color: #fff; border: none; border-radius: 6px; padding: 7px 18px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+    .query-btn-bar button.btn-line { background: #fff; color: var(--theme-primary); border: 1.5px solid var(--theme-primary); }
+    
+    /* 按钮样式 - 与index.html保持一致 */
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 18px 24px 18px 24px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
+      padding: 16px 18px 12px 18px;
+      width: calc(100% - 48px);
+      min-width: 600px;
+    }
+    .btn-main {
+      background: #4db6ac;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0 18px;
+      height: 36px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      transition: background 0.18s;
+      cursor: pointer;
+    }
+    .btn-main:hover {
+      background: #399488;
+    }
+    .btn-line {
+      background: #fff;
+      color: #444;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+      padding: 0 14px;
+      height: 36px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      transition: background 0.18s, border 0.18s;
+      cursor: pointer;
+    }
+    .btn-line:hover {
+      background: #f5f7fa;
+      border-color: #b0b8c1;
+    }
+    .action-bar .icon {
+      margin-right: 6px;
+      display: flex;
+      align-items: center;
+    }
+    .table-wrap { flex: 1; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); margin: 18px 24px 24px 24px; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid var(--theme-border); text-align: left; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    .table-link-edit { background: none; border: none; color: var(--theme-primary); font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-edit:hover { color: var(--theme-primary-hover); text-decoration: underline; }
+    .table-link-delete { background: none; border: none; color: #e74c3c; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-delete:hover { color: #b71c1c; text-decoration: underline; }
+    .pagination { display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding: 8px 24px 18px 24px; background: #fff; }
+    .pagination input { width: 40px; text-align: center; border: 1px solid #e3eaf3; border-radius: 4px; padding: 2px 4px; }
+    .pagination select { border: 1px solid #e3eaf3; border-radius: 4px; padding: 2px 4px; }
+    .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-active { background: #e8f5e8; color: #2e7d32; }
+    .status-inactive { background: #ffebee; color: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="logo">主数据管理平台</div>
+        <div class="topbar-title">会计科目管理</div>
+      </div>
+      <div class="topbar-right">
+        <button class="back-btn" onclick="goBack()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          返回首页
+        </button>
+      </div>
+    </div>
+    
+    <div class="content">
+      <div class="container">
+    <!-- 左侧树 -->
+    <div class="left-panel">
+      <div class="tree-header">会计科目分类</div>
+      <div class="tree-search">
+        <input type="text" id="treeSearchInput" placeholder="搜索科目...">
+      </div>
+      <div class="tree-list" id="subjectTree"></div>
+    </div>
+    <!-- 右侧表格 -->
+    <div class="right-panel">
+      <div class="toolbar">
+        <button class="tab-btn active" onclick="switchTab('query')">查询</button>
+        <button class="tab-btn" onclick="switchTab('apply')">申请</button>
+        <button class="tab-btn" onclick="switchTab('modify')">修改</button>
+        <button class="tab-btn" onclick="switchTab('freeze')">冻结</button>
+        <button class="tab-btn" onclick="switchTab('unfreeze')">解冻</button>
+        <button class="tab-btn" onclick="switchTab('audit')">审核</button>
+        <button class="tab-btn" onclick="switchTab('archive')">归档</button>
+        <button class="tab-btn" onclick="switchTab('search')">检索</button>
+      </div>
+      <div class="action-bar" id="actionBar">
+        <button class="btn-main" onclick="alert('快速查询功能待实现')">
+          <span class="icon">🔍</span>快速查询
+        </button>
+        <button class="btn-line" onclick="alert('高级查询功能待实现')">
+          <span class="icon">📄</span>高级查询
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;"><input type="checkbox" id="checkAll"></th>
+              <th>状态</th>
+              <th>代码</th>
+              <th>会计科目描述</th>
+              <th>科目类别</th>
+              <th>科目类型</th>
+              <th>科目类型组</th>
+              <th>数据版本</th>
+              <th style="width:100px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="subjectTableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+      <!-- 详情抽屉 -->
+      <div id="drawerMask" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;z-index:2000;background:rgba(0,0,0,0.10);">
+        <div id="drawerBox" style="position:fixed;top:0;right:0;bottom:0;width:420px;max-width:98vw;background:#fff;box-shadow:-2px 0 16px rgba(33,118,199,0.18);z-index:2100;display:flex;flex-direction:column;animation:drawerIn .25s;">
+          <div style="padding:18px 24px;font-size:18px;font-weight:600;color:#2176c7;border-bottom:1px solid #e3eaf3;display:flex;align-items:center;justify-content:space-between;">
+            <span>数据详情</span>
+            <button style="background:none;border:none;font-size:22px;color:#999;cursor:pointer;" onclick="closeDrawer()">×</button>
+          </div>
+          <div id="drawerContent" style="flex:1;padding:24px;overflow-y:auto;font-size:15px;color:#222;"></div>
+        </div>
+      </div>
+      <!-- 版本列表弹窗 -->
+      <div id="versionModalMask" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.18);z-index:3000;align-items:center;justify-content:center;">
+        <div class="modal-window" style="background:#fff;border-radius:10px;max-width:700px;width:90vw;max-height:90vh;overflow:auto;box-shadow:0 4px 24px rgba(33,118,199,0.13);position:relative;">
+          <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:16px 24px;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:space-between;">
+            版本列表
+            <span style='cursor:pointer;font-size:24px;' onclick="closeVersionModal()">×</span>
+          </div>
+          <div style="padding:24px;">
+            <button class="btn-main" id="versionCompareBtn" style="margin-bottom:16px;">版本比较</button>
+            <div class="table-wrap" style="box-shadow:none;">
+              <table style="min-width:600px;">
+                <thead>
+                  <tr>
+                    <th style="width:36px;"><input type="checkbox" id="versionSelectAll"></th>
+                    <th>版本号</th>
+                    <th>描述</th>
+                    <th>修改人</th>
+                    <th>修改时间</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="versionTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <style>@keyframes drawerIn { from { right: -440px; opacity: 0; } to { right: 0; opacity: 1; } }</style>
+    </div>
+  </div>
+  <script>
+    // 科目树数据
+    let subjectTreeData = [
+      { id: 1, name: '1001_库存现金', children: [] },
+      { id: 2, name: '1002_银行存款', children: [] },
+      { id: 3, name: '1003_△存放中央银行款项', children: [] },
+      { id: 4, name: '1004_△期货保证金存款', children: [] },
+      { id: 5, name: '1011_△存放同业', children: [] },
+      { id: 6, name: '1012_其他货币资金', children: [] },
+      { id: 7, name: '1021_结算备付金', children: [] },
+      { id: 8, name: '1031_△存出保证金', children: [] },
+      { id: 9, name: '1101_交易性金融资产', children: [] },
+      { id: 10, name: '1111_买入返售金融资产', children: [] },
+      { id: 11, name: '1121_应收票据', children: [] },
+      { id: 12, name: '1122_应收账款', children: [] }
+    ];
+    
+    // 各页签的独立数据
+    let tabData = {
+      query: [
+        { id: 2, status: '正常', code: '1002', desc: '银行存款', category: '资产类', type: '01', typeGroup: '通用科目', version: 2, selected: false },
+        { id: 1, status: '正常', code: '1001', desc: '库存现金', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 3, status: '正常', code: '1003', desc: '△存放中央银行款项', category: '资产类', type: '01', typeGroup: '通用科目', version: 3, selected: false }
+      ],
+      apply: [
+        { id: 4, status: '待申请', code: '1004', desc: '△期货保证金存款', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 5, status: '待申请', code: '1011', desc: '△存放同业', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false }
+      ],
+      modify: [
+        { id: 6, status: '待修改', code: '1012', desc: '其他货币资金', category: '资产类', type: '01', typeGroup: '通用科目', version: 2, selected: false },
+        { id: 7, status: '待修改', code: '1021', desc: '结算备付金', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false }
+      ],
+      freeze: [
+        { id: 8, status: '正常', code: '1031', desc: '△存出保证金', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 9, status: '正常', code: '1101', desc: '交易性金融资产', category: '资产类', type: '01', typeGroup: '通用科目', version: 2, selected: false }
+      ],
+      unfreeze: [
+        { id: 10, status: '已冻结', code: '1111', desc: '买入返售金融资产', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 11, status: '已冻结', code: '1121', desc: '应收票据', category: '资产类', type: '01', typeGroup: '通用科目', version: 3, selected: false }
+      ],
+      audit: [
+        { id: 12, status: '待审核', code: '1122', desc: '应收账款', category: '资产类', type: '01', typeGroup: '通用科目', version: 2, selected: false },
+        { id: 13, status: '待审核', code: '1123', desc: '预付账款', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false }
+      ],
+      archive: [
+        { id: 14, status: '已归档', code: '1124', desc: '应收股利', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 15, status: '已归档', code: '1125', desc: '应收利息', category: '资产类', type: '01', typeGroup: '通用科目', version: 2, selected: false }
+      ],
+      search: [
+        { id: 16, status: '正常', code: '1126', desc: '其他应收款', category: '资产类', type: '01', typeGroup: '通用科目', version: 1, selected: false },
+        { id: 17, status: '正常', code: '1127', desc: '坏账准备', category: '资产类', type: '01', typeGroup: '通用科目', version: 3, selected: false }
+      ]
+    };
+    
+    let currentTab = 'query';
+    let currentTreeId = null;
+    let pageSize = 25;
+    let currentPage = 1;
+    // 渲染树
+    function renderTree() {
+      const tree = document.getElementById('subjectTree');
+      tree.innerHTML = '';
+      let search = document.getElementById('treeSearchInput').value.trim();
+      function renderNode(node) {
+        if (search && node.name.indexOf(search) === -1) return '';
+        let selected = node.id === currentTreeId ? 'selected' : '';
+        return `<div class="tree-node ${selected}" onclick="selectTreeNode(${node.id})"><span class="tree-icon">📁</span>${node.name}</div>`;
+      }
+      tree.innerHTML = subjectTreeData.map(renderNode).join('');
+    }
+    // 选中树节点
+    function selectTreeNode(id) {
+      currentTreeId = id;
+      renderTree();
+      renderTable();
+    }
+    document.getElementById('treeSearchInput').oninput = renderTree;
+    // 页签切换函数
+    function switchTab(tabName) {
+      currentTab = tabName;
+      currentPage = 1;
+      
+      // 更新页签按钮状态
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // 更新操作按钮
+      updateActionBar(tabName);
+      
+      // 重新渲染表格
+      renderTable();
+    }
+    
+    // 更新操作按钮
+    function updateActionBar(tabName) {
+      const actionBar = document.getElementById('actionBar');
+      const buttonConfigs = {
+        query: [
+          { text: '快速查询', icon: '🔍', action: "alert('快速查询功能待实现')" },
+          { text: '高级查询', icon: '📄', action: "alert('高级查询功能待实现')" }
+        ],
+        apply: [
+          { text: '新建申请', icon: '➕', action: "alert('新建申请功能待实现')" },
+          { text: '批量申请', icon: '📋', action: "alert('批量申请功能待实现')" }
+        ],
+        modify: [
+          { text: '批量修改', icon: '✏️', action: "alert('批量修改功能待实现')" },
+          { text: '修改历史', icon: '📝', action: "alert('修改历史功能待实现')" }
+        ],
+        freeze: [
+          { text: '批量冻结', icon: '❄️', action: "alert('批量冻结功能待实现')" },
+          { text: '冻结原因', icon: '📋', action: "alert('冻结原因功能待实现')" }
+        ],
+        unfreeze: [
+          { text: '批量解冻', icon: '☀️', action: "alert('批量解冻功能待实现')" },
+          { text: '解冻申请', icon: '📝', action: "alert('解冻申请功能待实现')" }
+        ],
+        audit: [
+          { text: '批量审核', icon: '✅', action: "alert('批量审核功能待实现')" },
+          { text: '审核历史', icon: '📋', action: "alert('审核历史功能待实现')" }
+        ],
+        archive: [
+          { text: '批量归档', icon: '📦', action: "alert('批量归档功能待实现')" },
+          { text: '归档历史', icon: '📝', action: "alert('归档历史功能待实现')" }
+        ],
+        search: [
+          { text: '高级检索', icon: '🔍', action: "alert('高级检索功能待实现')" },
+          { text: '检索历史', icon: '📋', action: "alert('检索历史功能待实现')" }
+        ]
+      };
+      
+      const config = buttonConfigs[tabName] || buttonConfigs.query;
+      actionBar.innerHTML = config.map(btn => `
+        <button class="btn-main" onclick="${btn.action}">
+          <span class="icon">${btn.icon}</span>${btn.text}
+        </button>
+      `).join('');
+    }
+    
+    // 渲染表格
+    function renderTable() {
+      let data = tabData[currentTab].filter(row => !currentTreeId || row.id === currentTreeId);
+      // 分页
+      let total = data.length;
+      let totalPages = Math.ceil(total / pageSize);
+      if (currentPage > totalPages) currentPage = 1;
+      let start = (currentPage - 1) * pageSize;
+      let end = start + pageSize;
+      let pageData = data.slice(start, end);
+      // 渲染
+      let tbody = document.getElementById('subjectTableBody');
+      if (pageData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#bbb;padding:48px 0;">暂无数据</td></tr>`;
+      } else {
+        tbody.innerHTML = pageData.map((row, idx) => `
+          <tr>
+            <td><input type="checkbox" class="rowCheck" data-idx="${idx}" ${row.selected ? 'checked' : ''}></td>
+            <td><span class="status-badge ${getStatusClass(row.status)}">${row.status}</span></td>
+            <td>${row.code}</td>
+            <td>${row.desc}</td>
+            <td>${row.category}</td>
+            <td>${row.type}</td>
+            <td>${row.typeGroup}</td>
+            <td>${row.version > 1 ? `<a href=\"#\" style=\"color:#2176c7;text-decoration:underline;cursor:pointer;\" onclick=\"showVersionModal(${row.id},event)\">${row.version}</a>` : row.version}</td>
+            <td>
+              <button class="table-link-edit" onclick="showDetailDrawer(${row.id})">查看详情</button>
+              ${getActionButtons(row, currentTab)}
+            </td>
+          </tr>
+        `).join('');
+      }
+      renderPagination(total, totalPages);
+    }
+    
+    // 获取状态样式类
+    function getStatusClass(status) {
+      switch(status) {
+        case '正常': return 'status-active';
+        case '待申请': return 'status-inactive';
+        case '待修改': return 'status-inactive';
+        case '已冻结': return 'status-inactive';
+        case '待审核': return 'status-inactive';
+        case '已归档': return 'status-inactive';
+        default: return 'status-active';
+      }
+    }
+    
+    // 获取操作按钮
+    function getActionButtons(row, tabName) {
+      const buttonConfigs = {
+        query: '',
+        apply: `<button class="table-link-edit" onclick="alert('申请操作 - ${row.code}')" style="margin-left:8px;">申请</button>`,
+        modify: `<button class="table-link-edit" onclick="alert('修改操作 - ${row.code}')" style="margin-left:8px;">修改</button>`,
+        freeze: `<button class="table-link-edit" onclick="alert('冻结操作 - ${row.code}')" style="margin-left:8px;">冻结</button>`,
+        unfreeze: `<button class="table-link-edit" onclick="alert('解冻操作 - ${row.code}')" style="margin-left:8px;">解冻</button>`,
+        audit: `<button class="table-link-edit" onclick="alert('审核操作 - ${row.code}')" style="margin-left:8px;">审核</button>`,
+        archive: `<button class="table-link-edit" onclick="alert('归档操作 - ${row.code}')" style="margin-left:8px;">归档</button>`,
+        search: `<button class="table-link-edit" onclick="alert('检索操作 - ${row.code}')" style="margin-left:8px;">检索</button>`
+      };
+      return buttonConfigs[tabName] || '';
+    }
+    // 分页
+    function renderPagination(total, totalPages) {
+      let pag = document.getElementById('pagination');
+      pag.innerHTML = `
+        <span>当前页</span>
+        <input type="number" min="1" max="${totalPages}" value="${currentPage}" onchange="gotoPage(this.value)">
+        <span>/ 共${totalPages}页</span>
+        <button onclick="gotoPage(1)">&lt;&lt;</button>
+        <button onclick="gotoPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>
+        <button onclick="gotoPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>
+        <button onclick="gotoPage(${totalPages})">&gt;&gt;</button>
+        <span>每页</span>
+        <select onchange="changePageSize(this.value)">
+          <option value="25" ${pageSize==25?'selected':''}>25</option>
+          <option value="50" ${pageSize==50?'selected':''}>50</option>
+        </select>
+        <span>行</span>
+        <span>当前记录 ${(currentPage-1)*pageSize+1}--${Math.min(currentPage*pageSize,total)} 条</span>
+      `;
+    }
+    function gotoPage(page) {
+      page = parseInt(page);
+      if (isNaN(page) || page < 1) page = 1;
+      let totalPages = Math.ceil(tabData[currentTab].length / pageSize);
+      if (page > totalPages) page = totalPages;
+      currentPage = page;
+      renderTable();
+    }
+    function changePageSize(size) {
+      pageSize = parseInt(size);
+      currentPage = 1;
+      renderTable();
+    }
+    // 查看详情抽屉
+    function showDetailDrawer(id) {
+      const row = tabData[currentTab].find(r => r.id === id);
+      if (!row) return;
+      document.getElementById('drawerContent').innerHTML = `
+        <div style="font-size:17px;font-weight:600;margin-bottom:12px;">${row.code} - ${row.desc}</div>
+        <div style="margin-bottom:8px;"><b>状态：</b>${row.status}</div>
+        <div style="margin-bottom:8px;"><b>科目类别：</b>${row.category}</div>
+        <div style="margin-bottom:8px;"><b>科目类型：</b>${row.type}</div>
+        <div style="margin-bottom:8px;"><b>科目类型组：</b>${row.typeGroup}</div>
+        <div style="margin-bottom:8px;"><b>数据版本：</b>${row.version}</div>
+        <div style="margin-bottom:8px;"><b>当前页签：</b>${getTabDisplayName(currentTab)}</div>
+      `;
+      document.getElementById('drawerMask').style.display = 'block';
+    }
+    
+    // 获取页签显示名称
+    function getTabDisplayName(tabName) {
+      const tabNames = {
+        query: '查询',
+        apply: '申请',
+        modify: '修改',
+        freeze: '冻结',
+        unfreeze: '解冻',
+        audit: '审核',
+        archive: '归档',
+        search: '检索'
+      };
+      return tabNames[tabName] || tabName;
+    }
+    function closeDrawer() {
+      document.getElementById('drawerMask').style.display = 'none';
+    }
+    // 版本号点击，弹出版本列表弹窗
+    function showVersionModal(id, e) {
+      e.stopPropagation();
+      // 模拟版本数据
+      const row = tabData[currentTab].find(r => r.id === id);
+      // 假设每个科目有3个版本
+      const versions = [
+        { version: 1, desc: row.desc + '（初始）', user: '张三', time: '2023-01-01 10:00', status: '历史版本' },
+        { version: 2, desc: row.desc + '（调整）', user: '李四', time: '2023-06-01 14:20', status: '历史版本' },
+        { version: row.version, desc: row.desc + '（当前）', user: '王五', time: '2024-01-10 09:30', status: '当前版本' }
+      ];
+      const tbody = versions.map(v => `
+        <tr>
+          <td><input type="checkbox" class="versionCheck" value="${v.version}"></td>
+          <td>${v.version}</td>
+          <td>${v.desc}</td>
+          <td>${v.user}</td>
+          <td>${v.time}</td>
+          <td>${v.status === '当前版本' ? `<span style='color:#13c2c2;font-weight:600;'>${v.status}</span>` : v.status}</td>
+        </tr>
+      `).join('');
+      document.getElementById('versionTableBody').innerHTML = tbody;
+      document.getElementById('versionModalMask').style.display = 'flex';
+      // 全选
+      document.getElementById('versionSelectAll').onclick = function() {
+        let checked = this.checked;
+        document.querySelectorAll('.versionCheck').forEach(cb => cb.checked = checked);
+      };
+      // 版本比较
+      document.getElementById('versionCompareBtn').onclick = function() {
+        const selected = Array.from(document.querySelectorAll('.versionCheck:checked')).map(cb => cb.value);
+        if (selected.length !== 2) {
+          alert('请选择两个版本进行比较');
+          return;
+        }
+        alert('正在比较版本 ' + selected[0] + ' 和 ' + selected[1]);
+      };
+    }
+    function closeVersionModal() {
+      document.getElementById('versionModalMask').style.display = 'none';
+    }
+    // 全选
+    document.getElementById('checkAll').onclick = function() {
+      let checked = this.checked;
+      document.querySelectorAll('.rowCheck').forEach(cb => cb.checked = checked);
+    };
+    // 初始化
+    renderTree();
+    renderTable();
+    updateActionBar(currentTab);
+    
+    // 返回首页
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+    </div>
+  </div>
+</body>
+</html> 

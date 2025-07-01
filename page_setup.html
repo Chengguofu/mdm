@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>页面布局配置</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; font-size: 14px; }
+    .setup-container { max-width: 1400px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.10); padding: 32px 36px 28px 36px; display: flex; gap: 32px; }
+    .setup-left { flex: 1.2; min-width: 420px; border-right: 1px solid #e0e6ed; padding-right: 32px; }
+    .setup-right { flex: 2; min-width: 500px; padding-left: 32px; }
+    .setup-title { color: #2176c7; font-size: 18px; font-weight: 600; margin-bottom: 18px; }
+    .tab-bar { display: flex; gap: 16px; margin-bottom: 18px; }
+    .tab-bar button { background: #f4f8fb; border: none; border-radius: 4px 4px 0 0; padding: 8px 24px; font-size: 15px; color: #2176c7; cursor: pointer; }
+    .tab-bar button.active { background: #2176c7; color: #fff; }
+    .config-section { margin-bottom: 24px; }
+    .config-label { font-weight: 500; color: #185a99; margin-bottom: 6px; display: block; }
+    .config-row { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+    .config-row label { min-width: 120px; color: #444; }
+    .config-row input[type="checkbox"] { margin-right: 6px; }
+    .config-row select, .config-row input[type="text"] { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 13px; }
+    .draggable-list { border: 1px solid #c0d3eb; border-radius: 6px; background: #f8fafc; padding: 12px; min-height: 60px; margin-bottom: 10px; }
+    .draggable-item { background: #e3eaf3; border-radius: 4px; padding: 6px 12px; margin-bottom: 6px; cursor: grab; display: flex; align-items: center; justify-content: space-between; }
+    .draggable-item:last-child { margin-bottom: 0; }
+    .drag-handle { margin-right: 8px; color: #2176c7; cursor: grab; }
+    .preview-title { font-size: 16px; color: #2176c7; font-weight: 600; margin-bottom: 12px; }
+    .preview-area { background: #f0f6fd; border: 1px solid #c0d3eb; border-radius: 6px; padding: 18px; min-height: 320px; }
+    .btn-bar { display: flex; gap: 16px; margin-top: 24px; }
+    .btn-main { background: #4db6ac; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 14px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; }
+    .btn-main:hover { background: #399488; }
+    .btn-line { background: #fff; color: #444; border: 1px solid #d0d7de; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 14px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
+    .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
+    .field-config-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .field-config-row label { min-width: 60px; }
+    .field-config-row input, .field-config-row select { width: 90px; }
+    .tab-preview-bar { display:flex; gap:0; border-bottom:2px solid #e0e6ed; margin-bottom:18px; }
+    .tab-preview-btn { background:none; border:none; outline:none; font-size:15px; color:#2176c7; padding:8px 32px; cursor:pointer; border-radius:8px 8px 0 0; border-bottom:2px solid transparent; transition:background 0.18s, color 0.18s, border-bottom 0.18s; margin-right:2px; }
+    .tab-preview-btn.active { background:#f4f8fb; color:#185a99; border-bottom:2px solid #2176c7; font-weight:600; }
+    .modern-select {
+      border: 1.2px solid #c0d3eb;
+      border-radius: 6px;
+      padding: 6px 18px 6px 10px;
+      font-size: 14px;
+      background: #f9fbfd;
+      transition: border 0.18s, box-shadow 0.18s;
+      outline: none;
+    }
+    .modern-select:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px #e3eaf3;
+    }
+    .btn-modern {
+      background: none;
+      color: #2176c7;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+    .btn-modern:hover {
+      background: #e3eaf3;
+      color: #185a99;
+    }
+    .sort-row-flex { display: flex; align-items: center; gap: 8px; justify-content: flex-start; position: relative; }
+    .sort-row-delete { position: absolute; right: 12px; }
+    .field-group-title {
+      font-weight: 600;
+      color: #185a99;
+      margin: 8px 0 4px 0;
+      font-size: 13px;
+    }
+    .model-field-item {
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      background: #fff;
+      border: 1px solid #c0d3eb;
+      border-radius: 4px;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .field-type {
+      font-size: 12px;
+      color: #888;
+      background: #f4f8fb;
+      border-radius: 3px;
+      padding: 1px 6px;
+    }
+    .canvas-field-remove:hover { color: #c62828; }
+    .btn-preview-modern {
+      background: #fff;
+      color: #222;
+      border: 1.5px solid #e0e6ed;
+      border-radius: 10px;
+      padding: 0 12px;
+      height: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.18s, color 0.18s, border 0.18s;
+    }
+    .btn-preview-modern:hover {
+      background: #f4f8fb;
+      color: #2176c7;
+      border-color: #b0c4de;
+    }
+    .btn-preview-text { font-size: 14px; }
+    .btn-save-modern {
+      background: #18191a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 32px;
+      height: 48px;
+      font-size: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.18s, color 0.18s;
+    }
+    .btn-save-modern:hover {
+      background: #444;
+    }
+    .icon-eye {
+      display:inline-block;width:22px;height:22px;background:url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23000" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3.5"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/></svg>') center/contain no-repeat;vertical-align:middle;}
+    .icon-save {
+      display:inline-block;width:22px;height:22px;background:url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23fff" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v6h10V3"/></svg>') center/contain no-repeat;vertical-align:middle;}
+    .input-modern {
+      border: 1.5px solid #c0d3eb;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 15px;
+      background: #f9fbfd;
+      transition: border 0.18s, box-shadow 0.18s;
+      outline: none;
+    }
+    .input-modern:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px #e3eaf3;
+    }
+    .checkbox-modern {
+      width:18px;height:18px;accent-color:#2176c7;vertical-align:middle;
+    }
+    #previewModal, #previewDrawer { z-index: 9999 !important; }
+  </style>
+</head>
+<body>
+  <div class="setup-container" style="transform:scale(0.9);transform-origin:top center;">
+    <!-- 顶部操作按钮区 -->
+    <div style="position:absolute;top:36px;right:136px;z-index:10;display:flex;gap:18px;">
+      <button class="btn-preview-modern" onclick="previewConfig()"><span class="icon-eye"></span> <span class="btn-preview-text">预览</span></button>
+    </div>
+    <!-- 配置区 -->
+    <div class="setup-left">
+      <div class="setup-title">页面布局配置</div>
+      <div class="tab-bar">
+        <button id="tabList" class="active" onclick="switchTab('list')">列表页布局</button>
+        <button id="tabDetail" onclick="switchTab('detail')">详情页布局</button>
+      </div>
+      <div id="listConfig" class="config-section">
+        <div class="config-row"><label><input type="checkbox" id="autoFit">宽度自适应</label></div>
+        <div style="margin-top:16px;">
+          <div class="tab-preview-bar" style="margin-bottom:0;">
+            <button id="tabListFields" class="tab-preview-btn active" onclick="switchListTab('fields')">列表配置</button>
+            <button id="tabSortConfig" class="tab-preview-btn" onclick="switchListTab('sort')">排序配置</button>
+          </div>
+          <div id="listFieldsTab" style="display:block;">
+            <div id="listFields" class="draggable-list"></div>
+          </div>
+          <div id="sortConfigTab" style="display:none;">
+            <div style="margin-bottom:10px;">
+              <button type="button" class="btn-modern" onclick="openSortFieldModal()">添加排序字段</button>
+            </div>
+            <div id="sortFieldsConfig" style="display:flex;flex-direction:column;gap:4px;"></div>
+          </div>
+        </div>
+        <div class="config-label" style="margin-top:16px;">详情页展示选项</div>
+        <div class="config-row"><label><input type="radio" name="listDetailMode" value="drawer" checked>抽屉联动</label></div>
+        <div class="config-row"><label><input type="radio" name="listDetailMode" value="bottom">上下布局</label></div>
+      </div>
+      <div id="detailConfig" class="config-section" style="display:none;">
+        <div style="display:flex;gap:18px;align-items:flex-start;min-height:420px;">
+          <!-- 第一栏：字段池 -->
+          <div style="flex:1;min-width:160px;max-width:220px;background:#f8fafc;border:1px solid #e0e6ed;border-radius:8px;padding:12px 8px;">
+            <div id="modelFieldPool"></div>
+          </div>
+          <!-- 第二栏：布局配置+画布 -->
+          <div style="flex:2;min-width:320px;max-width:600px;background:#fff;border:1px solid #e0e6ed;border-radius:8px;padding:12px 18px;">
+            <!-- 新增公共布局配置区域 -->
+            <div id="detailLayoutConfig" style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #e0e6ed;">
+              <span style="font-weight:500;color:#185a99;margin-right:18px;">主子表布局：</span>
+              <label style="margin-right:18px;"><input type="radio" name="detailLayoutType" value="tab" checked onchange="setDetailLayoutType('tab')"> 分页签平铺</label>
+              <label><input type="radio" name="detailLayoutType" value="mainSubTab" onchange="setDetailLayoutType('mainSubTab')"> 上下页签</label>
+            </div>
+            <div id="detailCanvasTabs"></div>
+          </div>
+          <!-- 第三栏：属性配置 -->
+          <div style="flex:1;min-width:180px;max-width:260px;background:#f8fafc;border:1px solid #e0e6ed;border-radius:8px;padding:12px 14px;">
+            <div style="font-weight:600;color:#2176c7;margin-bottom:10px;">属性配置</div>
+            <div id="canvasFieldProps"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 预览区 -->
+    <div id="previewModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;min-width:864px;max-width:1296px;max-height:1296px;overflow:auto;border-radius:8px;box-shadow:0 4px 24px rgba(33,118,199,0.18);padding:28px 32px 24px 32px;position:relative;">
+        <div style="font-size:18px;color:#2176c7;font-weight:600;margin-bottom:16px;">页面预览
+          <span onclick="closePreview()" style="position:absolute;right:24px;top:18px;font-size:22px;cursor:pointer;color:#888;">×</span>
+        </div>
+        <div style="position:relative;">
+          <div id="previewArea" class="preview-area" style="background:#f0f6fd;border:1px solid #c0d3eb;border-radius:6px;padding:18px;min-height:320px;"></div>
+          <div id="previewDrawer" style="display:none;position:absolute;top:0;right:0;width:605px;height:100%;background:#fff;box-shadow:-2px 0 16px rgba(33,118,199,0.12);z-index:1001;transition:right 0.3s;overflow:auto;">
+            <div style="padding:24px 28px 18px 28px;position:relative;">
+              <span style="font-size:18px;color:#2176c7;font-weight:600;">详情页</span>
+              <span onclick="closePreviewDrawer()" style="position:absolute;right:18px;top:18px;font-size:22px;cursor:pointer;color:#888;">×</span>
+              <div id="previewDrawerContent" style="margin-top:18px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sortFieldModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;min-width:320px;max-width:90vw;max-height:80vh;overflow:auto;border-radius:8px;box-shadow:0 4px 24px rgba(33,118,199,0.18);padding:28px 32px 24px 32px;position:relative;">
+      <div style="font-size:16px;color:#2176c7;font-weight:600;margin-bottom:16px;">选择排序字段
+        <span onclick="closeSortFieldModal()" style="position:absolute;right:24px;top:18px;font-size:22px;cursor:pointer;color:#888;">×</span>
+      </div>
+      <div id="sortFieldList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
+      <button type="button" class="btn-main" onclick="addSelectedSortFields()">添加</button>
+    </div>
+  </div>
+  <script>
+    // 示例字段
+    const defaultListFields = [
+      { key: 'code', label: '编码', width: 120 },
+      { key: 'name', label: '名称', width: 160 },
+      { key: 'type', label: '类型', width: 100 },
+      { key: 'status', label: '状态', width: 80 }
+    ];
+    const modelFields = [
+      { key: 'code', label: '代码' },
+      { key: 'name', label: '名称' },
+      { key: 'country', label: '国家' },
+      { key: 'orgName', label: '单位名称' },
+      { key: 'financeUnit', label: '财务核算单位' },
+      { key: 'hrParent', label: '人事上级单位' }
+    ];
+    // 详情页布局专用数据
+    const detailBasicFields = [
+      { key: 'code', label: '代码', type: '文本' },
+      { key: 'name', label: '名称', type: '文本' },
+      { key: 'country', label: '国家', type: '文本' },
+      { key: 'orgName', label: '单位名称', type: '文本' }
+    ];
+    const detailFinanceFields = [
+      { key: 'financeUnit', label: '财务核算单位', type: '单位' }
+    ];
+    const detailHRFields = [
+      { key: 'hrParent', label: '人事上级单位', type: '单位' }
+    ];
+    const detailViews = [
+      { key: 'base', label: '基本视图' },
+      { key: 'finance', label: '财务视图' },
+      { key: 'hr', label: '人事视图' }
+    ];
+    let listFields = JSON.parse(JSON.stringify(defaultListFields));
+    let detailFields = JSON.parse(JSON.stringify(modelFields));
+    let fieldProps = {};
+    let sortFields = [{field: 'code', order: 'asc'}];
+    let canvasConfig = {
+      base: { layout: 'vertical', cols: 2, fields: [] },
+      finance: { layout: 'vertical', cols: 2, fields: [] },
+      hr: { layout: 'vertical', cols: 2, fields: [] }
+    };
+    let selectedView = 'base';
+    let selectedCanvasField = null;
+    let detailCanvasConfig = {
+      base: { layout: 'vertical', cols: 2, fields: [] },
+      finance: { layout: 'vertical', cols: 2, fields: [] },
+      hr: { layout: 'vertical', cols: 2, fields: [] }
+    };
+    let detailSelectedView = 'base';
+    let detailSelectedCanvasField = null;
+    // 新增全局变量保存布局方式
+    let detailLayoutType = 'tab';
+    // 拖拽排序
+    function renderDraggableList(list, containerId, type) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      const autoFit = document.getElementById('autoFit') && document.getElementById('autoFit').checked;
+      list.forEach((field, idx) => {
+        const item = document.createElement('div');
+        item.className = 'draggable-item';
+        item.draggable = true;
+        let widthVal = autoFit ? 0 : field.width;
+        item.innerHTML = `<span class='drag-handle'>☰</span>${field.label} <input type='number' min='40' max='400' value='${widthVal}' style='width:50px;margin-left:8px;' onchange='updateFieldWidth("${type}",${idx},this.value)' ${autoFit?'disabled':''}>`;
+        item.ondragstart = e => {
+          e.dataTransfer.setData('text/plain', idx);
+        };
+        item.ondragover = e => e.preventDefault();
+        item.ondrop = e => {
+          const from = +e.dataTransfer.getData('text/plain');
+          const to = idx;
+          if (from !== to) {
+            const arr = type === 'list' ? listFields : detailFields;
+            const moved = arr.splice(from, 1)[0];
+            arr.splice(to, 0, moved);
+            renderDraggableList(arr, containerId, type);
+          }
+        };
+        container.appendChild(item);
+      });
+    }
+    function updateFieldWidth(type, idx, value) {
+      if (type === 'list') listFields[idx].width = +value;
+      else detailFields[idx].width = +value;
+    }
+    // 字段属性配置
+    function renderFieldProps() {
+      const container = document.getElementById('fieldProps');
+      container.innerHTML = '';
+      detailFields.forEach((field, idx) => {
+        if (!fieldProps[field.key]) fieldProps[field.key] = { layout: 'vertical', format: '', placeholder: '', showLabel: true };
+        const props = fieldProps[field.key];
+        const row = document.createElement('div');
+        row.className = 'field-config-row';
+        row.innerHTML = `
+          <label>${field.label}</label>
+          <select onchange="setFieldProp('${field.key}','layout',this.value)"><option value="vertical" ${props.layout==='vertical'?'selected':''}>上下</option><option value="horizontal" ${props.layout==='horizontal'?'selected':''}>左右</option></select>
+          <input type="text" placeholder="提示文字" value="${props.placeholder}" onchange="setFieldProp('${field.key}','placeholder',this.value)">
+          <input type="text" placeholder="显示格式" value="${props.format}" onchange="setFieldProp('${field.key}','format',this.value)">
+          <label><input type="checkbox" ${props.showLabel?'checked':''} onchange="setFieldProp('${field.key}','showLabel',this.checked)">显示标题</label>
+        `;
+        container.appendChild(row);
+      });
+    }
+    function setFieldProp(key, prop, value) {
+      if (!fieldProps[key]) fieldProps[key] = { layout: 'vertical', format: '', placeholder: '', showLabel: true };
+      if (prop === 'showLabel') fieldProps[key][prop] = value;
+      else fieldProps[key][prop] = value;
+    }
+    // Tab切换
+    function switchTab(tab) {
+      document.getElementById('tabList').classList.remove('active');
+      document.getElementById('tabDetail').classList.remove('active');
+      document.getElementById('listConfig').style.display = tab==='list'?'block':'none';
+      document.getElementById('detailConfig').style.display = tab==='detail'?'block':'none';
+      if(tab==='list') {
+        document.getElementById('tabList').classList.add('active');
+        // ...原有列表页渲染...
+      } else {
+        document.getElementById('tabDetail').classList.add('active');
+        renderDetailModelFieldPool();
+        renderDetailCanvasTabs();
+        renderDetailCanvasFieldProps();
+      }
+    }
+    // 保存
+    function saveConfig() {
+      alert('配置已保存！\n（实际保存逻辑请对接后端）');
+    }
+    // 预览
+    function previewConfig() {
+      const modal = document.getElementById('previewModal');
+      modal.style.display = 'flex';
+      modal.style.zIndex = 9999;
+      const tab = document.getElementById('tabList').classList.contains('active') ? 'list' : 'detail';
+      let html = '';
+      if(tab==='list') {
+        // 判断详情页展示选项
+        const detailMode = document.querySelector('input[name="listDetailMode"]:checked').value;
+        if(detailMode==='drawer') {
+          html += `<table style='width:100%;border-collapse:collapse;'><tr>`;
+          listFields.forEach(f=>{
+            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${f.width}px;'>${f.label}</th>`;
+          });
+          html += `</tr>`;
+          for(let i=0;i<3;i++) {
+            html += `<tr>`;
+            listFields.forEach(f=>{
+              if(f.key==='code') {
+                html += `<td class='preview-code-cell' style='border:1px solid #c0d3eb;padding:6px;color:#2176c7;cursor:pointer;text-decoration:underline;'>示例${f.label}</td>`;
+              } else {
+                html += `<td style='border:1px solid #c0d3eb;padding:6px;'>示例${f.label}</td>`;
+              }
+            });
+            html += `</tr>`;
+          }
+          html += `</table>`;
+          html += `<div style='margin-top:18px;color:#888;'>（点击编码字段弹出抽屉展示详情页）</div>`;
+        } else {
+          // 上下布局
+          html += `<div style='display:flex;flex-direction:column;gap:18px;'>`;
+          html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+          html += `<table style='width:100%;border-collapse:collapse;'><tr>`;
+          listFields.forEach(f=>{
+            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${f.width}px;'>${f.label}</th>`;
+          });
+          html += `</tr>`;
+          for(let i=0;i<3;i++) {
+            html += `<tr>`;
+            listFields.forEach(f=>{
+              html += `<td style='border:1px solid #c0d3eb;padding:6px;'>示例${f.label}</td>`;
+            });
+            html += `</tr>`;
+          }
+          html += `</table>`;
+          html += `</div>`;
+          // 下半详情页区域：子表多页签
+          html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+          html += `<div class='tab-preview-bar' id='previewSubTabs'>`;
+          html += `<button class='tab-preview-btn active' data-subtab='sub1'>子表1</button>`;
+          html += `<button class='tab-preview-btn' data-subtab='sub2'>子表2</button>`;
+          html += `</div>`;
+          html += `<div id='previewSubTabContent'></div>`;
+          html += `</div>`;
+          html += `</div>`;
+        }
+      } else {
+        // 详情页预览
+        if(detailLayoutType==='tab') {
+          // 分页签平铺：多页签，包含基本视图、财务视图、人事视图、子表一、子表二
+          html += `<div class='tab-preview-bar' id='previewDetailTabs'>`;
+          html += `<button class='tab-preview-btn active' data-tab='base'>基本视图</button>`;
+          html += `<button class='tab-preview-btn' data-tab='finance'>财务视图</button>`;
+          html += `<button class='tab-preview-btn' data-tab='hr'>人事视图</button>`;
+          html += `<button class='tab-preview-btn' data-tab='sub1'>子表一</button>`;
+          html += `<button class='tab-preview-btn' data-tab='sub2'>子表二</button>`;
+          html += `</div>`;
+          html += `<div id='previewDetailTabContent'></div>`;
+        } else {
+          // 上下页签：上半多页签（基本、财务、人事），下半多页签（子表一、子表二）
+          html += `<div style='display:flex;flex-direction:column;gap:18px;'>`;
+          html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+          html += `<div class='tab-preview-bar' id='previewDetailTabsUp'>`;
+          html += `<button class='tab-preview-btn active' data-tab='base'>基本视图</button>`;
+          html += `<button class='tab-preview-btn' data-tab='finance'>财务视图</button>`;
+          html += `<button class='tab-preview-btn' data-tab='hr'>人事视图</button>`;
+          html += `</div>`;
+          html += `<div id='previewDetailTabContentUp'></div>`;
+          html += `</div>`;
+          html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+          html += `<div class='tab-preview-bar' id='previewDetailTabsDown'>`;
+          html += `<button class='tab-preview-btn active' data-tab='sub1'>子表一</button>`;
+          html += `<button class='tab-preview-btn' data-tab='sub2'>子表二</button>`;
+          html += `</div>`;
+          html += `<div id='previewDetailTabContentDown'></div>`;
+          html += `</div>`;
+          html += `</div>`;
+        }
+      }
+      document.getElementById('previewArea').innerHTML = html;
+      // 修复：为所有编码字段绑定抽屉弹出事件，使用setTimeout确保DOM已渲染
+      if(tab==='list') {
+        setTimeout(()=>{
+          document.querySelectorAll('.preview-code-cell').forEach(cell => {
+            cell.onclick = openPreviewDrawer;
+          });
+        }, 0);
+      }
+      // 详情页tab切换事件和内容渲染
+      if(tab==='detail') {
+        if(detailLayoutType==='tab') {
+          const tabs = document.querySelectorAll('#previewDetailTabs .tab-preview-btn');
+          const content = document.getElementById('previewDetailTabContent');
+          function renderTab(tab) {
+            if(tab==='base') content.innerHTML = renderPreviewFields(detailCanvasConfig.base);
+            else if(tab==='finance') content.innerHTML = renderPreviewFields(detailCanvasConfig.finance);
+            else if(tab==='hr') content.innerHTML = renderPreviewFields(detailCanvasConfig.hr);
+            else content.innerHTML = `<div style='padding:12px 0;'>${tab==='sub1'?'子表一':'子表二'}内容示例（可自定义字段/表格）</div>`;
+          }
+          tabs.forEach(btn => {
+            btn.onclick = function() {
+              tabs.forEach(b=>b.classList.remove('active'));
+              this.classList.add('active');
+              renderTab(this.getAttribute('data-tab'));
+            };
+          });
+          renderTab('base');
+        } else {
+          // 上下页签
+          const tabsUp = document.querySelectorAll('#previewDetailTabsUp .tab-preview-btn');
+          const contentUp = document.getElementById('previewDetailTabContentUp');
+          function renderTabUp(tab) {
+            if(tab==='base') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.base);
+            else if(tab==='finance') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.finance);
+            else if(tab==='hr') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.hr);
+          }
+          tabsUp.forEach(btn => {
+            btn.onclick = function() {
+              tabsUp.forEach(b=>b.classList.remove('active'));
+              this.classList.add('active');
+              renderTabUp(this.getAttribute('data-tab'));
+            };
+          });
+          renderTabUp('base');
+          const tabsDown = document.querySelectorAll('#previewDetailTabsDown .tab-preview-btn');
+          const contentDown = document.getElementById('previewDetailTabContentDown');
+          function renderTabDown(tab) {
+            contentDown.innerHTML = `<div style='padding:12px 0;'>${tab==='sub1'?'子表一':'子表二'}内容示例（可自定义字段/表格）</div>`;
+          }
+          tabsDown.forEach(btn => {
+            btn.onclick = function() {
+              tabsDown.forEach(b=>b.classList.remove('active'));
+              this.classList.add('active');
+              renderTabDown(this.getAttribute('data-tab'));
+            };
+          });
+          renderTabDown('sub1');
+        }
+      }
+    }
+    function closePreview() {
+      document.getElementById('previewModal').style.display = 'none';
+    }
+    // 初始化
+    renderDraggableList(listFields, 'listFields', 'list');
+    renderDraggableList(detailFields, 'detailFields', 'detail');
+    renderFieldProps();
+    // 初始化排序字段配置
+    renderSortFieldsConfig();
+    // 新增tab切换逻辑
+    function switchListTab(tab) {
+      document.getElementById('tabListFields').classList.remove('active');
+      document.getElementById('tabSortConfig').classList.remove('active');
+      document.getElementById('listFieldsTab').style.display = tab==='fields'?'block':'none';
+      document.getElementById('sortConfigTab').style.display = tab==='sort'?'block':'none';
+      if(tab==='fields') document.getElementById('tabListFields').classList.add('active');
+      else document.getElementById('tabSortConfig').classList.add('active');
+    }
+    // 排序配置区美化，参考Excel排序功能
+    function renderSortFieldsConfig() {
+      const container = document.getElementById('sortFieldsConfig');
+      container.innerHTML = '';
+      sortFields.forEach((sf, idx) => {
+        const row = document.createElement('div');
+        row.className = 'sort-row-flex';
+        row.style.background = '#f8fafc';
+        row.style.border = '1px solid #c0d3eb';
+        row.style.borderRadius = '4px';
+        row.style.padding = '6px 10px';
+        row.style.marginBottom = '6px';
+        row.innerHTML = `
+          <span style='color:#2176c7;font-size:15px;cursor:move;'>☰</span>
+          <select class='modern-select' onchange="updateSortField(${idx},'field',this.value)">
+            ${listFields.map(f=>`<option value='${f.key}' ${sf.field===f.key?'selected':''}>${f.label}</option>`).join('')}
+          </select>
+          <select class='modern-select' onchange="updateSortField(${idx},'order',this.value)">
+            <option value='asc' ${sf.order==='asc'?'selected':''}>升序</option>
+            <option value='desc' ${sf.order==='desc'?'selected':''}>降序</option>
+          </select>
+          <button type='button' class='btn-modern sort-row-delete' onclick='removeSortField(${idx})'>删除</button>
+        `;
+        // 拖拽排序
+        row.draggable = true;
+        row.ondragstart = e => { e.dataTransfer.setData('text/plain', idx); };
+        row.ondragover = e => e.preventDefault();
+        row.ondrop = e => {
+          const from = +e.dataTransfer.getData('text/plain');
+          const to = idx;
+          if (from !== to) {
+            const moved = sortFields.splice(from, 1)[0];
+            sortFields.splice(to, 0, moved);
+            renderSortFieldsConfig();
+          }
+        };
+        container.appendChild(row);
+      });
+    }
+    function removeSortField(idx) {
+      sortFields.splice(idx, 1);
+      renderSortFieldsConfig();
+    }
+    function updateSortField(idx, prop, value) {
+      if (prop === 'field') sortFields[idx].field = value;
+      else sortFields[idx].order = value;
+      renderSortFieldsConfig();
+    }
+    // 多选字段弹窗逻辑
+    function openSortFieldModal() {
+      const modal = document.getElementById('sortFieldModal');
+      const list = document.getElementById('sortFieldList');
+      const used = sortFields.map(s=>s.field);
+      list.innerHTML = listFields.filter(f=>!used.includes(f.key)).map(f=>`<label style='display:flex;align-items:center;gap:8px;'><input type='checkbox' value='${f.key}'>${f.label}</label>`).join('');
+      modal.style.display = 'flex';
+    }
+    function closeSortFieldModal() {
+      document.getElementById('sortFieldModal').style.display = 'none';
+    }
+    function addSelectedSortFields() {
+      const checks = document.querySelectorAll('#sortFieldList input[type=checkbox]:checked');
+      checks.forEach(c=>{
+        if(!sortFields.some(s=>s.field===c.value)) sortFields.push({field: c.value, order:'asc'});
+      });
+      closeSortFieldModal();
+      renderSortFieldsConfig();
+    }
+    // 监听autoFit变化，实时刷新主表列配置并统一宽度为0
+    const autoFitBox = document.getElementById('autoFit');
+    autoFitBox && autoFitBox.addEventListener('change', function(){
+      if(this.checked) listFields.forEach(f=>f.width=0);
+      renderDraggableList(listFields, 'listFields', 'list');
+    });
+    // 新增抽屉弹出/关闭逻辑
+    function openPreviewDrawer() {
+      const drawer = document.getElementById('previewDrawer');
+      const content = document.getElementById('previewDrawerContent');
+      if(!drawer || !content) return;
+      drawer.style.display = 'block';
+      // 内容与详情页布局上下页签一致
+      let html = `<div style='display:flex;flex-direction:column;gap:18px;'>`;
+      html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+      html += `<div class='tab-preview-bar' id='drawerDetailTabsUp'>`;
+      html += `<button class='tab-preview-btn active' data-tab='base'>基本视图</button>`;
+      html += `<button class='tab-preview-btn' data-tab='finance'>财务视图</button>`;
+      html += `<button class='tab-preview-btn' data-tab='hr'>人事视图</button>`;
+      html += `</div>`;
+      html += `<div id='drawerDetailTabContentUp'></div>`;
+      html += `</div>`;
+      html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
+      html += `<div class='tab-preview-bar' id='drawerDetailTabsDown'>`;
+      html += `<button class='tab-preview-btn active' data-tab='sub1'>子表一</button>`;
+      html += `<button class='tab-preview-btn' data-tab='sub2'>子表二</button>`;
+      html += `</div>`;
+      html += `<div id='drawerDetailTabContentDown'></div>`;
+      html += `</div>`;
+      html += `</div>`;
+      content.innerHTML = html;
+      // 绑定tab切换事件和内容渲染
+      const tabsUp = document.querySelectorAll('#drawerDetailTabsUp .tab-preview-btn');
+      const contentUp = document.getElementById('drawerDetailTabContentUp');
+      function renderTabUp(tab) {
+        if(tab==='base') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.base);
+        else if(tab==='finance') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.finance);
+        else if(tab==='hr') contentUp.innerHTML = renderPreviewFields(detailCanvasConfig.hr);
+      }
+      tabsUp.forEach(btn => {
+        btn.onclick = function() {
+          tabsUp.forEach(b=>b.classList.remove('active'));
+          this.classList.add('active');
+          renderTabUp(this.getAttribute('data-tab'));
+        };
+      });
+      renderTabUp('base');
+      const tabsDown = document.querySelectorAll('#drawerDetailTabsDown .tab-preview-btn');
+      const contentDown = document.getElementById('drawerDetailTabContentDown');
+      function renderTabDown(tab) {
+        contentDown.innerHTML = `<div style='padding:12px 0;'>${tab==='sub1'?'子表一':'子表二'}内容示例（可自定义字段/表格）</div>`;
+      }
+      tabsDown.forEach(btn => {
+        btn.onclick = function() {
+          tabsDown.forEach(b=>b.classList.remove('active'));
+          this.classList.add('active');
+          renderTabDown(this.getAttribute('data-tab'));
+        };
+      });
+      renderTabDown('sub1');
+    }
+    function closePreviewDrawer() {
+      document.getElementById('previewDrawer').style.display = 'none';
+    }
+    // 渲染字段池
+    function renderDetailModelFieldPool() {
+      const pool = document.getElementById('modelFieldPool');
+      let html = '';
+      // 保留所有字段，但不显示分组标题
+      html += detailBasicFields.map(f => `<div class='model-field-item' draggable='true' data-key='${f.key}' style='padding:6px 10px;margin-bottom:6px;background:#fff;border:1px solid #c0d3eb;border-radius:4px;cursor:grab;display:flex;align-items:center;gap:8px;'>${f.label}<span class='field-type'>${f.type}</span></div>`).join('');
+      html += detailFinanceFields.map(f => `<div class='model-field-item' draggable='true' data-key='${f.key}' style='padding:6px 10px;margin-bottom:6px;background:#fff;border:1px solid #c0d3eb;border-radius:4px;cursor:grab;display:flex;align-items:center;gap:8px;'>${f.label}<span class='field-type'>${f.type}</span></div>`).join('');
+      html += detailHRFields.map(f => `<div class='model-field-item' draggable='true' data-key='${f.key}' style='padding:6px 10px;margin-bottom:6px;background:#fff;border:1px solid #c0d3eb;border-radius:4px;cursor:grab;display:flex;align-items:center;gap:8px;'>${f.label}<span class='field-type'>${f.type}</span></div>`).join('');
+      pool.innerHTML = html;
+      enableFieldDragDrop();
+    }
+    // 第二栏增加页签，切换页签时渲染对应配置和画布
+    function renderDetailCanvasTabs() {
+      const tabBar = document.createElement('div');
+      tabBar.className = 'tab-preview-bar';
+      detailViews.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-preview-btn' + (detailSelectedView===v.key?' active':'');
+        btn.textContent = v.label;
+        btn.onclick = () => { detailSelectedView = v.key; detailSelectedCanvasField = null; renderDetailCanvasTabs(); };
+        tabBar.appendChild(btn);
+      });
+      const canvasWrap = document.createElement('div');
+      canvasWrap.style.marginTop = '8px';
+      // 配置区
+      const conf = detailCanvasConfig[detailSelectedView];
+      canvasWrap.innerHTML = `
+        <div style='margin-bottom:12px;'>
+          <label style='margin-right:16px;'>字段布局方式
+            <select id='canvasFieldLayout' class='modern-select' style='width:90px;'>
+              <option value='vertical' ${conf.layout==='vertical'?'selected':''}>上下</option>
+              <option value='horizontal' ${conf.layout==='horizontal'?'selected':''}>左右</option>
+            </select>
+          </label>
+          <label>每行显示栏数
+            <select id='canvasCols' class='modern-select' style='width:80px;'>
+              <option value='1' ${conf.cols===1?'selected':''}>1栏</option>
+              <option value='2' ${conf.cols===2?'selected':''}>2栏</option>
+              <option value='3' ${conf.cols===3?'selected':''}>3栏</option>
+              <option value='4' ${conf.cols===4?'selected':''}>4栏</option>
+            </select>
+          </label>
+        </div>
+        <div id='canvasArea' style='min-height:260px;background:#f4f8fb;border:1.5px dashed #c0d3eb;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:12px;'></div>
+      `;
+      const container = document.getElementById('detailCanvasTabs');
+      container.innerHTML = '';
+      container.appendChild(tabBar);
+      container.appendChild(canvasWrap);
+      // 事件绑定
+      document.getElementById('canvasFieldLayout').onchange = e => { conf.layout = e.target.value; renderDetailCanvasTabs(); };
+      document.getElementById('canvasCols').onchange = e => { conf.cols = +e.target.value; renderDetailCanvasTabs(); };
+      renderDetailCanvasArea();
+    }
+    // 渲染画布
+    function renderDetailCanvasArea() {
+      const conf = detailCanvasConfig[detailSelectedView];
+      const area = document.getElementById('canvasArea');
+      let html = '';
+      const totalSlots = Math.max(conf.fields.length, conf.cols); // 至少一行
+      for(let i=0;i<totalSlots;i+=conf.cols) {
+        html += `<div class='canvas-row' style='display:flex;gap:12px;margin-bottom:8px;'>`;
+        for(let j=0;j<conf.cols;j++) {
+          const idx = i+j;
+          const f = conf.fields[idx];
+          html += `<div class='canvas-slot' data-slot='${idx}' style='flex:1;min-width:0;min-height:48px;background:${['#eaf6ff','#f9fbe7','#fffbe7','#fce4ec'][j%4]};border:2px dashed #b0c4de;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;'>`;
+          if(f) {
+            html += `<div class='canvas-field-item' data-key='${f.key}' draggable='true' data-idx='${idx}' style='width:90%;padding:8px 10px;background:#fff;border:2px solid ${detailSelectedCanvasField===f.key?'#2176c7':'#c0d3eb'};border-radius:5px;cursor:grab;margin-bottom:0;text-align:center;position:relative;'>${f.label}<span class='canvas-field-remove' data-remove-idx='${idx}' style='position:absolute;right:4px;top:2px;color:#e74c3c;cursor:pointer;font-size:16px;'>×</span></div>`;
+          } else {
+            html += `<span style='color:#bbb;font-size:13px;'>拖拽字段到此处</span>`;
+          }
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+      area.innerHTML = html;
+      enableFieldDragDrop();
+    }
+    function enableFieldDragDrop() {
+      // 字段池字段拖拽
+      document.querySelectorAll('.model-field-item').forEach(item => {
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('fieldKey', item.getAttribute('data-key'));
+          e.dataTransfer.setData('fieldLabel', item.textContent.trim());
+          e.dataTransfer.setData('from', 'pool');
+        });
+      });
+      // 画布栏位拖拽放置
+      document.querySelectorAll('.canvas-slot').forEach(slot => {
+        slot.addEventListener('dragover', e => {
+          e.preventDefault();
+          slot.style.borderColor = '#2176c7';
+        });
+        slot.addEventListener('dragleave', e => {
+          slot.style.borderColor = '#b0c4de';
+        });
+        slot.addEventListener('drop', e => {
+          e.preventDefault();
+          slot.style.borderColor = '#b0c4de';
+          const conf = detailCanvasConfig[detailSelectedView];
+          const key = e.dataTransfer.getData('fieldKey');
+          const label = e.dataTransfer.getData('fieldLabel');
+          const from = e.dataTransfer.getData('from');
+          const idx = parseInt(slot.getAttribute('data-slot'));
+          if (from === 'pool') {
+            if (!key || conf.fields.some(f => f && f.key === key) || conf.fields[idx]) return;
+            while (conf.fields.length < idx) conf.fields.push(null);
+            conf.fields[idx] = { key, label };
+          } else if (from === 'canvas') {
+            const fromIdx = parseInt(e.dataTransfer.getData('fromIdx'));
+            if (fromIdx === idx) return;
+            const temp = conf.fields[fromIdx];
+            conf.fields[fromIdx] = conf.fields[idx];
+            conf.fields[idx] = temp;
+          }
+          renderDetailCanvasTabs();
+          renderDetailCanvasFieldProps();
+        });
+      });
+      // 画布字段拖拽排序和选中
+      document.querySelectorAll('.canvas-field-item').forEach(item => {
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('fieldKey', item.getAttribute('data-key'));
+          e.dataTransfer.setData('from', 'canvas');
+          e.dataTransfer.setData('fromIdx', item.getAttribute('data-idx'));
+        });
+        item.addEventListener('click', e => {
+          e.stopPropagation();
+          detailSelectedCanvasField = item.getAttribute('data-key');
+          renderDetailCanvasTabs();
+          renderDetailCanvasFieldProps();
+        });
+      });
+      // 删除icon
+      document.querySelectorAll('.canvas-field-remove').forEach(icon => {
+        icon.addEventListener('click', e => {
+          e.stopPropagation();
+          const idx = parseInt(icon.getAttribute('data-remove-idx'));
+          const conf = detailCanvasConfig[detailSelectedView];
+          conf.fields[idx] = null;
+          renderDetailCanvasTabs();
+          renderDetailCanvasFieldProps();
+        });
+      });
+    }
+    // 渲染属性配置
+    function renderDetailCanvasFieldProps() {
+      const propsDiv = document.getElementById('canvasFieldProps');
+      if(!detailSelectedCanvasField) { propsDiv.innerHTML = '<div style="color:#aaa;">请选择画布中的字段</div>'; return; }
+      const field = [...detailBasicFields, ...detailFinanceFields, ...detailHRFields].find(f=>f.key===detailSelectedCanvasField);
+      if (!field) { propsDiv.innerHTML = '<div style="color:#aaa;">字段不存在</div>'; return; }
+      if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', format: '' };
+      const props = fieldProps[field.key];
+      let formatInput = '';
+      if(field.type === '日期' || field.type === 'date') {
+        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 yyyy-MM-dd' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
+      } else {
+        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 #,##0.00' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
+      }
+      propsDiv.innerHTML = `
+        <div class='field-config-row'><label>字段标题</label><input type='text' class='input-modern' value='${field.label}' disabled style='background:#f4f8fb;'></div>
+        <div class='field-config-row'><label>显示标题</label><input type='checkbox' class='checkbox-modern' ${props.showLabel?'checked':''} onchange="setDetailFieldProp('${field.key}','showLabel',this.checked)"></div>
+        <div class='field-config-row'><label>字段宽度</label><input type='number' class='input-modern' min='40' max='400' value='${props.width||120}' onchange="setDetailFieldProp('${field.key}','width',this.value)"></div>
+        <div class='field-config-row'><label>提示文字</label><input type='text' class='input-modern' value='${props.placeholder||''}' placeholder='请输入提示文字' onchange="setDetailFieldProp('${field.key}','placeholder',this.value)"></div>
+        ${formatInput}
+      `;
+    }
+    function setDetailFieldProp(key, prop, value) {
+      if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', format: '' };
+      if (prop === 'showLabel') fieldProps[key][prop] = value;
+      else if (prop === 'width') fieldProps[key][prop] = +value;
+      else fieldProps[key][prop] = value;
+      renderDetailCanvasFieldProps();
+    }
+    // 新增全局变量保存布局方式
+    function setDetailLayoutType(type) {
+      detailLayoutType = type;
+      // 可根据需要刷新画布或子表区域
+      // renderDetailCanvasTabs();
+    }
+    // 新增渲染字段方法
+    function renderPreviewFields(conf) {
+      if(!conf || !conf.fields) return '<div style="color:#aaa;">暂无字段</div>';
+      let html = `<div style='display:flex;flex-direction:column;gap:12px;'>`;
+      const cols = conf.cols || 2;
+      for(let i=0;i<conf.fields.length;i+=cols) {
+        html += `<div style='display:flex;gap:16px;'>`;
+        for(let j=0;j<cols;j++) {
+          const f = conf.fields[i+j];
+          if(f) {
+            html += `<div style='flex:1;min-width:0;'><div style='font-weight:500;color:#2176c7;margin-bottom:2px;'>${f.label}</div><div style='border:1px solid #c0d3eb;background:#fff;padding:6px 10px;border-radius:4px;'>示例${f.label}</div></div>`;
+          }
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+    // 页面初始化
+    renderDraggableList(listFields, 'listFields', 'list');
+    renderDraggableList(detailFields, 'detailFields', 'detail');
+    renderFieldProps();
+    renderDetailModelFieldPool();
+    enableFieldDragDrop();
+    renderDetailCanvasTabs();
+    renderDetailCanvasFieldProps();
+  </script>
+</body>
+</html> 

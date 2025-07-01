@@ -484,81 +484,6 @@
     .modal-step.done:not(:last-child):after {
       background:#4db6ac;
     }
-    
-    /* 编码规则相关样式 */
-    .code-rule-switch input:checked + .code-rule-slider {
-      background-color: #4db6ac;
-    }
-    .code-rule-switch input:focus + .code-rule-slider {
-      box-shadow: 0 0 1px #4db6ac;
-    }
-    .code-rule-switch input:checked + .code-rule-slider:before {
-      transform: translateX(22px);
-    }
-    .code-rule-switch .code-rule-slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    .code-rule-switch .code-rule-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 22px;
-    }
-    .code-rule-switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 22px;
-    }
-    .code-rule-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    /* 编码规则抽屉动画 */
-    #codeRuleModalContent {
-      transition: right 0.3s ease;
-    }
-    
-    /* 编码规则表格样式 */
-    #tab-code table tr:hover td {
-      background: #f0f6fd;
-    }
-    #tab-code table tr:last-child td {
-      border-bottom: none;
-    }
-    
-    /* 业务规则链接样式 */
-    #tab-rule a:hover {
-      background: #185a99 !important;
-      box-shadow: 0 4px 12px rgba(33,118,199,0.15) !important;
-    }
-    
-    /* 编码规则链接样式 */
-    #tab-code a:hover {
-      background: #185a99 !important;
-      box-shadow: 0 4px 12px rgba(33,118,199,0.15) !important;
-    }
-    
-    /* 发布配置链接样式 */
-    #tab-layout a:hover {
-      background: #185a99 !important;
-      box-shadow: 0 4px 12px rgba(33,118,199,0.15) !important;
-    }
   </style>
 </head>
 <body>
@@ -573,7 +498,7 @@
       <div class="modal-step" data-step="attr"><span class="step-index">2</span> 属性配置</div>
       <div class="modal-step" data-step="rule"><span class="step-index">3</span> 业务规则</div>
       <div class="modal-step" data-step="code"><span class="step-index">4</span> 编码规则</div>
-      <div class="modal-step" data-step="layout"><span class="step-index">5</span> 发布配置</div>
+      <div class="modal-step" data-step="layout"><span class="step-index">5</span> 布局配置</div>
     </div>
     <div class="modal-content" id="tab-base">
       <div class="section-collapse-title" id="baseInfoCollapseBtn">
@@ -682,43 +607,57 @@
       </div>
     </div>
     <div class="modal-content" id="tab-rule" style="display:none;">
-      <div style="text-align: center; padding: 60px 20px; color: #666;">
-        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📋</div>
-        <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">业务规则管理</div>
-        <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
-          详细功能请参考业务规则管理页面<br>
-          您可以在这里配置和管理模型的业务规则
+      <table class="rule-table">
+        <thead>
+          <tr>
+            <th style="width:180px;">规则名称</th>
+            <th style="width:120px;">规则类型</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:160px;">创建时间</th>
+          </tr>
+        </thead>
+        <tbody id="ruleTableBody">
+        </tbody>
+      </table>
+      <div id="ruleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">规则详情</div>
+          <div id="ruleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeRuleDetail()">关闭</button>
         </div>
-        <a href="businessrule.html" target="_blank" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
-          前往业务规则管理
-        </a>
       </div>
     </div>
     <div class="modal-content" id="tab-code" style="display:none;">
-      <div style="text-align: center; padding: 60px 20px; color: #666;">
-        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">🔢</div>
-        <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">编码规则管理</div>
-        <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
-          详细功能请参考编码规则管理页面<br>
-          您可以在这里配置和管理模型的编码规则
+      <table class="rule-table code-rule-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">编码ID</th>
+            <th style="width:100px;">生成方式</th>
+            <th style="width:100px;">起始值</th>
+            <th style="width:100px;">终止值</th>
+            <th style="width:120px;">是否引用上层编码</th>
+            <th style="width:80px;">步长</th>
+            <th style="width:100px;">编码长度</th>
+            <th style="width:100px;">编码状态</th>
+            <th style="width:100px;">创建人</th>
+            <th style="width:120px;">创建时间</th>
+            <th style="width:90px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="codeRuleTableBody">
+        </tbody>
+      </table>
+      <div id="codeRuleDetailModal" class="rule-detail-modal" style="display:none;">
+        <div class="rule-detail-mask" onclick="closeCodeRuleDetail()"></div>
+        <div class="rule-detail-box">
+          <div class="rule-detail-title">编码规则详情</div>
+          <div id="codeRuleDetailContent"></div>
+          <button class="rule-detail-close" onclick="closeCodeRuleDetail()">关闭</button>
         </div>
-        <a href="data_coderule.html" target="_blank" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
-          前往编码规则管理
-        </a>
       </div>
     </div>
     <div class="modal-content" id="tab-layout" style="display:none;">
-      <div style="text-align: center; padding: 60px 20px; color: #666;">
-        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">🚀</div>
-        <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">发布配置管理</div>
-        <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
-          详细功能请参考发布配置管理页面<br>
-          您可以在这里配置和管理模型的发布设置
-        </div>
-        <a href="javascript:void(0)" onclick="openPageSetup()" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
-          前往发布配置管理
-        </a>
-      </div>
     </div>
   </div>
 </div>
@@ -942,6 +881,32 @@
     // 或 window.close();
   };
 })();
+// ... existing code ...
+
+// JS步骤条切换逻辑
+const stepOrder = ['base','attr','rule','code','layout'];
+const stepEls = document.querySelectorAll('.modal-step');
+function updateStepBar(activeStep) {
+  stepEls.forEach((el,idx)=>{
+    el.classList.remove('active','done');
+    if(stepOrder.indexOf(activeStep)>idx) el.classList.add('done');
+    else if(stepOrder.indexOf(activeStep)===idx) el.classList.add('active');
+    // 对勾
+    const idxSpan = el.querySelector('.step-index');
+    if(el.classList.contains('done')) idxSpan.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#4db6ac"/><path d="M4 8l3 3 5-5" stroke="#fff" stroke-width="2" fill="none"/></svg>';
+    else idxSpan.textContent = (idx+1);
+  });
+}
+stepEls.forEach((el,idx)=>{
+  el.onclick = function(){
+    stepOrder.forEach(s=>document.getElementById('tab-'+s).style.display='none');
+    document.getElementById('tab-'+stepOrder[idx]).style.display='';
+    updateStepBar(stepOrder[idx]);
+    renderFooter({dataset:{tab:stepOrder[idx]}});
+  };
+});
+// 页面初始化时高亮第一个
+updateStepBar('base');
 
 // 字段库模拟数据
 const FIELD_LIBRARY = [
@@ -1505,541 +1470,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // 页面初始化时高亮第一个
   showStep(0);
 });
-
-// ========== 编码规则功能 ========== //
-// 编码规则数据模拟
-let codeRuleData = [
-  { 
-    code: 'RULE001', 
-    name: '供应商编码规则', 
-    type: '自动编码', 
-    desc: '供应商自动编码规则，包含固定前缀+日期+流水号', 
-    field: 'supplier_code', 
-    status: '启用',
-    segments: [
-      { type: '固定码', config: { value: 'SUP' }, separator: '-' },
-      { type: '日期码', config: { field: 'create_date', format: 'YYYYMMDD' }, separator: '-' },
-      { type: '流水码', config: { maxLength: 4, padZero: true, step: 1 }, separator: '' }
-    ]
-  },
-  { 
-    code: 'RULE002', 
-    name: '员工编码规则', 
-    type: '手动编码', 
-    desc: '员工手动编码规则', 
-    field: 'employee_code', 
-    status: '启用',
-    manualLength: 8
-  },
-  { 
-    code: 'RULE003', 
-    name: '产品编码规则', 
-    type: '自动编码', 
-    desc: '产品编码规则，包含分类代码+流水号', 
-    field: 'product_code', 
-    status: '禁用',
-    segments: [
-      { type: '字段码', config: { field: 'category_code' }, separator: '-' },
-      { type: '流水码', config: { maxLength: 6, padZero: true, step: 1 }, separator: '' }
-    ]
-  }
-];
-let codeRuleEditIdx = -1;
-
-function renderCodeRuleTable() {
-  const tbody = document.getElementById('codeRuleTableBody');
-  if (codeRuleData.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 60px 20px; color: #666;">
-          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">📋</div>
-          <div style="font-size: 15px; margin-bottom: 8px;">暂无编码规则</div>
-          <div style="font-size: 13px; opacity: 0.7;">点击"新增编码规则"开始创建</div>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-  
-  tbody.innerHTML = codeRuleData.map((item, idx) => `
-    <tr>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left;">
-        <input type="checkbox" class="codeRuleRowCheck" data-idx="${idx}">
-      </td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left;">${item.code}</td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left;">${item.name}</td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left;">${item.type}</td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left;">${item.field}</td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: center;">
-        <label class="code-rule-switch" style="vertical-align: middle;">
-          <input type="checkbox" class="codeRuleRowStatusSwitch" data-idx="${idx}" ${item.status === '启用' ? 'checked' : ''}>
-          <span class="code-rule-slider"></span>
-        </label>
-      </td>
-      <td style="padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: center;">
-        <button type="button" onclick="editCodeRuleRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:14px;padding:0 8px;">编辑</button>
-        <button type="button" onclick="deleteCodeRuleRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:0 8px;">删除</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function showCodeRuleDrawer() {
-  document.getElementById('codeRuleModalMask').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('codeRuleModalContent').style.right = '0';
-  }, 10);
-}
-
-function hideCodeRuleDrawer() {
-  document.getElementById('codeRuleModalContent').style.right = '-800px';
-  setTimeout(() => {
-    document.getElementById('codeRuleModalMask').style.display = 'none';
-  }, 300);
-}
-
-function toggleCodeRuleConfig() {
-  const codeType = document.getElementById('codeRuleEditType').value;
-  const autoConfig = document.getElementById('codeRuleAutoConfig');
-  const manualConfig = document.getElementById('codeRuleManualConfig');
-  
-  if (codeType === '自动编码') {
-    autoConfig.style.display = 'block';
-    manualConfig.style.display = 'none';
-    // 清空编码段，因为类型改变了
-    document.getElementById('codeRuleSegmentsContainer').innerHTML = '';
-    document.getElementById('codeRulePreview').textContent = '请配置编码规则';
-  } else {
-    autoConfig.style.display = 'none';
-    manualConfig.style.display = 'block';
-  }
-}
-
-function addCodeRuleSegment(event) {
-  if (event) {
-    event.stopPropagation();
-  }
-  const container = document.getElementById('codeRuleSegmentsContainer');
-  const segmentId = Date.now();
-  const codeType = document.getElementById('codeRuleEditType').value;
-
-  let typeOptions = '';
-  if (codeType === '自动编码') {
-    typeOptions = `
-      <option value="固定码">固定码</option>
-      <option value="日期码">日期码</option>
-      <option value="字段码">字段码</option>
-      <option value="流水码">流水码</option>
-      <option value="引用码">引用码</option>
-    `;
-  } else {
-    typeOptions = `<option value="手工码">手工码</option>`;
-  }
-
-  const segmentHtml = `
-    <div class="code-rule-segment-item" data-segment-id="${segmentId}" style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e0e6ed; border-radius: 6px; margin-bottom: 12px;">
-      <div style="width: 120px; flex-shrink: 0;">
-        <select class="code-rule-segment-type-select" onchange="updateCodeRuleSegmentConfig(${segmentId})" style="width: 100%; padding: 6px 8px; border: 1px solid #c0d3eb; border-radius: 4px; font-size: 13px;">
-          ${typeOptions}
-        </select>
-      </div>
-      <div class="code-rule-segment-config" id="code-rule-config-${segmentId}" style="flex: 1; display: flex; gap: 8px; align-items: center; min-height: 32px;"></div>
-      <button type="button" onclick="removeCodeRuleSegment(${segmentId}, event)" style="padding: 4px 10px; font-size: 11px; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s; background: #e74c3c; color: #fff; height:32px; white-space:nowrap;">删除</button>
-    </div>
-  `;
-  container.insertAdjacentHTML('beforeend', segmentHtml);
-  updateCodeRuleSegmentConfig(segmentId);
-}
-
-function updateCodeRuleSegmentConfig(segmentId) {
-  const segment = document.querySelector(`[data-segment-id="${segmentId}"]`);
-  const typeSelect = segment.querySelector('.code-rule-segment-type-select');
-  const configDiv = segment.querySelector('.code-rule-segment-config');
-  const type = typeSelect.value;
-  const codeType = document.getElementById('codeRuleEditType').value;
-
-  // 先清空
-  configDiv.innerHTML = '';
-
-  let configHtml = '';
-
-  if (codeType === '自动编码') {
-    switch(type) {
-      case '固定码':
-        configHtml = `<input type="text" class="code-rule-fixed-value" placeholder="固定字符" style="width:120px;" oninput="updateCodeRulePreview()">`;
-        configHtml += `<input type="text" class="code-rule-separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodeRulePreview()" style="width:64px;margin-left:8px;">`;
-        break;
-      case '日期码':
-        configHtml = `
-          <select class="code-rule-date-field" style="width:120px;" onchange="updateCodeRulePreview()">
-            <option value="create_date">创建日期</option>
-            <option value="update_date">更新日期</option>
-          </select>
-          <input type="text" class="code-rule-date-format" placeholder="日期格式" value="YYYYMMDD" style="width:100px;" oninput="updateCodeRulePreview()">
-          <input type="text" class="code-rule-separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodeRulePreview()" style="width:64px;margin-left:8px;">
-        `;
-        break;
-      case '字段码':
-        configHtml = `
-          <select class="code-rule-field-name" style="width:120px;" onchange="updateCodeRulePreview()">
-            <option value="">模型属性</option>
-            <option value="attr1">属性1</option>
-            <option value="attr2">属性2</option>
-            <option value="attr3">属性3</option>
-          </select>
-          <select class="code-rule-ref-attr" style="width:120px;margin-left:8px;" onchange="updateCodeRulePreview()">
-            <option value="">引用属性</option>
-            <option value="ref1">引用1</option>
-            <option value="ref2">引用2</option>
-            <option value="ref3">引用3</option>
-          </select>
-          <input type="text" class="code-rule-separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodeRulePreview()" style="width:64px;margin-left:8px;">
-        `;
-        break;
-      case '流水码':
-        configHtml = `
-          <div style='display:flex;flex-direction:column;gap:4px;max-width:900px;'>
-            <div style='display:flex;align-items:flex-end;gap:4px;flex-wrap:nowrap;'>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">最大长度</label>
-                <input type="number" class="code-rule-serial-length" min="1" max="10" value="4" oninput="updateCodeRulePreview()" style="width:58px;">
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">补零</label>
-                <input type="checkbox" class="code-rule-serial-pad" checked onchange="updateCodeRulePreview()" style="width:13px;height:13px;">
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">步长</label>
-                <input type="number" class="code-rule-serial-step" value="1" min="1" oninput="updateCodeRulePreview()" style="width:35px;">
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">起始值</label>
-                <input type="number" class="code-rule-serial-start" value="1" min="0" oninput="updateCodeRulePreview()" style="width:40px;">
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">终止值</label>
-                <input type="number" class="code-rule-serial-end" value="9999" min="0" oninput="updateCodeRulePreview()" style="width:58px;">
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">分隔符</label>
-                <input type="text" class="code-rule-separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodeRulePreview()" style="width:40px;">
-              </div>
-            </div>
-            <div style='display:flex;align-items:center;gap:8px;flex-wrap:nowrap;justify-content:flex-start;'>
-              <label style='white-space:nowrap;'>重置类型</label>
-              <select class="code-rule-serial-reset-type" style="width:90px;" onchange="updateCodeRuleSerialResetConfig(this, ${segmentId})">
-                <option value="none">不重置</option>
-                <option value="date">按日期重置</option>
-                <option value="field">按字段值重置</option>
-              </select>
-              <div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='code-rule-serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>
-            </div>
-          </div>
-        `;
-        break;
-      case '引用码':
-        configHtml = `<input type="text" class="code-rule-parent-field" placeholder="父级字段" style="width:120px;" oninput="updateCodeRulePreview()">`;
-        configHtml += `<input type="text" class="code-rule-separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodeRulePreview()" style="width:64px;margin-left:8px;">`;
-        break;
-    }
-  } else {
-    // 手动编码模式
-    configHtml = `<input type="number" class="code-rule-manual-length" placeholder="最大长度" min="1" max="20" style="width:120px;" oninput="updateCodeRulePreview()">`;
-  }
-
-  configDiv.innerHTML = configHtml;
-  updateCodeRulePreview();
-}
-
-function updateCodeRulePreview() {
-  const segments = document.querySelectorAll('.code-rule-segment-item');
-  let preview = '';
-  
-  segments.forEach((segment, index) => {
-    const type = segment.querySelector('.code-rule-segment-type-select').value;
-    const separator = segment.querySelector('.code-rule-separator-input') ? segment.querySelector('.code-rule-separator-input').value : '';
-    
-    let segmentValue = '';
-    switch(type) {
-      case '固定码':
-        segmentValue = segment.querySelector('.code-rule-fixed-value') ? segment.querySelector('.code-rule-fixed-value').value : 'FIX';
-        break;
-      case '日期码':
-        segmentValue = '20241201';
-        break;
-      case '字段码':
-        segmentValue = segment.querySelector('.code-rule-field-name') ? segment.querySelector('.code-rule-field-name').value : 'FIELD';
-        break;
-      case '流水码':
-        const length = segment.querySelector('.code-rule-serial-length') ? segment.querySelector('.code-rule-serial-length').value : 4;
-        const start = segment.querySelector('.code-rule-serial-start') ? segment.querySelector('.code-rule-serial-start').value : 1;
-        segmentValue = String(start).padStart(length, '0');
-        break;
-      case '引用码':
-        segmentValue = segment.querySelector('.code-rule-parent-field') ? segment.querySelector('.code-rule-parent-field').value : 'REF';
-        break;
-    }
-    
-    preview += segmentValue;
-    if (index < segments.length - 1 && separator) {
-      preview += separator;
-    }
-  });
-  
-  document.getElementById('codeRulePreview').textContent = preview || '请配置编码规则';
-}
-
-function removeCodeRuleSegment(segmentId, event) {
-  if (event) {
-    event.stopPropagation();
-  }
-  const segment = document.querySelector(`[data-segment-id="${segmentId}"]`);
-  if (segment) {
-    segment.remove();
-    updateCodeRulePreview();
-  }
-}
-
-function saveCodeRuleRow() {
-  const formData = {
-    code: document.getElementById('codeRuleEditCode').value,
-    name: document.getElementById('codeRuleEditName').value,
-    type: document.getElementById('codeRuleEditType').value,
-    field: document.getElementById('codeRuleEditField').value,
-    status: document.getElementById('codeRuleStatusSwitch').checked ? '启用' : '禁用'
-  };
-
-  if (formData.type === '自动编码') {
-    const segments = [];
-    document.querySelectorAll('.code-rule-segment-item').forEach(segment => {
-      const type = segment.querySelector('.code-rule-segment-type-select').value;
-      const separator = segment.querySelector('.code-rule-separator-input') ? segment.querySelector('.code-rule-separator-input').value : '';
-      let config = {};
-      
-      if (type === '固定码') {
-        config.value = segment.querySelector('.code-rule-fixed-value') ? segment.querySelector('.code-rule-fixed-value').value : '';
-      } else if (type === '日期码') {
-        config.field = segment.querySelector('.code-rule-date-field') ? segment.querySelector('.code-rule-date-field').value : '';
-        config.format = segment.querySelector('.code-rule-date-format') ? segment.querySelector('.code-rule-date-format').value : '';
-      } else if (type === '字段码') {
-        config.field = segment.querySelector('.code-rule-field-name') ? segment.querySelector('.code-rule-field-name').value : '';
-        config.ref = segment.querySelector('.code-rule-ref-attr') ? segment.querySelector('.code-rule-ref-attr').value : '';
-      } else if (type === '流水码') {
-        config.maxLength = parseInt(segment.querySelector('.code-rule-serial-length') ? segment.querySelector('.code-rule-serial-length').value : 4);
-        config.padZero = segment.querySelector('.code-rule-serial-pad') ? segment.querySelector('.code-rule-serial-pad').checked : true;
-        config.step = parseInt(segment.querySelector('.code-rule-serial-step') ? segment.querySelector('.code-rule-serial-step').value : 1);
-        config.start = parseInt(segment.querySelector('.code-rule-serial-start') ? segment.querySelector('.code-rule-serial-start').value : 1);
-        config.end = parseInt(segment.querySelector('.code-rule-serial-end') ? segment.querySelector('.code-rule-serial-end').value : 9999);
-        config.resetType = segment.querySelector('.code-rule-serial-reset-type') ? segment.querySelector('.code-rule-serial-reset-type').value : 'none';
-        if(config.resetType === 'date') {
-          config.resetDate = segment.querySelector('.code-rule-serial-reset-date') ? segment.querySelector('.code-rule-serial-reset-date').value : '';
-        } else if(config.resetType === 'field') {
-          config.resetField = segment.querySelector('.code-rule-serial-reset-field') ? segment.querySelector('.code-rule-serial-reset-field').value : '';
-        }
-      } else if (type === '引用码') {
-        config.field = segment.querySelector('.code-rule-parent-field') ? segment.querySelector('.code-rule-parent-field').value : '';
-      }
-      
-      segments.push({ type, config, separator });
-    });
-    formData.segments = segments;
-  } else if (formData.type === '手动编码') {
-    formData.manualLength = parseInt(document.getElementById('codeRuleManualLength').value);
-  }
-
-  if (codeRuleEditIdx === -1) {
-    codeRuleData.push(formData);
-  } else {
-    codeRuleData[codeRuleEditIdx] = formData;
-  }
-  
-  renderCodeRuleTable();
-  hideCodeRuleDrawer();
-}
-
-// 新增编码规则
-function addCodeRuleRow() {
-  codeRuleEditIdx = -1;
-  document.getElementById('codeRuleDrawerTitle').textContent = '新增编码规则';
-  document.getElementById('codeRuleEditForm').reset();
-  document.getElementById('codeRuleStatusSwitch').checked = true;
-  document.getElementById('codeRuleSegmentsContainer').innerHTML = '';
-  document.getElementById('codeRulePreview').textContent = '请配置编码规则';
-  toggleCodeRuleConfig();
-  showCodeRuleDrawer();
-}
-
-// 编辑编码规则
-function editCodeRuleRow(idx) {
-  codeRuleEditIdx = idx;
-  const item = codeRuleData[idx];
-  document.getElementById('codeRuleDrawerTitle').textContent = '编辑编码规则';
-  document.getElementById('codeRuleEditCode').value = item.code;
-  document.getElementById('codeRuleEditName').value = item.name;
-  document.getElementById('codeRuleEditType').value = item.type;
-  document.getElementById('codeRuleEditField').value = item.field;
-  document.getElementById('codeRuleStatusSwitch').checked = item.status === '启用';
-  
-  if (item.type === '自动编码' && item.segments) {
-    document.getElementById('codeRuleSegmentsContainer').innerHTML = '';
-    item.segments.forEach(segment => {
-      addCodeRuleSegment(null);
-      const lastSegment = document.querySelector('.code-rule-segment-item:last-child');
-      const typeSelect = lastSegment.querySelector('.code-rule-segment-type-select');
-      typeSelect.value = segment.type;
-      updateCodeRuleSegmentConfig(lastSegment.dataset.segmentId);
-      
-      // 设置配置值
-      setTimeout(() => {
-        const configDiv = lastSegment.querySelector('.code-rule-segment-config');
-        const separatorInput = lastSegment.querySelector('.code-rule-separator-input');
-        
-        if (segment.type === '固定码') {
-          if(configDiv.querySelector('.code-rule-fixed-value')) configDiv.querySelector('.code-rule-fixed-value').value = segment.config.value;
-        } else if (segment.type === '日期码') {
-          if(configDiv.querySelector('.code-rule-date-field')) configDiv.querySelector('.code-rule-date-field').value = segment.config.field;
-          if(configDiv.querySelector('.code-rule-date-format')) configDiv.querySelector('.code-rule-date-format').value = segment.config.format;
-        } else if (segment.type === '字段码') {
-          if(configDiv.querySelector('.code-rule-field-name')) configDiv.querySelector('.code-rule-field-name').value = segment.config.field;
-          if(configDiv.querySelector('.code-rule-ref-attr')) configDiv.querySelector('.code-rule-ref-attr').value = segment.config.ref || '';
-        } else if (segment.type === '流水码') {
-          if(configDiv.querySelector('.code-rule-serial-length')) configDiv.querySelector('.code-rule-serial-length').value = segment.config.maxLength;
-          if(configDiv.querySelector('.code-rule-serial-pad')) configDiv.querySelector('.code-rule-serial-pad').checked = segment.config.padZero;
-          if(configDiv.querySelector('.code-rule-serial-step')) configDiv.querySelector('.code-rule-serial-step').value = segment.config.step;
-          if(configDiv.querySelector('.code-rule-serial-start')) configDiv.querySelector('.code-rule-serial-start').value = segment.config.start || 1;
-          if(configDiv.querySelector('.code-rule-serial-end')) configDiv.querySelector('.code-rule-serial-end').value = segment.config.end || 9999;
-          // 回显重置类型
-          const resetType = segment.config.resetType || 'none';
-          const resetTypeSelect = configDiv.parentElement.querySelector('.code-rule-serial-reset-type');
-          if(resetTypeSelect) {
-            resetTypeSelect.value = resetType;
-            updateCodeRuleSerialResetConfig(resetTypeSelect, segmentId);
-            if(resetType === 'date' && configDiv.parentElement.querySelector('.code-rule-serial-reset-date')) {
-              configDiv.parentElement.querySelector('.code-rule-serial-reset-date').value = segment.config.resetDate || 'year';
-            } else if(resetType === 'field' && configDiv.parentElement.querySelector('.code-rule-serial-reset-field')) {
-              configDiv.parentElement.querySelector('.code-rule-serial-reset-field').value = segment.config.resetField || 'field1';
-            }
-          }
-        } else if (segment.type === '引用码') {
-          if(configDiv.querySelector('.code-rule-parent-field')) configDiv.querySelector('.code-rule-parent-field').value = segment.config.field;
-        }
-        
-        if(separatorInput) separatorInput.value = segment.separator;
-      }, 100);
-    });
-    updateCodeRulePreview();
-  } else if (item.type === '手动编码') {
-    document.getElementById('codeRuleManualLength').value = item.manualLength || '';
-  }
-  
-  toggleCodeRuleConfig();
-  showCodeRuleDrawer();
-}
-
-// 删除编码规则
-function deleteCodeRuleRow(idx) {
-  if (confirm('确定要删除这条编码规则吗？')) {
-    codeRuleData.splice(idx, 1);
-    renderCodeRuleTable();
-  }
-}
-
-// 编码规则相关事件绑定
-document.addEventListener('DOMContentLoaded', function() {
-  // 初始化编码规则表格
-  renderCodeRuleTable();
-  
-  // 新增编码规则按钮
-  document.getElementById('addCodeRuleBtn') && (document.getElementById('addCodeRuleBtn').onclick = addCodeRuleRow);
-  
-  // 删除编码规则按钮
-  document.getElementById('deleteCodeRuleBtn') && (document.getElementById('deleteCodeRuleBtn').onclick = function() {
-    const checkedBoxes = document.querySelectorAll('.codeRuleRowCheck:checked');
-    if (checkedBoxes.length === 0) {
-      alert('请选择要删除的记录');
-      return;
-    }
-    
-    if (confirm(`确定要删除选中的 ${checkedBoxes.length} 条记录吗？`)) {
-      const indices = Array.from(checkedBoxes).map(cb => parseInt(cb.dataset.idx)).sort((a, b) => b - a);
-      indices.forEach(idx => codeRuleData.splice(idx, 1));
-      renderCodeRuleTable();
-      document.getElementById('codeRuleCheckAll').checked = false;
-    }
-  });
-  
-  // 编码规则表单提交
-  document.getElementById('codeRuleEditForm') && (document.getElementById('codeRuleEditForm').onsubmit = function(e) {
-    e.preventDefault();
-    saveCodeRuleRow();
-  });
-  
-  // 编码规则抽屉关闭
-  document.getElementById('codeRuleDrawerClose') && (document.getElementById('codeRuleDrawerClose').onclick = hideCodeRuleDrawer);
-  document.getElementById('codeRuleDrawerCancel') && (document.getElementById('codeRuleDrawerCancel').onclick = hideCodeRuleDrawer);
-  
-  // 编码规则抽屉遮罩点击关闭
-  document.getElementById('codeRuleModalMask') && (document.getElementById('codeRuleModalMask').onclick = function(e) {
-    if (e.target === this) {
-      hideCodeRuleDrawer();
-    }
-  });
-  
-  // 编码规则全选功能
-  document.getElementById('codeRuleCheckAll') && (document.getElementById('codeRuleCheckAll').onchange = function() {
-    const checkboxes = document.querySelectorAll('.codeRuleRowCheck');
-    checkboxes.forEach(cb => cb.checked = this.checked);
-  });
-  
-  // 编码规则适用条件搜索按钮事件
-  document.getElementById('codeRuleConditionSearchBtn') && (document.getElementById('codeRuleConditionSearchBtn').onclick = function() {
-    window.open('condition_new.html', '_blank');
-  });
-  
-  // 添加事件监听器用于实时更新预览
-  document.addEventListener('input', function(e) {
-    if (e.target.closest('#codeRuleAutoConfig')) {
-      updateCodeRulePreview();
-    }
-  });
-});
-
-// 编码规则流水码重置配置
-function updateCodeRuleSerialResetConfig(select, segmentId) {
-  const val = select.value;
-  const extraDiv = document.getElementById('code-rule-serial-reset-extra-' + segmentId);
-  if(val === 'date') {
-    if(extraDiv) {
-      extraDiv.style.display = '';
-      extraDiv.innerHTML = `<label>重置周期</label><select class='code-rule-serial-reset-date' style='width:90px;'><option value='year'>年</option><option value='quarter'>季度</option><option value='month'>月</option></select>`;
-    }
-  } else if(val === 'field') {
-    if(extraDiv) {
-      extraDiv.style.display = '';
-      extraDiv.innerHTML = `<div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='code-rule-serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>`;
-    }
-  } else {
-    if(extraDiv) {
-      extraDiv.style.display = 'none';
-      extraDiv.innerHTML = '';
-    }
-  }
-}
-
-// 发布配置页面跳转函数
-function openPageSetup() {
-  // 获取当前选择的模型分类
-  const modelCategory = document.getElementById('modelCategorySelect').value;
-  
-  // 根据模型分类决定打开哪个页面
-  if (modelCategory === '引用分类模型' || modelCategory === '引用分类多视图') {
-    // 打开树形页面布局配置
-    window.open('page_setup_tree.html', '_blank');
-  } else {
-    // 打开普通页面布局配置
-    window.open('page_setup.html', '_blank');
-  }
-}
 </script>
 </body>
 </html> 

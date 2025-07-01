@@ -1,0 +1,4390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>数据布局预览</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --theme-bg: #f7faff;
+      --theme-primary: #2176c7;
+      --theme-secondary: #4db6ac;
+      --theme-border: #e3eaf3;
+      --theme-hover: #f0f6fd;
+      --theme-text: #185a99;
+      --theme-text-light: #666;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      background: var(--theme-bg);
+      margin: 0;
+      font-size: 14px;
+      color: var(--theme-text);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(33,118,199,0.10);
+      padding: 32px;
+    }
+
+    .section-title {
+      color: var(--theme-primary);
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: "📊";
+      font-size: 24px;
+    }
+
+    /* 配置区域样式 */
+    .config-section {
+      background: #f8fafc;
+      border: 1px solid var(--theme-border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .config-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--theme-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .config-title::before {
+      content: "⚙️";
+      font-size: 18px;
+    }
+
+    /* 模型选择区域 */
+    .model-selection {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .model-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .model-label {
+      font-weight: 500;
+      color: var(--theme-text);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .radio-item:hover {
+      background: var(--theme-hover);
+    }
+
+    .radio-item input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--theme-primary);
+    }
+
+    .radio-item label {
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--theme-text);
+    }
+
+    /* 选项区域 */
+    .options-group {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .checkbox-item:hover {
+      background: var(--theme-hover);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--theme-secondary);
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--theme-text);
+    }
+
+    /* 预览按钮 */
+    .preview-section {
+      display: flex;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .btn-preview {
+      background: var(--theme-primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.2);
+    }
+
+    .btn-preview:hover {
+      background: #185a99;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(33, 118, 199, 0.3);
+    }
+
+    .btn-preview:active {
+      transform: translateY(0);
+    }
+
+    /* 预览窗口 */
+    .preview-window {
+      border: 1px solid var(--theme-border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      min-height: 500px;
+    }
+
+    .preview-header {
+      background: #f4f8fb;
+      border-bottom: 1px solid var(--theme-border);
+      padding: 0;
+    }
+
+    .preview-tabs {
+      display: flex;
+      background: #f4f8fb;
+    }
+
+    .preview-tab {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--theme-text-light);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .preview-tab.active {
+      color: var(--theme-primary);
+      border-bottom-color: var(--theme-primary);
+      background: #fff;
+    }
+
+    .preview-tab:hover:not(.active) {
+      background: var(--theme-hover);
+      color: var(--theme-text);
+    }
+
+    .preview-content {
+      padding: 24px;
+      min-height: 400px;
+    }
+
+    .preview-panel {
+      display: none;
+    }
+
+    .preview-panel.active {
+      display: block;
+    }
+
+    /* 列表预览样式 */
+    .list-preview {
+      background: #fff;
+    }
+
+    .list-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--theme-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .list-table th {
+      background: #f4f8fb;
+      color: var(--theme-primary);
+      font-weight: 600;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--theme-border);
+    }
+
+    .list-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--theme-border);
+    }
+
+    .list-table tr:hover {
+      background: var(--theme-hover);
+    }
+
+    .list-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* 详情预览样式 */
+    .detail-preview {
+      background: #fff;
+    }
+
+    .detail-form {
+      max-width: 600px;
+    }
+
+    /* 详情页签样式 */
+    .detail-tabs {
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(33,118,199,0.06);
+      padding: 16px 24px 24px 24px;
+    }
+
+    .tab-header {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--theme-primary);
+      background: #fff;
+      color: var(--theme-primary);
+      border-radius: 4px 4px 0 0;
+      padding: 6px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #f0f6fd;
+      color: var(--theme-primary);
+      border-bottom: 2px solid #fff;
+    }
+
+    .tab-content {
+      min-height: 120px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* 联系人列表样式 */
+    .contact-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-add-contact {
+      background: var(--theme-secondary);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add-contact:hover {
+      background: #399488;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--theme-border);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .contact-item:hover {
+      background: #f0f6fd;
+      border-color: var(--theme-primary);
+    }
+
+    .contact-info {
+      flex: 1;
+    }
+
+    .contact-name {
+      font-weight: 600;
+      color: var(--theme-text);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .contact-title {
+      color: var(--theme-text-light);
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .contact-phone, .contact-email {
+      color: var(--theme-text-light);
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .contact-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-edit, .btn-delete {
+      background: none;
+      border: 1px solid var(--theme-border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-edit {
+      color: var(--theme-primary);
+      border-color: var(--theme-primary);
+    }
+
+    .btn-edit:hover {
+      background: var(--theme-primary);
+      color: #fff;
+    }
+
+    .btn-delete {
+      color: #e74c3c;
+      border-color: #e74c3c;
+    }
+
+    .btn-delete:hover {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--theme-text-light);
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state .text {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .empty-state .sub-text {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        padding: 20px;
+      }
+
+      .model-selection {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .model-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .model-label {
+        min-width: auto;
+      }
+
+      .radio-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .options-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      color: var(--theme-text);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--theme-border);
+      border-radius: 6px;
+      font-size: 14px;
+      background: #f9fbfd;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--theme-primary);
+      background: #fff;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* 左树右表布局样式 */
+    .tree-table-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      width: 100%;
+    }
+    .tree-panel {
+      width: 220px;
+      min-width: 180px;
+      background: #f8f9fb;
+      border-right: 1px solid #e0e0e0;
+      padding: 12px 8px 12px 12px;
+    }
+    .table-panel {
+      flex: 1;
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    .tree-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--theme-border);
+      background: #f4f8fb;
+    }
+
+    .tree-content {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .tree-item:hover {
+      background: var(--theme-hover);
+    }
+
+    .tree-item.active {
+      background: var(--theme-primary);
+      color: #fff;
+    }
+
+    .tree-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .tree-text {
+      flex: 1;
+    }
+
+    .tree-children {
+      margin-left: 20px;
+      margin-top: 4px;
+    }
+
+    .tree-children .tree-item {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .post-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+    }
+    .post-table th, .post-table td {
+      border: 1px solid #e3eaf3;
+      padding: 8px 16px;
+      text-align: left;
+    }
+    .post-table th {
+      background: #f7faff;
+      color: var(--theme-primary);
+      font-weight: bold;
+    }
+    .post-table td {
+      color: var(--theme-text);
+    }
+    .post-table td:last-child button {
+      margin-right: 8px;
+    }
+
+    /* 暂无设计消息样式 */
+    .no-design-message {
+      text-align: center;
+      padding: 80px 40px;
+      color: var(--theme-text-light);
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 12px;
+      margin: 20px;
+      border: 1px solid var(--theme-border);
+      box-shadow: 0 4px 12px rgba(33, 118, 199, 0.08);
+    }
+
+    .no-design-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+      opacity: 0.7;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .no-design-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--theme-primary);
+      margin-bottom: 16px;
+    }
+
+    .no-design-desc {
+      font-size: 16px;
+      color: var(--theme-text);
+      margin-bottom: 32px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .no-design-desc strong {
+      color: var(--theme-primary);
+      background: rgba(33, 118, 199, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .no-design-tips {
+      text-align: left;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--theme-border);
+      box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06);
+    }
+
+    .tip-item {
+      font-size: 14px;
+      color: var(--theme-text);
+      margin-bottom: 12px;
+      line-height: 1.6;
+      padding-left: 8px;
+    }
+
+    .tip-item strong {
+      color: var(--theme-primary);
+    }
+
+    .tip-item:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section-title">数据布局预览</div>
+
+    <!-- 配置区域 -->
+    <div class="config-section">
+      <div class="config-title">布局配置</div>
+      
+      <!-- 模型选择 -->
+      <div class="model-selection">
+        <!-- 模型类型 -->
+        <div class="model-group">
+          <div class="model-row">
+            <div class="model-label">模型类型：</div>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" id="normal" name="modelType" value="normal" checked>
+                <label for="normal">普通模型</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="multiView" name="modelType" value="multiView">
+                <label for="multiView">多视图</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="categoryRef" name="modelType" value="categoryRef">
+                <label for="categoryRef">分类引用</label>
+              </div>
+              <div class="radio-item">
+                <input type="radio" id="categoryMultiView" name="modelType" value="categoryMultiView">
+                <label for="categoryMultiView">分类引用多视图</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 显示选项 -->
+        <div class="model-group">
+          <div class="model-row">
+            <div class="model-label">显示选项：</div>
+            <div class="options-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="dataStructure" name="options" value="treeStructure" onchange="handleTreeCheckboxChange()">
+                <label for="dataStructure">树</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="subTable" name="options" value="subTable">
+                <label for="subTable">子表</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="multiTree" name="options" value="multiTree" onchange="handleMultiTreeCheckboxChange()">
+                <label for="multiTree">多树</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 预览按钮 -->
+    <div class="preview-section">
+      <button class="btn-preview" id="previewBtn" onclick="showPreview()">
+        <span>👁️</span>
+        预览布局
+      </button>
+    </div>
+
+    <!-- 预览窗口 -->
+    <div class="preview-window" id="previewWindow" style="display: none;">
+      <div class="preview-header">
+        <div class="preview-tabs">
+          <button class="preview-tab active" onclick="switchTab('list')">列表视图</button>
+          <button class="preview-tab" onclick="switchTab('detail')">详情视图</button>
+        </div>
+      </div>
+      
+      <div class="preview-content">
+        <!-- 列表预览面板 -->
+        <div class="preview-panel active" id="listPanel">
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr id="tableHeader">
+                  <th>ID</th>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>状态</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>001</td>
+                  <td>客户主数据</td>
+                  <td>普通模型</td>
+                  <td><span style="color: #2e7d32; background: #e8f5e8; padding: 2px 8px; border-radius: 12px; font-size: 12px;">启用</span></td>
+                  <td>2024-01-15</td>
+                  <td>
+                    <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                    <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>002</td>
+                  <td>产品主数据</td>
+                  <td>普通模型</td>
+                  <td><span style="color: #2e7d32; background: #e8f5e8; padding: 2px 8px; border-radius: 12px; font-size: 12px;">启用</span></td>
+                  <td>2024-01-16</td>
+                  <td>
+                    <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                    <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>003</td>
+                  <td>供应商主数据</td>
+                  <td>普通模型</td>
+                  <td><span style="color: #c62828; background: #ffebee; padding: 2px 8px; border-radius: 12px; font-size: 12px;">禁用</span></td>
+                  <td>2024-01-17</td>
+                  <td>
+                    <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                    <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 详情预览面板 -->
+        <div class="preview-panel" id="detailPanel">
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnPost">组织岗位</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">
+                  <div class="detail-form">
+                    <div class="form-group">
+                      <label>ID:</label>
+                      <span>001</span>
+                    </div>
+                    <div class="form-group">
+                      <label>名称:</label>
+                      <span>客户主数据</span>
+                    </div>
+                    <div class="form-group">
+                      <label>类型:</label>
+                      <span>普通模型</span>
+                    </div>
+                    <div class="form-group">
+                      <label>状态:</label>
+                      <span style="color: #2e7d32; background: #e8f5e8; padding: 2px 8px; border-radius: 12px; font-size: 12px;">启用</span>
+                    </div>
+                    <div class="form-group">
+                      <label>描述:</label>
+                      <span>用于管理客户基础信息的主数据模型，包含客户基本信息、联系方式等字段。</span>
+                    </div>
+                    <div class="form-group">
+                      <label>创建时间:</label>
+                      <span>2024-01-15 10:30:00</span>
+                    </div>
+                    <div class="form-group">
+                      <label>更新时间:</label>
+                      <span>2024-01-20 14:25:00</span>
+                    </div>
+                    <div class="form-group">
+                      <label>备注:</label>
+                      <span>该模型已通过测试，可以正常使用。</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="postTab">
+                  <div class="post-list">
+                    <h4>组织岗位列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>岗位名称</th><th>岗位编码</th><th>负责人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>部门经理</td><td>BM001</td><td>王五</td><td>138-8888-0001</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                        <tr>
+                          <td>技术主管</td><td>JS001</td><td>赵六</td><td>139-8888-0002</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 初始空状态 -->
+    <div class="empty-state" id="emptyState">
+      <div class="icon">📊</div>
+      <div class="text">请选择布局配置并点击预览按钮</div>
+      <div class="sub-text">预览将显示列表和详情两种布局效果</div>
+    </div>
+  </div>
+
+  <script>
+    // 处理树复选框变化
+    function handleTreeCheckboxChange() {
+      const treeCheckbox = document.getElementById('dataStructure');
+      const multiTreeCheckbox = document.getElementById('multiTree');
+      
+      if (treeCheckbox.checked) {
+        // 如果选择了树，则取消多树的选择
+        multiTreeCheckbox.checked = false;
+      }
+    }
+
+    // 处理多树复选框变化
+    function handleMultiTreeCheckboxChange() {
+      const treeCheckbox = document.getElementById('dataStructure');
+      const multiTreeCheckbox = document.getElementById('multiTree');
+      
+      if (multiTreeCheckbox.checked) {
+        // 如果选择了多树，则取消树的选择
+        treeCheckbox.checked = false;
+      }
+    }
+
+    // 切换预览标签页
+    function switchTab(tabName) {
+      // 移除所有活动状态
+      document.querySelectorAll('.preview-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.preview-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+
+      // 激活选中的标签页
+      if (tabName === 'list') {
+        document.querySelector('.preview-tab:first-child').classList.add('active');
+        document.getElementById('listPanel').classList.add('active');
+      } else {
+        document.querySelector('.preview-tab:last-child').classList.add('active');
+        document.getElementById('detailPanel').classList.add('active');
+      }
+    }
+
+    // 显示预览
+    function showPreview() {
+      const modelType = document.querySelector('input[name="modelType"]:checked').value;
+      const treeStructure = document.getElementById('dataStructure').checked;
+      const subTable = document.getElementById('subTable').checked;
+      const multiTree = document.getElementById('multiTree').checked;
+      
+      console.log('预览参数:', { modelType, treeStructure, subTable, multiTree });
+      
+      // 获取当前组合的数据
+      const currentData = generateDemoData(modelType, treeStructure, subTable, multiTree);
+      
+      console.log('生成的数据:', currentData);
+      
+      // 检查是否为未定义的组合
+      if (currentData === null) {
+        showNoDesignMessage();
+        return;
+      }
+      
+      // 更新列表视图
+      updateListView(currentData.listData, modelType, treeStructure, subTable, multiTree);
+      
+      // 更新详情视图
+      updateDetailView(currentData.detailData, modelType, treeStructure, subTable, multiTree);
+      
+      // 显示预览窗口
+      const previewWindow = document.getElementById('previewWindow');
+      previewWindow.style.display = 'block';
+      
+      // 默认显示列表页签
+      switchTab('list');
+    }
+
+    // 生成不同组合的demo数据
+    function generateDemoData(modelType, treeStructure, subTable, multiTree) {
+      // 为每种组合定义完全独立的数据
+      const demoData = {
+        // 1. 普通模型
+        normal: {
+          listData: [
+            { id: 'SP001', name: '华为技术有限公司', code: 'HW001', type: '生产商', status: '启用', contact: '张经理', phone: '0755-12345678', address: '深圳市龙岗区坂田华为基地' },
+            { id: 'SP002', name: '联想集团有限公司', code: 'LX002', type: '代理商', status: '启用', contact: '李经理', phone: '010-87654321', address: '北京市朝阳区联想大厦' },
+            { id: 'SP003', name: '戴尔科技集团', code: 'DE003', type: '生产商', status: '禁用', contact: '王经理', phone: '021-98765432', address: '上海市浦东新区戴尔园区' }
+          ],
+          detailData: {
+            id: 'SP001',
+            name: '华为技术有限公司',
+            code: 'HW001',
+            type: '生产商',
+            status: '启用',
+            contact: '张经理',
+            phone: '0755-12345678',
+            email: 'zhang@huawei.com',
+            address: '深圳市龙岗区坂田华为基地',
+            taxCode: '91440300708461136T',
+            bankAccount: '招商银行深圳分行',
+            createTime: '2024-01-15 10:30:00',
+            updateTime: '2024-01-20 14:25:00'
+          }
+        },
+        // 2. 普通模型 + 子表
+        normalSubTable: {
+          listData: [
+            { id: 'SP001', name: '华为技术有限公司', code: 'HW001', type: '生产商', status: '启用', contact: '张经理', phone: '0755-12345678' },
+            { id: 'SP002', name: '联想集团有限公司', code: 'LX002', type: '代理商', status: '启用', contact: '李经理', phone: '010-87654321' },
+            { id: 'SP003', name: '戴尔科技集团', code: 'DE003', type: '生产商', status: '禁用', contact: '王经理', phone: '021-98765432' }
+          ],
+          detailData: {
+            id: 'SP001',
+            name: '华为技术有限公司',
+            code: 'HW001',
+            type: '生产商',
+            status: '启用',
+            contact: '张经理',
+            phone: '0755-12345678',
+            email: 'zhang@huawei.com',
+            address: '深圳市龙岗区坂田华为基地'
+          }
+        },
+        // 3. 普通模型 + 树
+        normalTree: {
+          treeData: [
+            { id: 'root', name: '物料分类', children: [
+              { id: 'cat1', name: '原材料', children: [
+                { id: 'cat1-1', name: '金属材料' },
+                { id: 'cat1-2', name: '塑料材料' },
+                { id: 'cat1-3', name: '电子元件' }
+              ]},
+              { id: 'cat2', name: '半成品', children: [
+                { id: 'cat2-1', name: '电路板' },
+                { id: 'cat2-2', name: '外壳组件' }
+              ]},
+              { id: 'cat3', name: '成品', children: [
+                { id: 'cat3-1', name: '手机' },
+                { id: 'cat3-2', name: '电脑' },
+                { id: 'cat3-3', name: '平板' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '铝合金板材', category: '金属材料', spec: '6061-T6', unit: 'kg', price: '25.50' },
+            { id: 'MT002', code: 'MT002', name: 'ABS塑料粒', category: '塑料材料', spec: 'ABS-757', unit: 'kg', price: '12.80' },
+            { id: 'MT003', code: 'MT003', name: '电阻器', category: '电子元件', spec: '10KΩ±1%', unit: '个', price: '0.15' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '铝合金板材',
+            category: '金属材料',
+            spec: '6061-T6',
+            unit: 'kg',
+            price: '25.50',
+            supplier: '中铝集团',
+            minStock: '100',
+            maxStock: '1000',
+            description: '高强度铝合金板材，适用于电子产品外壳制造'
+          }
+        },
+        // 4. 普通模型 + 多树
+        normalMultiTree: {
+          treeData: [
+            { id: 'tree1', name: '组织架构', children: [
+              { id: 'org1', name: '技术部', children: [
+                { id: 'dept1', name: '开发组' },
+                { id: 'dept2', name: '测试组' }
+              ]},
+              { id: 'org2', name: '销售部', children: [
+                { id: 'dept3', name: '国内销售' },
+                { id: 'dept4', name: '海外销售' }
+              ]}
+            ]},
+            { id: 'tree2', name: '产品线', children: [
+              { id: 'prod1', name: '消费电子', children: [
+                { id: 'item1', name: '智能手机' },
+                { id: 'item2', name: '平板电脑' }
+              ]},
+              { id: 'prod2', name: '企业级产品', children: [
+                { id: 'item3', name: '服务器' },
+                { id: 'item4', name: '存储设备' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'EMP001', name: '张三', dept: '开发组', position: '高级工程师', phone: '138-0001-0001' },
+            { id: 'EMP002', name: '李四', dept: '测试组', position: '测试工程师', phone: '138-0001-0002' },
+            { id: 'EMP003', name: '王五', dept: '国内销售', position: '销售经理', phone: '138-0001-0003' }
+          ],
+          detailData: {
+            id: 'EMP001',
+            name: '张三',
+            dept: '开发组',
+            position: '高级工程师',
+            phone: '138-0001-0001',
+            email: 'zhangsan@company.com',
+            entryDate: '2020-03-15',
+            salary: '15000'
+          }
+        },
+        // 5. 普通模型 + 树 + 子表
+        normalTreeSubTable: {
+          treeData: [
+            { id: 'root', name: '物料分类', children: [
+              { id: 'cat1', name: '原材料', children: [
+                { id: 'cat1-1', name: '金属材料' },
+                { id: 'cat1-2', name: '塑料材料' }
+              ]},
+              { id: 'cat2', name: '半成品', children: [
+                { id: 'cat2-1', name: '电路板' },
+                { id: 'cat2-2', name: '外壳组件' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '铝合金板材', category: '金属材料', spec: '6061-T6', unit: 'kg' },
+            { id: 'MT002', code: 'MT002', name: 'ABS塑料粒', category: '塑料材料', spec: 'ABS-757', unit: 'kg' },
+            { id: 'MT003', code: 'MT003', name: '电阻器', category: '电子元件', spec: '10KΩ±1%', unit: '个' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '铝合金板材',
+            category: '金属材料',
+            spec: '6061-T6',
+            unit: 'kg',
+            price: '25.50',
+            supplier: '中铝集团'
+          }
+        },
+        // 6. 多视图
+        multiView: {
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '电子产品', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '笔记本电脑', category: '电子产品', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板电脑', category: '电子产品', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '电子产品',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        },
+        // 7. 多视图 + 子表
+        multiViewSubTable: {
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '电子产品', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '笔记本电脑', category: '电子产品', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板电脑', category: '电子产品', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '电子产品',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        },
+        // 8. 多视图 + 树 + 子表
+        multiViewTreeSubTable: {
+          treeData: [
+            { id: 'root', name: '产品分类', children: [
+              { id: 'cat1', name: '消费电子', children: [
+                { id: 'cat1-1', name: '智能手机' },
+                { id: 'cat1-2', name: '平板电脑' }
+              ]},
+              { id: 'cat2', name: '企业级产品', children: [
+                { id: 'cat2-1', name: '服务器' },
+                { id: 'cat2-2', name: '存储设备' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '智能手机', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '服务器主板', category: '服务器', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板主板', category: '平板电脑', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '智能手机',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        },
+        // 9. 分类引用
+        categoryRef: {
+          treeData: [
+            { id: 'root', name: '组织架构', children: [
+              { id: 'org1', name: '技术部', children: [
+                { id: 'dept1', name: '开发组' },
+                { id: 'dept2', name: '测试组' }
+              ]},
+              { id: 'org2', name: '销售部', children: [
+                { id: 'dept3', name: '国内销售' },
+                { id: 'dept4', name: '海外销售' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'EMP001', name: '张三', dept: '开发组', position: '高级工程师', phone: '138-0001-0001', status: '在职' },
+            { id: 'EMP002', name: '李四', dept: '测试组', position: '测试工程师', phone: '138-0001-0002', status: '在职' },
+            { id: 'EMP003', name: '王五', dept: '国内销售', position: '销售经理', phone: '138-0001-0003', status: '离职' }
+          ],
+          detailData: {
+            id: 'EMP001',
+            name: '张三',
+            dept: '开发组',
+            position: '高级工程师',
+            phone: '138-0001-0001',
+            email: 'zhangsan@company.com',
+            idCard: '110101199001011234',
+            entryDate: '2020-03-15',
+            status: '在职'
+          }
+        },
+        // 10. 分类引用 + 子表
+        categoryRefSubTable: {
+          treeData: [
+            { id: 'root', name: '组织架构', children: [
+              { id: 'org1', name: '技术部', children: [
+                { id: 'dept1', name: '开发组' },
+                { id: 'dept2', name: '测试组' }
+              ]},
+              { id: 'org2', name: '销售部', children: [
+                { id: 'dept3', name: '国内销售' },
+                { id: 'dept4', name: '海外销售' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'EMP001', name: '张三', dept: '开发组', position: '高级工程师', phone: '138-0001-0001', status: '在职' },
+            { id: 'EMP002', name: '李四', dept: '测试组', position: '测试工程师', phone: '138-0001-0002', status: '在职' },
+            { id: 'EMP003', name: '王五', dept: '国内销售', position: '销售经理', phone: '138-0001-0003', status: '离职' }
+          ],
+          detailData: {
+            id: 'EMP001',
+            name: '张三',
+            dept: '开发组',
+            position: '高级工程师',
+            phone: '138-0001-0001',
+            email: 'zhangsan@company.com',
+            idCard: '110101199001011234',
+            entryDate: '2020-03-15',
+            status: '在职'
+          }
+        },
+        // 11. 分类引用多视图
+        categoryMultiView: {
+          treeData: [
+            { id: 'root', name: '组织架构', children: [
+              { id: 'org1', name: '技术部', children: [
+                { id: 'dept1', name: '开发组' },
+                { id: 'dept2', name: '测试组' }
+              ]},
+              { id: 'org2', name: '销售部', children: [
+                { id: 'dept3', name: '国内销售' },
+                { id: 'dept4', name: '海外销售' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'EMP001', name: '张三', dept: '开发组', position: '高级工程师', phone: '138-0001-0001', status: '在职' },
+            { id: 'EMP002', name: '李四', dept: '测试组', position: '测试工程师', phone: '138-0001-0002', status: '在职' },
+            { id: 'EMP003', name: '王五', dept: '国内销售', position: '销售经理', phone: '138-0001-0003', status: '离职' }
+          ],
+          detailData: {
+            id: 'EMP001',
+            name: '张三',
+            dept: '开发组',
+            position: '高级工程师',
+            phone: '138-0001-0001',
+            email: 'zhangsan@company.com',
+            idCard: '110101199001011234',
+            entryDate: '2020-03-15',
+            status: '在职'
+          }
+        },
+        // 12. 分类引用多视图 + 子表
+        categoryMultiViewSubTable: {
+          treeData: [
+            { id: 'root', name: '组织架构', children: [
+              { id: 'org1', name: '技术部', children: [
+                { id: 'dept1', name: '开发组' },
+                { id: 'dept2', name: '测试组' }
+              ]},
+              { id: 'org2', name: '销售部', children: [
+                { id: 'dept3', name: '国内销售' },
+                { id: 'dept4', name: '海外销售' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'EMP001', name: '张三', dept: '开发组', position: '高级工程师', phone: '138-0001-0001', status: '在职' },
+            { id: 'EMP002', name: '李四', dept: '测试组', position: '测试工程师', phone: '138-0001-0002', status: '在职' },
+            { id: 'EMP003', name: '王五', dept: '国内销售', position: '销售经理', phone: '138-0001-0003', status: '离职' }
+          ],
+          detailData: {
+            id: 'EMP001',
+            name: '张三',
+            dept: '开发组',
+            position: '高级工程师',
+            phone: '138-0001-0001',
+            email: 'zhangsan@company.com',
+            idCard: '110101199001011234',
+            entryDate: '2020-03-15',
+            status: '在职'
+          }
+        },
+        // 13. 多视图 + 树
+        multiViewTree: {
+          treeData: [
+            { id: 'root', name: '产品分类', children: [
+              { id: 'cat1', name: '消费电子', children: [
+                { id: 'cat1-1', name: '智能手机' },
+                { id: 'cat1-2', name: '平板电脑' }
+              ]},
+              { id: 'cat2', name: '企业级产品', children: [
+                { id: 'cat2-1', name: '服务器' },
+                { id: 'cat2-2', name: '存储设备' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '智能手机', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '服务器主板', category: '服务器', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板主板', category: '平板电脑', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '智能手机',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        },
+        // 14. 多视图 + 多树
+        multiViewMultiTree: {
+          treeData: [
+            { id: 'tree1', name: '产品分类', children: [
+              { id: 'cat1', name: '消费电子', children: [
+                { id: 'cat1-1', name: '智能手机' },
+                { id: 'cat1-2', name: '平板电脑' }
+              ]},
+              { id: 'cat2', name: '企业级产品', children: [
+                { id: 'cat2-1', name: '服务器' },
+                { id: 'cat2-2', name: '存储设备' }
+              ]}
+            ]},
+            { id: 'tree2', name: '技术架构', children: [
+              { id: 'tech1', name: '硬件平台', children: [
+                { id: 'tech1-1', name: 'ARM架构' },
+                { id: 'tech1-2', name: 'x86架构' }
+              ]},
+              { id: 'tech2', name: '软件平台', children: [
+                { id: 'tech2-1', name: 'Android' },
+                { id: 'tech2-2', name: 'iOS' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '智能手机', tech: 'ARM架构', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '服务器主板', category: '服务器', tech: 'x86架构', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板主板', category: '平板电脑', tech: 'ARM架构', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '智能手机',
+            tech: 'ARM架构',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        },
+        // 15. 多视图 + 多树 + 子表
+        multiViewMultiTreeSubTable: {
+          treeData: [
+            { id: 'tree1', name: '产品分类', children: [
+              { id: 'cat1', name: '消费电子', children: [
+                { id: 'cat1-1', name: '智能手机' },
+                { id: 'cat1-2', name: '平板电脑' }
+              ]},
+              { id: 'cat2', name: '企业级产品', children: [
+                { id: 'cat2-1', name: '服务器' },
+                { id: 'cat2-2', name: '存储设备' }
+              ]}
+            ]},
+            { id: 'tree2', name: '技术架构', children: [
+              { id: 'tech1', name: '硬件平台', children: [
+                { id: 'tech1-1', name: 'ARM架构' },
+                { id: 'tech1-2', name: 'x86架构' }
+              ]},
+              { id: 'tech2', name: '软件平台', children: [
+                { id: 'tech2-1', name: 'Android' },
+                { id: 'tech2-2', name: 'iOS' }
+              ]}
+            ]}
+          ],
+          listData: [
+            { id: 'MT001', code: 'MT001', name: '智能手机主板', category: '智能手机', tech: 'ARM架构', status: '启用', createTime: '2024-01-15' },
+            { id: 'MT002', code: 'MT002', name: '服务器主板', category: '服务器', tech: 'x86架构', status: '启用', createTime: '2024-01-16' },
+            { id: 'MT003', code: 'MT003', name: '平板主板', category: '平板电脑', tech: 'ARM架构', status: '禁用', createTime: '2024-01-17' }
+          ],
+          detailData: {
+            id: 'MT001',
+            code: 'MT001',
+            name: '智能手机主板',
+            category: '智能手机',
+            tech: 'ARM架构',
+            status: '启用',
+            createTime: '2024-01-15 10:30:00'
+          }
+        }
+      };
+
+      // 根据组合选择对应的数据
+      if (modelType === 'normal') {
+        if (multiTree) {
+          return demoData.normalMultiTree;
+        } else if (treeStructure && subTable) {
+          return demoData.normalTreeSubTable;
+        } else if (treeStructure) {
+          return demoData.normalTree;
+        } else if (subTable) {
+          return demoData.normalSubTable;
+        } else {
+          return demoData.normal;
+        }
+      } else if (modelType === 'multiView') {
+        if (multiTree && subTable) {
+          return demoData.multiViewMultiTreeSubTable;
+        } else if (multiTree) {
+          return demoData.multiViewMultiTree;
+        } else if (treeStructure && subTable) {
+          return demoData.multiViewTreeSubTable;
+        } else if (treeStructure) {
+          return demoData.multiViewTree;
+        } else if (subTable) {
+          return demoData.multiViewSubTable;
+        } else {
+          return demoData.multiView;
+        }
+      } else if (modelType === 'categoryRef') {
+        if (subTable) {
+          return demoData.categoryRefSubTable;
+        } else {
+          return demoData.categoryRef;
+        }
+      } else if (modelType === 'categoryMultiView') {
+        if (subTable) {
+          return demoData.categoryMultiViewSubTable;
+        } else {
+          return demoData.categoryMultiView;
+        }
+      }
+      
+      // 检查是否为未定义的组合
+      // 以下组合暂未设计：
+      // 1. 分类引用 + 树
+      // 2. 分类引用 + 多树
+      // 3. 分类引用多视图 + 树
+      // 4. 分类引用多视图 + 多树
+      // 5. 任何包含多树但非普通模型的组合
+      
+      if (modelType === 'categoryRef' && (treeStructure || multiTree)) {
+        return null; // 分类引用 + 树/多树
+      }
+      
+      if (modelType === 'categoryMultiView' && (treeStructure || multiTree)) {
+        return null; // 分类引用多视图 + 树/多树
+      }
+      
+      // 如果组合不在预设范围内，返回null表示暂无设计
+      return null;
+    }
+
+    // 更新列表视图
+    function updateListView(listData, modelType, treeStructure, subTable, multiTree) {
+      console.log('updateListView:', modelType, 'tree:', treeStructure, 'subTable:', subTable, 'multiTree:', multiTree);
+      const listPanel = document.getElementById('listPanel');
+      
+      // 根据组合决定列表布局
+      if (modelType === 'normal' && multiTree) {
+        // 4. 普通模型 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">组织架构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">组织架构</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">产品线</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">组织架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">技术部</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">开发组</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">测试组</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">销售部</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">国内销售</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">海外销售</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>姓名</th>
+                      <th>部门</th>
+                      <th>岗位</th>
+                      <th>联系电话</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.dept}</td>
+                        <td>${item.position}</td>
+                        <td>${item.phone}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">组织架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术部</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">开发组</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">测试组</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">销售部</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">国内销售</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">海外销售</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品线</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+      } else if (modelType === 'normal' && treeStructure) {
+        // 3. 普通模型 + 树：左树右表布局（物料分类）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">物料分类</h4>
+                </div>
+                <div class="tree-content">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">物料分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">原材料</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">金属材料</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">塑料材料</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">电子元件</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">半成品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">电路板</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">外壳组件</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">成品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">电脑</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>规格</th>
+                      <th>单位</th>
+                      <th>价格</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.spec}</td>
+                        <td>${item.unit}</td>
+                        <td>¥${item.price}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'normal' && !treeStructure && !subTable) {
+        // 1. 普通模型：普通表格布局（供应商主数据）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>供应商名称</th>
+                  <th>编码</th>
+                  <th>类型</th>
+                  <th>联系人</th>
+                  <th>联系电话</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listData.map(item => `
+                  <tr>
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.code}</td>
+                    <td>${item.type}</td>
+                    <td>${item.contact}</td>
+                    <td>${item.phone}</td>
+                    <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                    <td>
+                      <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                      <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (modelType === 'normal' && !treeStructure && subTable) {
+        // 2. 普通模型 + 子表：普通表格布局（供应商主数据）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>供应商名称</th>
+                  <th>编码</th>
+                  <th>类型</th>
+                  <th>联系人</th>
+                  <th>联系电话</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listData.map(item => `
+                  <tr>
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.code}</td>
+                    <td>${item.type}</td>
+                    <td>${item.contact}</td>
+                    <td>${item.phone}</td>
+                    <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                    <td>
+                      <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                      <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (modelType === 'normal' && treeStructure && subTable) {
+        // 5. 普通模型 + 树 + 子表：左树右表布局
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">物料分类</h4>
+                </div>
+                <div class="tree-content">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">物料分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">原材料</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">金属材料</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">塑料材料</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">半成品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">电路板</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">外壳组件</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>规格</th>
+                      <th>单位</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.spec}</td>
+                        <td>${item.unit}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'multiView' && !treeStructure && !subTable) {
+        // 6. 多视图：普通表格布局（物料信息）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>名称</th>
+                  <th>分类</th>
+                  <th>状态</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listData.map(item => `
+                  <tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                    <td>${item.createTime}</td>
+                    <td>
+                      <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                      <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (modelType === 'multiView' && !treeStructure && subTable) {
+        // 7. 多视图 + 子表：普通表格布局
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>名称</th>
+                  <th>分类</th>
+                  <th>状态</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listData.map(item => `
+                  <tr>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                    <td>${item.createTime}</td>
+                    <td>
+                      <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                      <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (modelType === 'multiView' && treeStructure && !subTable) {
+        // 13. 多视图 + 树：左树右表布局
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">产品分类</h4>
+                </div>
+                <div class="tree-content">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'multiView' && multiTree && subTable) {
+        // 15. 多视图 + 多树 + 子表：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：左树右表布局（可切换树根节点）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">树结构</h4>
+                  <div style="margin-top: 8px;">
+                    <button id="switchTree1" style="background: var(--theme-primary); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; cursor: pointer;">产品分类</button>
+                    <button id="switchTree2" style="background: #ccc; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">技术架构</button>
+                  </div>
+                </div>
+                <div class="tree-content" id="treeContent">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>技术架构</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.tech}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        // 绑定树切换事件
+        setTimeout(() => {
+          const switchTree1 = document.getElementById('switchTree1');
+          const switchTree2 = document.getElementById('switchTree2');
+          const treeContent = document.getElementById('treeContent');
+          switchTree1.onclick = function() {
+            switchTree1.style.background = 'var(--theme-primary)';
+            switchTree2.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">产品分类</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">消费电子</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">智能手机</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">平板电脑</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">企业级产品</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">服务器</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">存储设备</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+          switchTree2.onclick = function() {
+            switchTree2.style.background = 'var(--theme-primary)';
+            switchTree1.style.background = '#ccc';
+            treeContent.innerHTML = `
+              <div class="tree-item active">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">技术架构</span>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">硬件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">ARM架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">x86架构</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="tree-icon">📁</span>
+                <span class="tree-text">软件平台</span>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">Android</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📄</span>
+                    <span class="tree-text">iOS</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          };
+        }, 100);
+        return;
+      } else if (modelType === 'multiView' && treeStructure && subTable) {
+        // 8. 多视图 + 树 + 子表：四个页签
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">产品分类</h4>
+                </div>
+                <div class="tree-content">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">产品分类</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">消费电子</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">智能手机</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">平板电脑</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">企业级产品</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">服务器</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">存储设备</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>编码</th>
+                      <th>名称</th>
+                      <th>分类</th>
+                      <th>状态</th>
+                      <th>创建时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.code}</td>
+                        <td>${item.name}</td>
+                        <td>${item.category}</td>
+                        <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>${item.createTime}</td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnSubTable1', 'tabBtnSubTable2'], ['basicTab', 'financeTab', 'subTable1Tab', 'subTable2Tab']);
+      } else if (modelType === 'categoryRef' || modelType === 'categoryMultiView') {
+        // 9-12. 分类引用相关：左树右表布局（组织架构 + 员工信息）
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <div class="tree-table-layout">
+              <!-- 左侧树形结构 -->
+              <div class="tree-panel">
+                <div class="tree-header">
+                  <h4 style="margin: 0; color: var(--theme-primary);">组织架构</h4>
+                </div>
+                <div class="tree-content">
+                  <div class="tree-item active">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">组织架构</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">技术部</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">开发组</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">测试组</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-icon">📁</span>
+                    <span class="tree-text">销售部</span>
+                    <div class="tree-children">
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">国内销售</span>
+                      </div>
+                      <div class="tree-item">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-text">海外销售</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 右侧表格 -->
+              <div class="table-panel">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>姓名</th>
+                      <th>部门</th>
+                      <th>岗位</th>
+                      <th>联系电话</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${listData.map(item => `
+                      <tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.dept}</td>
+                        <td>${item.position}</td>
+                        <td>${item.phone}</td>
+                        <td><span style="color: ${item.status === '在职' ? '#2e7d32' : '#c62828'}; background: ${item.status === '在职' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                        <td>
+                          <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                          <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        // 默认：普通表格布局
+        listPanel.innerHTML = `
+          <div class="list-preview">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>状态</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${listData.map(item => `
+                  <tr>
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>${item.type || item.category}</td>
+                    <td><span style="color: ${item.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${item.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${item.status}</span></td>
+                    <td>${item.createTime || ''}</td>
+                    <td>
+                      <button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 14px;">编辑</button>
+                      <button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 14px; margin-left: 8px;">删除</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+    // 更新详情视图
+    function updateDetailView(detailData, modelType, treeStructure, subTable, multiTree) {
+      const detailPanel = document.getElementById('detailPanel');
+      
+      // 详情字段渲染模板
+      function renderDetailForm(data, type = 'normal') {
+        if (type === 'supplier') {
+          return `
+            <div class="detail-form">
+              <div class="form-group"><label class="form-label">ID：</label><span class="form-value">${data.id}</span></div>
+              <div class="form-group"><label class="form-label">供应商名称：</label><span class="form-value">${data.name}</span></div>
+              <div class="form-group"><label class="form-label">编码：</label><span class="form-value">${data.code}</span></div>
+              <div class="form-group"><label class="form-label">类型：</label><span class="form-value">${data.type}</span></div>
+              <div class="form-group"><label class="form-label">状态：</label><span class="form-value" style="color: ${data.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${data.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${data.status}</span></div>
+              <div class="form-group"><label class="form-label">联系人：</label><span class="form-value">${data.contact}</span></div>
+              <div class="form-group"><label class="form-label">联系电话：</label><span class="form-value">${data.phone}</span></div>
+              <div class="form-group"><label class="form-label">邮箱：</label><span class="form-value">${data.email}</span></div>
+              <div class="form-group"><label class="form-label">地址：</label><span class="form-value">${data.address}</span></div>
+              <div class="form-group"><label class="form-label">税号：</label><span class="form-value">${data.taxCode}</span></div>
+              <div class="form-group"><label class="form-label">开户行：</label><span class="form-value">${data.bankAccount}</span></div>
+              <div class="form-group"><label class="form-label">创建时间：</label><span class="form-value">${data.createTime}</span></div>
+              <div class="form-group"><label class="form-label">更新时间：</label><span class="form-value">${data.updateTime}</span></div>
+            </div>
+          `;
+        } else if (type === 'material') {
+          return `
+            <div class="detail-form">
+              <div class="form-group"><label class="form-label">ID：</label><span class="form-value">${data.id}</span></div>
+              <div class="form-group"><label class="form-label">编码：</label><span class="form-value">${data.code}</span></div>
+              <div class="form-group"><label class="form-label">名称：</label><span class="form-value">${data.name}</span></div>
+              <div class="form-group"><label class="form-label">分类：</label><span class="form-value">${data.category}</span></div>
+              <div class="form-group"><label class="form-label">规格：</label><span class="form-value">${data.spec}</span></div>
+              <div class="form-group"><label class="form-label">单位：</label><span class="form-value">${data.unit}</span></div>
+              <div class="form-group"><label class="form-label">价格：</label><span class="form-value">¥${data.price}</span></div>
+              <div class="form-group"><label class="form-label">供应商：</label><span class="form-value">${data.supplier}</span></div>
+              <div class="form-group"><label class="form-label">最小库存：</label><span class="form-value">${data.minStock}</span></div>
+              <div class="form-group"><label class="form-label">最大库存：</label><span class="form-value">${data.maxStock}</span></div>
+              <div class="form-group"><label class="form-label">描述：</label><span class="form-value">${data.description}</span></div>
+            </div>
+          `;
+        } else if (type === 'employee') {
+          return `
+            <div class="detail-form">
+              <div class="form-group"><label class="form-label">ID：</label><span class="form-value">${data.id}</span></div>
+              <div class="form-group"><label class="form-label">姓名：</label><span class="form-value">${data.name}</span></div>
+              <div class="form-group"><label class="form-label">部门：</label><span class="form-value">${data.dept}</span></div>
+              <div class="form-group"><label class="form-label">岗位：</label><span class="form-value">${data.position}</span></div>
+              <div class="form-group"><label class="form-label">联系电话：</label><span class="form-value">${data.phone}</span></div>
+              <div class="form-group"><label class="form-label">邮箱：</label><span class="form-value">${data.email}</span></div>
+              <div class="form-group"><label class="form-label">身份证号：</label><span class="form-value">${data.idCard}</span></div>
+              <div class="form-group"><label class="form-label">入职日期：</label><span class="form-value">${data.entryDate}</span></div>
+              <div class="form-group"><label class="form-label">状态：</label><span class="form-value" style="color: ${data.status === '在职' ? '#2e7d32' : '#c62828'}; background: ${data.status === '在职' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${data.status}</span></div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="detail-form">
+              <div class="form-group"><label class="form-label">ID：</label><span class="form-value">${data.id}</span></div>
+              <div class="form-group"><label class="form-label">名称：</label><span class="form-value">${data.name}</span></div>
+              <div class="form-group"><label class="form-label">类型：</label><span class="form-value">${data.type}</span></div>
+              <div class="form-group"><label class="form-label">状态：</label><span class="form-value" style="color: ${data.status === '启用' ? '#2e7d32' : '#c62828'}; background: ${data.status === '启用' ? '#e8f5e8' : '#ffebee'}; padding: 2px 8px; border-radius: 12px; font-size: 12px;">${data.status}</span></div>
+              <div class="form-group"><label class="form-label">创建时间：</label><span class="form-value">${data.createTime}</span></div>
+            </div>
+          `;
+        }
+      }
+
+      // 根据组合决定详情布局
+      if (modelType === 'normal' && !treeStructure && !subTable) {
+        // 1. 普通模型：普通表单（供应商主数据）
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'supplier')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'normal' && !treeStructure && subTable) {
+        // 2. 普通模型 + 子表：两个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnSubTable">子表一</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'supplier')}</div>
+                <div class="tab-panel" id="subTableTab">
+                  <div class="post-list">
+                    <h4>供应商联系人列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>联系人姓名</th><th>职务</th><th>联系电话</th><th>邮箱</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>张经理</td><td>采购经理</td><td>138-8888-0001</td><td>zhang@huawei.com</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                        <tr>
+                          <td>李助理</td><td>采购助理</td><td>139-8888-0002</td><td>li@huawei.com</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initTabEvents('tabBtnBasic', 'tabBtnSubTable', 'basicTab', 'subTableTab');
+      } else if (modelType === 'normal' && multiTree) {
+        // 4. 普通模型 + 多树：普通表单
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'employee')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'normal' && treeStructure && !subTable) {
+        // 3. 普通模型 + 树：普通表单（物料分类）
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'material')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'normal' && treeStructure && subTable) {
+        // 5. 普通模型 + 树 + 子表：两个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnSubTable">子表一</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'material')}</div>
+                <div class="tab-panel" id="subTableTab">
+                  <div class="post-list">
+                    <h4>物料供应商列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>供应商名称</th><th>联系人</th><th>联系电话</th><th>价格</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>中铝集团</td><td>王经理</td><td>138-8888-0001</td><td>¥25.50</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                        <tr>
+                          <td>宝钢集团</td><td>李经理</td><td>139-8888-0002</td><td>¥26.00</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initTabEvents('tabBtnBasic', 'tabBtnSubTable', 'basicTab', 'subTableTab');
+      } else if (modelType === 'multiView' && treeStructure && !subTable) {
+        // 13. 多视图 + 树：三个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnProduction">生产视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                    <div class="form-group"><label class="form-label">税率：</label><span class="form-value">13%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="productionTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">生产周期：</label><span class="form-value">7天</span></div>
+                    <div class="form-group"><label class="form-label">质量标准：</label><span class="form-value">ISO9001</span></div>
+                    <div class="form-group"><label class="form-label">工艺要求：</label><span class="form-value">SMT贴片</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnProduction'], ['basicTab', 'financeTab', 'productionTab']);
+      } else if (modelType === 'multiView' && multiTree && subTable) {
+        // 15. 多视图 + 多树 + 子表：四个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnSubTable1">子表一</button>
+                <button class="tab-btn" id="tabBtnSubTable2">子表二</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                    <div class="form-group"><label class="form-label">税率：</label><span class="form-value">13%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable1Tab">
+                  <div class="post-list">
+                    <h4>供应商列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>供应商名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>华为技术</td><td>张经理</td><td>138-8888-0001</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable2Tab">
+                  <div class="post-list">
+                    <h4>客户列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>客户名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>联想集团</td><td>李经理</td><td>139-8888-0002</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnSubTable1', 'tabBtnSubTable2'], ['basicTab', 'financeTab', 'subTable1Tab', 'subTable2Tab']);
+      } else if (modelType === 'multiView' && multiTree) {
+        // 14. 多视图 + 多树：三个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnProduction">生产视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                    <div class="form-group"><label class="form-label">税率：</label><span class="form-value">13%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="productionTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">生产周期：</label><span class="form-value">7天</span></div>
+                    <div class="form-group"><label class="form-label">质量标准：</label><span class="form-value">ISO9001</span></div>
+                    <div class="form-group"><label class="form-label">工艺要求：</label><span class="form-value">SMT贴片</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnProduction'], ['basicTab', 'financeTab', 'productionTab']);
+      } else if (modelType === 'multiView' && !treeStructure && !subTable) {
+        // 6. 多视图：四个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnProduction">生产视图</button>
+                <button class="tab-btn" id="tabBtnSales">销售视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                    <div class="form-group"><label class="form-label">税率：</label><span class="form-value">13%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="productionTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">生产周期：</label><span class="form-value">7天</span></div>
+                    <div class="form-group"><label class="form-label">质量标准：</label><span class="form-value">ISO9001</span></div>
+                    <div class="form-group"><label class="form-label">工艺要求：</label><span class="form-value">SMT贴片</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="salesTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">销售区域：</label><span class="form-value">全国</span></div>
+                    <div class="form-group"><label class="form-label">销售渠道：</label><span class="form-value">直销+代理</span></div>
+                    <div class="form-group"><label class="form-label">售后服务：</label><span class="form-value">1年保修</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnProduction', 'tabBtnSales'], ['basicTab', 'financeTab', 'productionTab', 'salesTab']);
+      } else if (modelType === 'multiView' && !treeStructure && subTable) {
+        // 7. 多视图 + 子表：四个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnSubTable1">子表一</button>
+                <button class="tab-btn" id="tabBtnSubTable2">子表二</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable1Tab">
+                  <div class="post-list">
+                    <h4>供应商列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>供应商名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>华为技术</td><td>张经理</td><td>138-8888-0001</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable2Tab">
+                  <div class="post-list">
+                    <h4>客户列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>客户名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>联想集团</td><td>李经理</td><td>139-8888-0002</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnSubTable1', 'tabBtnSubTable2'], ['basicTab', 'financeTab', 'subTable1Tab', 'subTable2Tab']);
+      } else if (modelType === 'multiView' && treeStructure && subTable) {
+        // 8. 多视图 + 树 + 子表：四个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnFinance">财务视图</button>
+                <button class="tab-btn" id="tabBtnSubTable1">子表一</button>
+                <button class="tab-btn" id="tabBtnSubTable2">子表二</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+                <div class="tab-panel" id="financeTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">成本价：</label><span class="form-value">¥120.00</span></div>
+                    <div class="form-group"><label class="form-label">销售价：</label><span class="form-value">¥180.00</span></div>
+                    <div class="form-group"><label class="form-label">利润率：</label><span class="form-value">50%</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable1Tab">
+                  <div class="post-list">
+                    <h4>供应商列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>供应商名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>华为技术</td><td>张经理</td><td>138-8888-0001</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTable2Tab">
+                  <div class="post-list">
+                    <h4>客户列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>客户名称</th><th>联系人</th><th>联系电话</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>联想集团</td><td>李经理</td><td>139-8888-0002</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnFinance', 'tabBtnSubTable1', 'tabBtnSubTable2'], ['basicTab', 'financeTab', 'subTable1Tab', 'subTable2Tab']);
+      } else if (modelType === 'categoryRef' && !subTable) {
+        // 9. 分类引用：普通表单（员工信息）
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'employee')}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (modelType === 'categoryRef' && subTable) {
+        // 10. 分类引用 + 子表：两个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnSubTable">子表一</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'employee')}</div>
+                <div class="tab-panel" id="subTableTab">
+                  <div class="post-list">
+                    <h4>工作经历列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>公司名称</th><th>职位</th><th>入职时间</th><th>离职时间</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>腾讯科技</td><td>软件工程师</td><td>2018-03-01</td><td>2020-02-28</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                        <tr>
+                          <td>阿里巴巴</td><td>高级工程师</td><td>2020-03-01</td><td>2022-02-28</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initTabEvents('tabBtnBasic', 'tabBtnSubTable', 'basicTab', 'subTableTab');
+      } else if (modelType === 'categoryMultiView' && !subTable) {
+        // 11. 分类引用多视图：两个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnHR">人事视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'employee')}</div>
+                <div class="tab-panel" id="hrTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">员工编号：</label><span class="form-value">EMP001</span></div>
+                    <div class="form-group"><label class="form-label">薪资等级：</label><span class="form-value">P6</span></div>
+                    <div class="form-group"><label class="form-label">基本工资：</label><span class="form-value">¥15000</span></div>
+                    <div class="form-group"><label class="form-label">绩效系数：</label><span class="form-value">1.2</span></div>
+                    <div class="form-group"><label class="form-label">社保基数：</label><span class="form-value">¥12000</span></div>
+                    <div class="form-group"><label class="form-label">公积金基数：</label><span class="form-value">¥12000</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initTabEvents('tabBtnBasic', 'tabBtnHR', 'basicTab', 'hrTab');
+      } else if (modelType === 'categoryMultiView' && subTable) {
+        // 12. 分类引用多视图 + 子表：三个页签
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+                <button class="tab-btn" id="tabBtnHR">人事视图</button>
+                <button class="tab-btn" id="tabBtnSubTable">子表一</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData, 'employee')}</div>
+                <div class="tab-panel" id="hrTab">
+                  <div class="detail-form">
+                    <div class="form-group"><label class="form-label">员工编号：</label><span class="form-value">EMP001</span></div>
+                    <div class="form-group"><label class="form-label">薪资等级：</label><span class="form-value">P6</span></div>
+                    <div class="form-group"><label class="form-label">基本工资：</label><span class="form-value">¥15000</span></div>
+                    <div class="form-group"><label class="form-label">绩效系数：</label><span class="form-value">1.2</span></div>
+                  </div>
+                </div>
+                <div class="tab-panel" id="subTableTab">
+                  <div class="post-list">
+                    <h4>培训记录列表</h4>
+                    <table class="post-table">
+                      <thead>
+                        <tr>
+                          <th>培训课程</th><th>培训时间</th><th>培训地点</th><th>成绩</th><th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Java高级开发</td><td>2024-01-15</td><td>线上培训</td><td>优秀</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                        <tr>
+                          <td>项目管理</td><td>2024-02-20</td><td>线下培训</td><td>良好</td>
+                          <td><button style="background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px;">编辑</button><button style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 12px;">删除</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        initMultiTabEvents(['tabBtnBasic', 'tabBtnHR', 'tabBtnSubTable'], ['basicTab', 'hrTab', 'subTableTab']);
+      } else {
+        // 默认：普通表单
+        detailPanel.innerHTML = `
+          <div class="detail-preview">
+            <div class="detail-tabs">
+              <div class="tab-header">
+                <button class="tab-btn active" id="tabBtnBasic">基本视图</button>
+              </div>
+              <div class="tab-content">
+                <div class="tab-panel active" id="basicTab">${renderDetailForm(detailData)}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 初始化两个页签的事件
+    function initTabEvents(btn1Id, btn2Id, tab1Id, tab2Id) {
+      setTimeout(() => {
+        const btn1 = document.getElementById(btn1Id);
+        const btn2 = document.getElementById(btn2Id);
+        const tab1 = document.getElementById(tab1Id);
+        const tab2 = document.getElementById(tab2Id);
+        
+        btn1.onclick = function() {
+          btn1.classList.add('active');
+          btn2.classList.remove('active');
+          tab1.classList.add('active');
+          tab2.classList.remove('active');
+          tab1.style.display = 'block';
+          tab2.style.display = 'none';
+        };
+        btn2.onclick = function() {
+          btn2.classList.add('active');
+          btn1.classList.remove('active');
+          tab2.classList.add('active');
+          tab1.classList.remove('active');
+          tab2.style.display = 'block';
+          tab1.style.display = 'none';
+        };
+        
+        // 初始化时只显示第一个页签
+        tab1.style.display = 'block';
+        tab2.style.display = 'none';
+      }, 0);
+    }
+
+    // 初始化多个页签的事件
+    function initMultiTabEvents(btnIds, tabIds) {
+      setTimeout(() => {
+        const btns = btnIds.map(id => document.getElementById(id));
+        const tabs = tabIds.map(id => document.getElementById(id));
+        
+        btns.forEach((btn, index) => {
+          btn.onclick = function() {
+            // 移除所有活动状态
+            btns.forEach(b => b.classList.remove('active'));
+            tabs.forEach(t => {
+              t.classList.remove('active');
+              t.style.display = 'none';
+            });
+            
+            // 激活当前页签
+            btn.classList.add('active');
+            tabs[index].classList.add('active');
+            tabs[index].style.display = 'block';
+          };
+        });
+        
+        // 初始化时只显示第一个页签
+        tabs.forEach((tab, index) => {
+          tab.style.display = index === 0 ? 'block' : 'none';
+        });
+      }, 0);
+    }
+
+    // 显示暂无设计消息
+    function showNoDesignMessage() {
+      const modelType = document.querySelector('input[name="modelType"]:checked').value;
+      const treeStructure = document.getElementById('dataStructure').checked;
+      const subTable = document.getElementById('subTable').checked;
+      const multiTree = document.getElementById('multiTree').checked;
+      
+      const previewWindow = document.getElementById('previewWindow');
+      const listPanel = document.getElementById('listPanel');
+      const detailPanel = document.getElementById('detailPanel');
+      
+      // 显示预览窗口
+      previewWindow.style.display = 'block';
+      
+      // 默认显示列表页签
+      switchTab('list');
+      
+      // 生成当前选择的组合描述
+      let combinationDesc = getModelTypeName(modelType);
+      const options = [];
+      if (treeStructure) options.push('树');
+      if (subTable) options.push('子表');
+      if (multiTree) options.push('多树');
+      
+      if (options.length > 0) {
+        combinationDesc += ' + ' + options.join(' + ');
+      }
+      
+      // 判断是否为分类引用+树/多树 或 分类引用多视图+树/多树
+      let specialTip = '';
+      if (
+        (modelType === 'categoryRef' && (treeStructure || multiTree)) ||
+        (modelType === 'categoryMultiView' && (treeStructure || multiTree))
+      ) {
+        specialTip = `<div class="no-design-special-tip" style="color:#e74c3c;font-weight:bold;font-size:16px;margin-bottom:8px;">当前组合暂不支持：分类引用+树/多树，分类引用多视图+树/多树</div>`;
+      }
+      
+      // 在列表和详情面板都显示暂无设计消息
+      const noDesignHTML = `
+        <div class="no-design-message">
+          <div class="no-design-icon">🚧</div>
+          <div class="no-design-title">暂无设计</div>
+          ${specialTip}
+          <div class="no-design-desc">当前选择的组合"<strong>${combinationDesc}</strong>"尚未设计，请选择其他组合或联系开发团队。</div>
+          <div class="no-design-tips">
+            <div class="tip-item">• <strong>已支持的组合：</strong></div>
+            <div class="tip-item">  - 普通模型（基础、+树、+子表、+树+子表、+多树）</div>
+            <div class="tip-item">  - 多视图（基础、+树、+子表、+树+子表、+多树、+多树+子表）</div>
+            <div class="tip-item">  - 分类引用（基础、+子表）</div>
+            <div class="tip-item">  - 分类引用多视图（基础、+子表）</div>
+            <div class="tip-item">• <strong>暂不支持：</strong>分类引用+树/多树、分类引用多视图+树/多树</div>
+            <div class="tip-item">• 更多组合正在开发中，敬请期待</div>
+          </div>
+        </div>
+      `;
+      
+      listPanel.innerHTML = noDesignHTML;
+      detailPanel.innerHTML = noDesignHTML;
+    }
+
+    // 获取模型类型的中文名称
+    function getModelTypeName(modelType) {
+      const typeNames = {
+        'normal': '普通模型',
+        'multiView': '多视图',
+        'categoryRef': '分类引用',
+        'categoryMultiView': '分类引用多视图'
+      };
+      return typeNames[modelType] || modelType;
+    }
+
+    // 监听模型类型变化，控制树和多树复选框的可用状态
+    function handleModelTypeChange() {
+      const modelType = document.querySelector('input[name="modelType"]:checked').value;
+      const treeCheckbox = document.getElementById('dataStructure');
+      const multiTreeCheckbox = document.getElementById('multiTree');
+      if (modelType === 'categoryRef' || modelType === 'categoryMultiView') {
+        treeCheckbox.checked = false;
+        treeCheckbox.disabled = true;
+        multiTreeCheckbox.checked = false;
+        multiTreeCheckbox.disabled = true;
+      } else if (modelType === 'multiView') {
+        multiTreeCheckbox.checked = false;
+        multiTreeCheckbox.disabled = true;
+        treeCheckbox.disabled = false;
+      } else {
+        treeCheckbox.disabled = false;
+        multiTreeCheckbox.disabled = false;
+      }
+    }
+    // 页面加载和模型类型切换时绑定
+    window.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('input[name="modelType"]').forEach(radio => {
+        radio.addEventListener('change', handleModelTypeChange);
+      });
+      handleModelTypeChange();
+    });
+  </script>
+</body>
+</html>

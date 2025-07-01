@@ -747,9 +747,9 @@
                 <th>用户编码</th>
                 <th>用户名</th>
                 <th>单位名称</th>
-                <th>创建人编码</th>
+                <th style="min-width:133px;width:133px;">创建人编码</th>
                 <th style="min-width:133px;width:133px;">创建人名称</th>
-                <th>创建时间</th>
+                <th style="min-width:133px;width:133px;">创建时间</th>
               </tr>
             </thead>
             <tbody id="userTableBody">
@@ -1245,6 +1245,24 @@
             // 这里可以加apply相关的事件绑定
           } else if (tabType === 'modify') {
             document.getElementById('modelTabContent').innerHTML = renderModelModifyTab();
+            // 绑定模型修改页签下按钮事件
+            bindModelModifyEvents();
+          } else if (tabType === 'freeze') {
+            document.getElementById('modelTabContent').innerHTML = renderModelFreezeTab();
+            // 绑定模型冻结页签下按钮事件
+            bindModelFreezeEvents();
+          } else if (tabType === 'unfreeze') {
+            document.getElementById('modelTabContent').innerHTML = renderModelUnfreezeTab();
+            // 绑定模型解冻页签下按钮事件
+            bindModelUnfreezeEvents();
+          } else if (tabType === 'review') {
+            document.getElementById('modelTabContent').innerHTML = renderModelReviewTab();
+            // 绑定模型审核页签下按钮事件
+            bindModelReviewEvents();
+          } else if (tabType === 'search') {
+            document.getElementById('modelTabContent').innerHTML = renderModelSearchTab();
+            // 绑定模型检索页签下按钮事件
+            bindModelSearchEvents();
           }
           // 其他tab同理
         };
@@ -1258,6 +1276,380 @@
         modelQueryShowQueryBar = !modelQueryShowQueryBar;
         renderAndBindModelQueryTab();
       };
+    }
+
+    // 绑定模型修改页签的事件
+    function bindModelModifyEvents() {
+      // 选择数据按钮点击事件
+      const selectDataBtn = document.getElementById('selectDataBtn');
+      if (selectDataBtn) {
+        selectDataBtn.onclick = function() {
+          // 设置当前页签类型，用于区分数据源
+          window.currentTabType = 'modify';
+          document.getElementById('selectDataModal').style.display = 'flex';
+          // 加载正常状态的模型数据
+          loadNormalModelData();
+        };
+      }
+
+      // 模型初始化按钮点击事件
+      const modelInitBtn = document.getElementById('modelInitBtn');
+      if (modelInitBtn) {
+        modelInitBtn.onclick = function() {
+          // 这里可以添加模型初始化的逻辑
+          alert('模型初始化功能');
+          // 可以打开一个初始化配置对话框或执行初始化操作
+        };
+      }
+
+      // 快速查询按钮点击事件
+      const quickSearchBtn = document.getElementById('modelQuickSearchBtn');
+      if (quickSearchBtn) {
+        quickSearchBtn.onclick = function() {
+          const quickSearchBar = document.getElementById('selectDataQuickSearchBar');
+          if (quickSearchBar) {
+            quickSearchBar.style.display = quickSearchBar.style.display === 'none' ? 'block' : 'none';
+          }
+        };
+      }
+
+      // 高级查询按钮点击事件
+      const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+      if (advancedSearchBtn) {
+        advancedSearchBtn.onclick = function() {
+          // 复用现有的高级查询功能
+          showAdvancedSearchModal();
+        };
+      }
+    }
+
+    // 绑定模型冻结页签的事件
+    function bindModelFreezeEvents() {
+      // 选择数据按钮点击事件
+      const selectDataBtn = document.getElementById('selectDataBtn');
+      if (selectDataBtn) {
+        selectDataBtn.onclick = function() {
+          // 设置当前页签类型，用于区分数据源
+          window.currentTabType = 'freeze';
+          document.getElementById('selectDataModal').style.display = 'flex';
+          // 加载正常状态的模型数据
+          loadNormalModelData();
+        };
+      }
+
+      // 冻结按钮点击事件
+      const freezeBtn = document.getElementById('freezeBtn');
+      if (freezeBtn) {
+        freezeBtn.onclick = function() {
+          // 获取选中的行
+          const selectedRows = document.querySelectorAll('#applyModelTableBody input[type="checkbox"]:checked');
+          if (selectedRows.length === 0) {
+            alert('请至少选择一条数据进行冻结');
+            return;
+          }
+          
+          // 这里可以添加冻结逻辑
+          alert(`确认冻结选中的 ${selectedRows.length} 条数据吗？`);
+          // 可以打开一个冻结确认对话框或执行具体的冻结操作
+        };
+      }
+
+      // 快速查询按钮点击事件
+      const quickSearchBtn = document.getElementById('modelQuickSearchBtn');
+      if (quickSearchBtn) {
+        quickSearchBtn.onclick = function() {
+          const quickSearchBar = document.getElementById('selectDataQuickSearchBar');
+          if (quickSearchBar) {
+            quickSearchBar.style.display = quickSearchBar.style.display === 'none' ? 'block' : 'none';
+          }
+        };
+      }
+
+      // 高级查询按钮点击事件
+      const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+      if (advancedSearchBtn) {
+        advancedSearchBtn.onclick = function() {
+          // 复用现有的高级查询功能
+          showAdvancedSearchModal();
+        };
+      }
+    }
+
+    // 绑定模型解冻页签的事件
+    function bindModelUnfreezeEvents() {
+      // 选择数据按钮点击事件
+      const selectDataBtn = document.getElementById('selectDataBtn');
+      if (selectDataBtn) {
+        selectDataBtn.onclick = function() {
+          // 设置当前页签类型，用于区分数据源
+          window.currentTabType = 'unfreeze';
+          document.getElementById('selectDataModal').style.display = 'flex';
+          // 加载冻结状态的模型数据
+          loadFrozenModelData();
+        };
+      }
+
+      // 解冻按钮点击事件
+      const unfreezeBtn = document.getElementById('unfreezeBtn');
+      if (unfreezeBtn) {
+        unfreezeBtn.onclick = function() {
+          // 获取选中的行
+          const selectedRows = document.querySelectorAll('#applyModelTableBody input[type="checkbox"]:checked');
+          if (selectedRows.length === 0) {
+            alert('请至少选择一条数据进行解冻');
+            return;
+          }
+          
+          // 这里可以添加解冻逻辑
+          alert(`确认解冻选中的 ${selectedRows.length} 条数据吗？`);
+          // 可以打开一个解冻确认对话框或执行具体的解冻操作
+        };
+      }
+
+      // 快速查询按钮点击事件
+      const quickSearchBtn = document.getElementById('modelQuickSearchBtn');
+      if (quickSearchBtn) {
+        quickSearchBtn.onclick = function() {
+          const quickSearchBar = document.getElementById('selectDataQuickSearchBar');
+          if (quickSearchBar) {
+            quickSearchBar.style.display = quickSearchBar.style.display === 'none' ? 'block' : 'none';
+          }
+        };
+      }
+
+      // 高级查询按钮点击事件
+      const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+      if (advancedSearchBtn) {
+        advancedSearchBtn.onclick = function() {
+          // 复用现有的高级查询功能
+          showAdvancedSearchModal();
+        };
+      }
+    }
+
+    // 绑定模型审核页签的事件
+    function bindModelReviewEvents() {
+      // 通过按钮点击事件（批量操作）
+      const approveBtn = document.getElementById('approveBtn');
+      if (approveBtn) {
+        approveBtn.onclick = function() {
+          // 获取选中的行
+          const selectedRows = document.querySelectorAll('#applyModelTableBody input[type="checkbox"]:checked');
+          if (selectedRows.length === 0) {
+            alert('请至少选择一条数据进行审核通过');
+            return;
+          }
+          
+          // 这里可以添加批量通过逻辑
+          alert(`确认通过选中的 ${selectedRows.length} 条数据吗？`);
+        };
+      }
+
+      // 驳回按钮点击事件（批量操作）
+      const rejectBtn = document.getElementById('rejectBtn');
+      if (rejectBtn) {
+        rejectBtn.onclick = function() {
+          // 获取选中的行
+          const selectedRows = document.querySelectorAll('#applyModelTableBody input[type="checkbox"]:checked');
+          if (selectedRows.length === 0) {
+            alert('请至少选择一条数据进行驳回');
+            return;
+          }
+          
+          // 这里可以添加批量驳回逻辑
+          alert(`确认驳回选中的 ${selectedRows.length} 条数据吗？`);
+        };
+      }
+
+      // 快速查询按钮点击事件
+      const quickSearchBtn = document.getElementById('modelQuickSearchBtn');
+      if (quickSearchBtn) {
+        quickSearchBtn.onclick = function() {
+          const quickSearchBar = document.getElementById('selectDataQuickSearchBar');
+          if (quickSearchBar) {
+            quickSearchBar.style.display = quickSearchBar.style.display === 'none' ? 'block' : 'none';
+          }
+        };
+      }
+
+      // 高级查询按钮点击事件
+      const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+      if (advancedSearchBtn) {
+        advancedSearchBtn.onclick = function() {
+          // 复用现有的高级查询功能
+          showAdvancedSearchModal();
+        };
+      }
+    }
+
+    // 加载冻结状态的模型数据
+    function loadFrozenModelData() {
+      // 模拟冻结状态的模型数据
+      const frozenModelData = [
+        {
+          name: '冻结模型A',
+          code: 'frozen_model_a',
+          description: '这是一个冻结状态的模型A',
+          type: '主数据',
+          level: '否',
+          creator: 'admin',
+          createTime: '2023-01-01',
+          currentModifier: 'admin',
+          lastModifier: 'admin',
+          lastModifyTime: '2023-12-01',
+          version: '3',
+          reviewer: '张三',
+          status: '已冻结',
+          language: '中文'
+        },
+        {
+          name: '冻结模型B',
+          code: 'frozen_model_b',
+          description: '这是一个冻结状态的模型B',
+          type: '系统字典表',
+          level: '否',
+          creator: 'admin',
+          createTime: '2023-02-01',
+          currentModifier: 'admin',
+          lastModifier: 'admin',
+          lastModifyTime: '2023-11-15',
+          version: '2',
+          reviewer: '李四',
+          status: '已冻结',
+          language: '中文'
+        },
+        {
+          name: '冻结模型C',
+          code: 'frozen_model_c',
+          description: '这是一个冻结状态的模型C',
+          type: '主数据',
+          level: '是',
+          creator: 'admin',
+          createTime: '2023-03-01',
+          currentModifier: 'admin',
+          lastModifier: 'admin',
+          lastModifyTime: '2023-10-20',
+          version: '4',
+          reviewer: '王五',
+          status: '已冻结',
+          language: '英文'
+        }
+      ];
+
+      // 更新选择数据对话框的表格内容
+      const tableBody = document.getElementById('selectDataTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = frozenModelData.map(model => `
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox"></td>
+            <td>${model.name}</td>
+            <td>${model.code}</td>
+            <td>${model.description}</td>
+            <td>${model.type}</td>
+            <td>${model.level}</td>
+            <td>${model.creator}</td>
+            <td>${model.createTime}</td>
+            <td>${model.currentModifier}</td>
+            <td>${model.lastModifier}</td>
+            <td>${model.lastModifyTime}</td>
+            <td><a href="#" class="version-link">${model.version}</a></td>
+            <td>${model.reviewer}</td>
+            <td>${model.status}</td>
+            <td>${model.language}</td>
+          </tr>
+        `).join('');
+      }
+
+      // 更新对话框标题，表明这是冻结模型数据
+      const modalTitle = document.querySelector('#selectDataModal .modal-content > div:first-child');
+      if (modalTitle) {
+        modalTitle.innerHTML = '选择冻结模型数据 <span style="position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;" id="selectDataClose">×</span>';
+      }
+    }
+
+    // 加载正常状态的模型数据
+    function loadNormalModelData() {
+      // 模拟正常状态的模型数据（原有的数据）
+      const normalModelData = [
+        {
+          name: '元数据',
+          code: 'mdm_meta',
+          description: '系统元数据管理',
+          type: '系统字典表',
+          level: '否',
+          creator: 'admin',
+          createTime: '2019-01-01',
+          currentModifier: 'admin',
+          lastModifier: 'admin',
+          lastModifyTime: '2022-03-25',
+          version: '2',
+          reviewer: '张三',
+          status: '正常',
+          language: '中文'
+        },
+        {
+          name: '模型类型',
+          code: 'mdm_model_type',
+          description: '数据模型类型定义',
+          type: '系统字典表',
+          level: '否',
+          creator: 'admin',
+          createTime: '2019-01-01',
+          currentModifier: 'hefanqi',
+          lastModifier: 'admin',
+          lastModifyTime: '2022-03-25',
+          version: '4',
+          reviewer: '李四',
+          status: '待提交',
+          language: '中文'
+        },
+        {
+          name: '文件类型',
+          code: 'mdm_sys_file_type',
+          description: '系统支持的文件类型',
+          type: '系统字典表',
+          level: '否',
+          creator: 'admin',
+          createTime: '2019-01-01',
+          currentModifier: 'admin',
+          lastModifier: 'admin',
+          lastModifyTime: '2022-03-25',
+          version: '2',
+          reviewer: '王五',
+          status: '待提交',
+          language: '中文'
+        }
+      ];
+
+      // 更新选择数据对话框的表格内容
+      const tableBody = document.getElementById('selectDataTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = normalModelData.map(model => `
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox"></td>
+            <td>${model.name}</td>
+            <td>${model.code}</td>
+            <td>${model.description}</td>
+            <td>${model.type}</td>
+            <td>${model.level}</td>
+            <td>${model.creator}</td>
+            <td>${model.createTime}</td>
+            <td>${model.currentModifier}</td>
+            <td>${model.lastModifier}</td>
+            <td>${model.lastModifyTime}</td>
+            <td><a href="#" class="version-link">${model.version}</a></td>
+            <td>${model.reviewer}</td>
+            <td>${model.status}</td>
+            <td>${model.language}</td>
+          </tr>
+        `).join('');
+      }
+
+      // 更新对话框标题，表明这是正常模型数据
+      const modalTitle = document.querySelector('#selectDataModal .modal-content > div:first-child');
+      if (modalTitle) {
+        modalTitle.innerHTML = '选择数据 <span style="position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;" id="selectDataClose">×</span>';
+      }
     }
 
     let advancedSearchInitialized = false;
@@ -1418,7 +1810,6 @@
                 <th>审核人</th>
                 <th>状态</th>
                 <th>语言</th>
-                <th>操作</th>
               </tr>
             </thead>
             ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
@@ -1451,7 +1842,6 @@
               <td><input type='text' placeholder='审核人' style='width:98%;'></td>
               <td><input type='text' placeholder='状态' style='width:98%;'></td>
               <td><input type='text' placeholder='语言' style='width:98%;'></td>
-              <td></td>
             </tr>` : ''}
             <tbody>
               <tr>
@@ -1470,7 +1860,6 @@
                 <td>张三</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_meta">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1488,7 +1877,6 @@
                 <td>李四</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_model_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1506,7 +1894,6 @@
                 <td>王五</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_sys_file_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1524,7 +1911,6 @@
                 <td>赵六</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_field_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1542,7 +1928,6 @@
                 <td>孙七</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_sys_if">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1560,7 +1945,6 @@
                 <td>周八</td>
                 <td>正常</td>
                 <td>英文</td>
-                <td><button class="btn-er" data-code="mdm_op_type">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1578,7 +1962,6 @@
                 <td>吴九</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_syslog">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1596,7 +1979,6 @@
                 <td>郑十</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-er" data-code="mdm_system">查看关系</button></td>
               </tr>
             </tbody>
           </table>
@@ -1657,7 +2039,7 @@
                 <td>张三</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1675,7 +2057,7 @@
                 <td>李四</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1693,7 +2075,7 @@
                 <td>王五</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1711,7 +2093,7 @@
                 <td>赵六</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1729,7 +2111,7 @@
                 <td>孙七</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1747,7 +2129,7 @@
                 <td>周八</td>
                 <td>正常</td>
                 <td>英文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1765,7 +2147,7 @@
                 <td>吴九</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1783,7 +2165,7 @@
                 <td>郑十</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button class="btn-line" style="padding:4px 8px;font-size:13px;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
               </tr>
             </tbody>
           </table>
@@ -1791,10 +2173,945 @@
       `;
     }
 
-    function renderModelModifyTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型修改功能暂未实现</div>`; }
-    function renderModelFreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型冻结功能暂未实现</div>`; }
-    function renderModelUnfreezeTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型解冻功能暂未实现</div>`; }
-    function renderModelSearchTab() { return `<div style='padding:32px;font-size:18px;color:#888;'>模型检索功能暂未实现</div>`; }
+    function renderModelModifyTab() { 
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-main" id="selectDataBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H1l8-8 8 8h-8v8z"/></svg>
+          </span>选择数据</button>
+          <button class="btn-line" id="modelInitBtn">模型初始化</button>
+          <button class="btn-line" id="applyDeleteBtn">删除</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `; 
+    }
+
+    function renderModelFreezeTab() { 
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-main" id="selectDataBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H1l8-8 8 8h-8v8z"/></svg>
+          </span>选择数据</button>
+          <button class="btn-main" id="freezeBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+          </span>冻结</button>
+          <button class="btn-line" id="applyDeleteBtn">删除</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `; 
+    }
+
+    function renderModelUnfreezeTab() { 
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-main" id="selectDataBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H1l8-8 8 8h-8v8z"/></svg>
+          </span>选择数据</button>
+          <button class="btn-main" id="unfreezeBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg>
+          </span>解冻</button>
+          <button class="btn-line" id="applyDeleteBtn">删除</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `; 
+    }
+
+    function renderModelReviewTab() { 
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+          <button class="btn-main" id="approveBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          </span>通过</button>
+          <button class="btn-line" id="rejectBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </span>驳回</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>待审核</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待审核</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `; 
+    }
+
+    function renderModelSearchTab() { 
+      return `
+        <div class="action-bar">
+          <button class="btn-main" id="modelQuickSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </span>快速查询</button>
+          <button class="btn-line" id="advancedSearchBtn"><span class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </span>高级查询</button>
+        </div>
+        <div class="table-wrap">
+          <table class="model-table">
+            <thead>
+              <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="applySelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="applyModelTableBody">
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_meta">元数据</a></td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_model_type">模型类型</a></td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_file_type">文件类型</a></td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_field_type">字段类型</a></td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td><a href="#" class="version-link">2</a></td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_sys_if">是否</a></td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">3</a></td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_op_type">操作类型</a></td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">4</a></td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_syslog">MDM_SYSLOG</a></td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">5</a></td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td class="checkbox-cell"><input type="checkbox"></td>
+                <td><a href="#" class="model-name-link" data-id="mdm_system">MDM_SYSTEM</a></td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td><a href="#" class="version-link">6</a></td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `; 
+    }
 
     // 版本弹窗逻辑（事件委托，兼容动态渲染）
     let currentVersionModelCode = null;
@@ -1925,6 +3242,18 @@
         const ruleId = e.target.getAttribute('data-rule-id');
         openRuleDetail(ruleId);
       }
+      // 处理模型审核页签的行操作按钮
+      if (e.target.textContent === '通过' && e.target.closest('#applyModelTableBody')) {
+        const row = e.target.closest('tr');
+        const modelName = row.querySelector('.model-name-link').textContent;
+        alert(`确认通过模型 "${modelName}" 吗？`);
+        // 这里可以添加单行通过逻辑
+      } else if (e.target.textContent === '驳回' && e.target.closest('#applyModelTableBody')) {
+        const row = e.target.closest('tr');
+        const modelName = row.querySelector('.model-name-link').textContent;
+        alert(`确认驳回模型 "${modelName}" 吗？`);
+        // 这里可以添加单行驳回逻辑
+      }
     });
 
     drawerMask.addEventListener('click', closeDrawer);
@@ -2035,7 +3364,7 @@
                 <td>正常</td>
                 <td>admin</td>
                 <td>2023-01-01 10:00:00</td>
-                <td><button>编辑</button> <button>删除</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button> <button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">删除</button></td>
             </tr>
         `;
       }
@@ -2225,6 +3554,270 @@
           });
       }
     });
+
+    // 绑定模型检索页签的事件
+    function bindModelSearchEvents() {
+      // 快速查询按钮点击事件
+      const quickSearchBtn = document.getElementById('modelQuickSearchBtn');
+      if (quickSearchBtn) {
+        quickSearchBtn.onclick = function() {
+          const quickSearchBar = document.getElementById('selectDataQuickSearchBar');
+          if (quickSearchBar) {
+            quickSearchBar.style.display = quickSearchBar.style.display === 'none' ? 'block' : 'none';
+          }
+        };
+      }
+
+      // 高级查询按钮点击事件
+      const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+      if (advancedSearchBtn) {
+        advancedSearchBtn.onclick = function() {
+          // 复用现有的高级查询功能
+          showAdvancedSearchModal();
+        };
+      }
+    }
   </script>
+
+  <!-- 选择数据对话框 -->
+  <div id="selectDataModal" class="modal-mask">
+    <div class="modal-content" style="max-width: 1200px; width: 90vw;">
+      <div style="background:#2176c7;color:#fff;font-size:18px;font-weight:500;padding:14px 20px;border-radius:8px 8px 0 0;">
+        选择数据 <span style='position:absolute;right:20px;top:14px;cursor:pointer;font-size:22px;' id="selectDataClose">×</span>
+      </div>
+      <div style="padding:20px;">
+        <!-- 快速搜索和高级搜索按钮 -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+          <button class="btn-main" id="selectDataQuickSearchBtn" style="height:32px;font-size:14px;">
+            <span class="icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+            </span>快速查询
+          </button>
+          <button class="btn-line" id="selectDataAdvancedSearchBtn" style="height:32px;font-size:14px;">
+            <span class="icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/>
+              </svg>
+            </span>高级查询
+          </button>
+        </div>
+        
+        <!-- 快速查询栏 -->
+        <div id="selectDataQuickSearchBar" style="display:none;background:#f4f8fc;border:1px solid #c0d3eb;border-radius:4px;padding:12px;margin-bottom:16px;">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <label style="font-size:14px;color:#333;">模型名称:</label>
+              <input type="text" placeholder="请输入模型名称" style="width:120px;padding:4px 8px;border:1px solid #c0d3eb;border-radius:3px;font-size:13px;">
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <label style="font-size:14px;color:#333;">模型编码:</label>
+              <input type="text" placeholder="请输入模型编码" style="width:120px;padding:4px 8px;border:1px solid #c0d3eb;border-radius:3px;font-size:13px;">
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <label style="font-size:14px;color:#333;">类型:</label>
+              <select style="width:100px;padding:4px 8px;border:1px solid #c0d3eb;border-radius:3px;font-size:13px;">
+                <option value="">全部</option>
+                <option value="系统字典表">系统字典表</option>
+                <option value="字典表">字典表</option>
+                <option value="主数据">主数据</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <label style="font-size:14px;color:#333;">状态:</label>
+              <select style="width:80px;padding:4px 8px;border:1px solid #c0d3eb;border-radius:3px;font-size:13px;">
+                <option value="">全部</option>
+                <option value="正常">正常</option>
+                <option value="待提交">待提交</option>
+                <option value="草稿">草稿</option>
+                <option value="停用">停用</option>
+              </select>
+            </div>
+            <button class="btn-main" style="height:28px;font-size:13px;padding:0 12px;">查询</button>
+            <button class="btn-line" style="height:28px;font-size:13px;padding:0 12px;">重置</button>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div style="overflow:auto;max-height:400px;">
+          <table class="model-table" style="min-width:1000px;">
+            <thead>
+              <tr>
+                <th style="width:40px;"><input type="checkbox" id="selectDataSelectAll"></th>
+                <th>模型名称</th>
+                <th>模型编码</th>
+                <th>模型描述</th>
+                <th>类型</th>
+                <th>层级展示</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>当前修改人</th>
+                <th>最后修改人</th>
+                <th>最后修改时间</th>
+                <th>模型版本</th>
+                <th>审核人</th>
+                <th>状态</th>
+                <th>语言</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="selectDataTableBody">
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>元数据</td>
+                <td>mdm_meta</td>
+                <td>系统元数据管理</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td>2</td>
+                <td>张三</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>模型类型</td>
+                <td>mdm_model_type</td>
+                <td>数据模型类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>hefanqi</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td>4</td>
+                <td>李四</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>文件类型</td>
+                <td>mdm_sys_file_type</td>
+                <td>系统支持的文件类型</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2022-03-25</td>
+                <td>2</td>
+                <td>王五</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>字段类型</td>
+                <td>mdm_field_type</td>
+                <td>数据字段类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>lichunyang</td>
+                <td>admin</td>
+                <td>2025-04-17</td>
+                <td>2</td>
+                <td>赵六</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>是否</td>
+                <td>mdm_sys_if</td>
+                <td>系统是否选项</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>3</td>
+                <td>孙七</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>操作类型</td>
+                <td>mdm_op_type</td>
+                <td>系统操作类型定义</td>
+                <td>系统字典表</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>4</td>
+                <td>周八</td>
+                <td>正常</td>
+                <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>MDM_SYSLOG</td>
+                <td>mdm_syslog</td>
+                <td>系统日志记录</td>
+                <td>主数据</td>
+                <td>否</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>5</td>
+                <td>吴九</td>
+                <td>正常</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>MDM_SYSTEM</td>
+                <td>mdm_system</td>
+                <td>系统信息管理</td>
+                <td>主数据</td>
+                <td>是</td>
+                <td>admin</td>
+                <td>2019-01-01</td>
+                <td>admin</td>
+                <td>admin</td>
+                <td>2025-06-11</td>
+                <td>6</td>
+                <td>郑十</td>
+                <td>待提交</td>
+                <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- 底部按钮 -->
+        <div style="display:flex;justify-content:flex-end;gap:18px;margin-top:18px;">
+          <button type="button" id="selectDataOk" style="background:#2176c7;color:#fff;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">确定</button>
+          <button type="button" id="selectDataCancel" style="background:#e3eaf3;color:#2176c7;padding:8px 32px;border:none;border-radius:4px;font-size:15px;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html> 

@@ -1025,6 +1025,7 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         保存设置
                     </button>
+                    <button id="homeSettingsReset" style="background:#f4f6fa;color:#2176c7;margin-left:8px;">重置</button>
                     <button id="homeSettingsClose">关闭</button>
                 </div>
             </div>
@@ -1626,6 +1627,7 @@ const homeSettingsBtn = document.getElementById('homeSettingsBtn');
 const homeSettingsMask = document.getElementById('homeSettingsMask');
 const homeSettingsSave = document.getElementById('homeSettingsSave');
 const homeSettingsClose = document.getElementById('homeSettingsClose');
+const homeSettingsReset = document.getElementById('homeSettingsReset');
 
 homeSettingsBtn.onclick = function() {
     isSettingsMode = true;
@@ -1645,6 +1647,21 @@ homeSettingsClose.onclick = function() {
     isSettingsMode = false;
     homeSettingsMask.style.display = 'none';
     document.body.style.overflow = '';
+};
+homeSettingsReset.onclick = function() {
+    // 默认初始布局
+    const defaultConfig = [
+        { key: 'stat', x:0, y:0, w:2, h:1 },
+        { key: 'todo', x:2, y:0, w:2, h:1 },
+        { key: 'notice', x:0, y:1, w:2, h:1 },
+        { key: 'standard', x:2, y:1, w:1, h:1 },
+        { key: 'rule', x:3, y:1, w:1, h:1 },
+        { key: 'quick', x:0, y:2, w:4, h:1 },
+        { key: 'external', x:0, y:3, w:4, h:1 }
+    ];
+    setHomeCanvasConfig(defaultConfig);
+    renderHomeSettingsModuleList();
+    renderHomeSettingsCanvas();
 };
 
 // 学位菜单点击显示列表页

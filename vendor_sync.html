@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供应商数据同步 - 主数据管理平台</title>
+    <style>
+        :root {
+            --theme-bg: #f7faff;
+            --theme-topbar: linear-gradient(90deg, #2176c7 60%, #3ba1e3 100%);
+            --theme-sidebar: #fff;
+            --theme-content: #f4f8fb;
+            --theme-topbar-font: #fff;
+            --theme-menu-active: #2176c7;
+            --theme-menu-hover: #185a99;
+            --theme-table-header: #f4f8fb;
+            --theme-table-header-font: #2176c7;
+            --theme-table-row-hover: #f0f6fd;
+            --theme-table-border: #e3eaf3;
+            --theme-btn: #2176c7;
+            --theme-btn-hover: #185a99;
+            --theme-avatar-bg: #eaf3fb;
+            --theme-avatar-font: #2176c7;
+            --theme-content-text: #185a99;
+            --theme-shadow-color: rgba(33, 118, 199, 0.06);
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: var(--theme-bg);
+            color: #222;
+        }
+        
+        .layout {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+        
+        .topbar {
+            height: 56px;
+            background: var(--theme-topbar);
+            color: var(--theme-topbar-font);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(33, 118, 199, 0.08);
+            z-index: 10;
+            position: relative;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: 36px;
+            background: transparent;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #2176c7;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .topbar-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--theme-topbar-font);
+            letter-spacing: 1px;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 15px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.13);
+            border: none;
+            border-radius: 16px;
+            padding: 2px 18px;
+            font-size: 15px;
+            color: #fff;
+            margin-right: 4px;
+            letter-spacing: 1px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            height: 32px;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .sync-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(33,118,199,0.08);
+            overflow: hidden;
+        }
+        
+        .sync-header {
+            background: linear-gradient(135deg, #2176c7 0%, #3ba1e3 100%);
+            color: #fff;
+            padding: 24px 32px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sync-body {
+            padding: 32px;
+        }
+        
+        .sync-section {
+            margin-bottom: 32px;
+            border: 1px solid #e3eaf3;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f4f8fb;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e3eaf3;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2176c7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-content {
+            padding: 24px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #185a99;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            padding: 10px 12px;
+            border: 1.5px solid #c0d3eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2176c7;
+            box-shadow: 0 0 0 2px rgba(33, 118, 199, 0.1);
+        }
+        
+        .form-select {
+            padding: 10px 12px;
+            border: 1.5px solid #c0d3eb;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .btn-main {
+            background: var(--theme-btn);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-main:hover {
+            background: var(--theme-btn-hover);
+        }
+        
+        .btn-line {
+            background: #fff;
+            color: var(--theme-btn);
+            border: 1px solid var(--theme-btn);
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-line:hover {
+            background: var(--theme-btn);
+            color: #fff;
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-success:hover {
+            background: #388e3c;
+        }
+        
+        .sync-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        
+        .sync-table th,
+        .sync-table td {
+            padding: 12px;
+            border: 1px solid #e3eaf3;
+            text-align: left;
+        }
+        
+        .sync-table th {
+            background: #f4f8fb;
+            font-weight: 600;
+            color: #2176c7;
+        }
+        
+        .sync-table tr:hover {
+            background: #f0f6fd;
+        }
+        
+        .status-success {
+            color: #4caf50;
+            font-weight: 500;
+        }
+        
+        .status-error {
+            color: #f44336;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            color: #ff9800;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e3eaf3;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2176c7, #3ba1e3);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .log-panel {
+            background: #f8f9fa;
+            border: 1px solid #e3eaf3;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-title {
+            font-weight: 600;
+            color: #2176c7;
+            margin-bottom: 12px;
+        }
+        
+        .log-content {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+            white-space: pre-wrap;
+        }
+        
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 2px 0;
+        }
+        
+        .log-entry.info {
+            color: #2176c7;
+        }
+        
+        .log-entry.success {
+            color: #4caf50;
+        }
+        
+        .log-entry.error {
+            color: #f44336;
+        }
+        
+        .log-entry.warning {
+            color: #ff9800;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e3eaf3;
+        }
+        
+        .checkbox-cell {
+            width: 36px;
+            text-align: center;
+        }
+        
+        .checkbox-cell input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="logo">主数据管理平台</div>
+                <div class="topbar-title">供应商数据同步</div>
+            </div>
+            <div class="topbar-right">
+                <button class="back-btn" onclick="goBack()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    返回首页
+                </button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="sync-container">
+                <div class="sync-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"></path>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                        <path d="M3 22v-6h6"></path>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                    企查查供应商信息同步
+                </div>
+                
+                <div class="sync-body">
+                    <!-- 同步配置 -->
+                    <div class="sync-section">
+                        <div class="section-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
+                            </svg>
+                            同步配置
+                        </div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">同步服务</label>
+                                    <select class="form-select" id="syncService">
+                                        <option value="qcc">企查查供应商信息同步</option>
+                                        <option value="tianyan">天眼查供应商信息同步</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">同步范围</label>
+                                    <select class="form-select" id="syncScope">
+                                        <option value="selected">选中数据</option>
+                                        <option value="all">全部数据</option>
+                                        <option value="filter">按条件筛选</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">更新策略</label>
+                                    <select class="form-select" id="updateStrategy">
+                                        <option value="merge">合并更新（保留现有数据）</option>
+                                        <option value="replace">完全替换</option>
+                                        <option value="append">仅补充空值</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">错误处理</label>
+                                    <select class="form-select" id="errorHandling">
+                                        <option value="continue">继续处理其他记录</option>
+                                        <option value="stop">遇到错误停止</option>
+                                        <option value="retry">自动重试</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 数据选择 -->
+                    <div class="sync-section">
+                        <div class="section-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10,9 9,9 8,9"></polyline>
+                            </svg>
+                            数据选择
+                        </div>
+                        <div class="section-content">
+                            <div style="margin-bottom: 16px;">
+                                <button class="btn-main" onclick="selectAllVendors()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9,11 12,14 22,4"></polyline>
+                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                    </svg>
+                                    全选
+                                </button>
+                                <button class="btn-line" onclick="clearSelection()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    </svg>
+                                    清空选择
+                                </button>
+                            </div>
+                            <table class="sync-table" id="vendorTable">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-cell">
+                                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                        </th>
+                                        <th>供应商编码</th>
+                                        <th>供应商名称</th>
+                                        <th>统一社会信用代码</th>
+                                        <th>注册地址</th>
+                                        <th>最后更新时间</th>
+                                        <th>同步状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vendorTableBody">
+                                    <tr>
+                                        <td class="checkbox-cell">
+                                            <input type="checkbox" name="vendorSelect" value="V001">
+                                        </td>
+                                        <td>V001</td>
+                                        <td>北京华信供应链</td>
+                                        <td>91110105MA00B8XXXXX</td>
+                                        <td>北京市朝阳区XX路</td>
+                                        <td>2024-01-15 10:30:00</td>
+                                        <td><span class="status-success">已同步</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="checkbox-cell">
+                                            <input type="checkbox" name="vendorSelect" value="V002">
+                                        </td>
+                                        <td>V002</td>
+                                        <td>上海盛达贸易</td>
+                                        <td>91310115MA1K4XXXXX</td>
+                                        <td>上海市浦东新区XX路</td>
+                                        <td>2024-01-10 14:20:00</td>
+                                        <td><span class="status-pending">待同步</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="checkbox-cell">
+                                            <input type="checkbox" name="vendorSelect" value="V003">
+                                        </td>
+                                        <td>V003</td>
+                                        <td>深圳市新科电子</td>
+                                        <td>91440300MA5FXXXXXX</td>
+                                        <td>深圳市南山区XX路</td>
+                                        <td>2024-01-08 09:15:00</td>
+                                        <td><span class="status-error">同步失败</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 同步执行 -->
+                    <div class="sync-section">
+                        <div class="section-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                            </svg>
+                            同步执行
+                        </div>
+                        <div class="section-content">
+                            <div style="margin-bottom: 16px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <span style="font-weight: 500; color: #185a99;">同步进度：</span>
+                                    <span id="progressText">0 / 0</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="log-panel">
+                                <div class="log-title">同步日志</div>
+                                <div class="log-content" id="syncLog">
+[2024-01-20 15:30:00] 开始供应商数据同步任务
+[2024-01-20 15:30:01] 加载同步配置：企查查供应商信息同步
+[2024-01-20 15:30:02] 选择供应商数据：3条记录
+[2024-01-20 15:30:03] 准备开始同步...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="action-buttons">
+                        <button class="btn-line" onclick="previewSync()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            预览同步
+                        </button>
+                        <button class="btn-success" onclick="startSync()" id="startSyncBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                            </svg>
+                            开始同步
+                        </button>
+                        <button class="btn-line" onclick="stopSync()" id="stopSyncBtn" style="display: none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="6" y="4" width="12" height="20" rx="2" ry="2"></rect>
+                                <line x1="6" y1="10" x2="18" y2="10"></line>
+                            </svg>
+                            停止同步
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let syncInProgress = false;
+        let syncProgress = 0;
+        let totalRecords = 0;
+        let currentRecord = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        function initializePage() {
+            updateProgress(0, 0);
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function selectAllVendors() {
+            const checkboxes = document.querySelectorAll('input[name="vendorSelect"]');
+            checkboxes.forEach(cb => cb.checked = true);
+            document.getElementById('selectAll').checked = true;
+        }
+
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('input[name="vendorSelect"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('input[name="vendorSelect"]');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        function updateProgress(current, total) {
+            currentRecord = current;
+            totalRecords = total;
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            progressText.textContent = `${current} / ${total}`;
+            
+            if (total > 0) {
+                const percentage = (current / total) * 100;
+                progressFill.style.width = `${percentage}%`;
+            } else {
+                progressFill.style.width = '0%';
+            }
+        }
+
+        function addLogEntry(message, type = 'info') {
+            const logContent = document.getElementById('syncLog');
+            const timestamp = new Date().toLocaleString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContent.appendChild(logEntry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function previewSync() {
+            const selectedVendors = document.querySelectorAll('input[name="vendorSelect"]:checked');
+            if (selectedVendors.length === 0) {
+                alert('请先选择要同步的供应商');
+                return;
+            }
+
+            addLogEntry(`预览同步：选中 ${selectedVendors.length} 条供应商记录`, 'info');
+            alert(`预览完成：将同步 ${selectedVendors.length} 条供应商记录`);
+        }
+
+        function startSync() {
+            const selectedVendors = document.querySelectorAll('input[name="vendorSelect"]:checked');
+            if (selectedVendors.length === 0) {
+                alert('请先选择要同步的供应商');
+                return;
+            }
+
+            syncInProgress = true;
+            totalRecords = selectedVendors.length;
+            currentRecord = 0;
+
+            document.getElementById('startSyncBtn').style.display = 'none';
+            document.getElementById('stopSyncBtn').style.display = 'inline-flex';
+            
+            addLogEntry(`开始同步 ${totalRecords} 条供应商记录`, 'info');
+            updateProgress(0, totalRecords);
+
+            simulateSync(selectedVendors);
+        }
+
+        function simulateSync(selectedVendors) {
+            let index = 0;
+            
+            const syncInterval = setInterval(() => {
+                if (!syncInProgress || index >= selectedVendors.length) {
+                    clearInterval(syncInterval);
+                    if (syncInProgress) {
+                        completeSync();
+                    }
+                    return;
+                }
+
+                const checkbox = selectedVendors[index];
+                const row = checkbox.closest('tr');
+                const vendorCode = checkbox.value;
+                const vendorName = row.querySelectorAll('td')[2].textContent;
+
+                addLogEntry(`正在同步供应商：${vendorName} (${vendorCode})`, 'info');
+                
+                setTimeout(() => {
+                    const success = Math.random() > 0.2;
+                    
+                    if (success) {
+                        addLogEntry(`✓ 供应商 ${vendorName} 同步成功`, 'success');
+                        row.querySelector('td:last-child span').textContent = '已同步';
+                        row.querySelector('td:last-child span').className = 'status-success';
+                    } else {
+                        addLogEntry(`✗ 供应商 ${vendorName} 同步失败：API调用超时`, 'error');
+                        row.querySelector('td:last-child span').textContent = '同步失败';
+                        row.querySelector('td:last-child span').className = 'status-error';
+                    }
+
+                    currentRecord++;
+                    updateProgress(currentRecord, totalRecords);
+                }, 1000 + Math.random() * 2000);
+
+                index++;
+            }, 2000);
+        }
+
+        function stopSync() {
+            syncInProgress = false;
+            addLogEntry('用户手动停止同步', 'warning');
+            
+            document.getElementById('startSyncBtn').style.display = 'inline-flex';
+            document.getElementById('stopSyncBtn').style.display = 'none';
+        }
+
+        function completeSync() {
+            syncInProgress = false;
+            addLogEntry(`同步完成！共处理 ${totalRecords} 条记录`, 'success');
+            
+            document.getElementById('startSyncBtn').style.display = 'inline-flex';
+            document.getElementById('stopSyncBtn').style.display = 'none';
+            
+            const successCount = document.querySelectorAll('.status-success').length;
+            const errorCount = document.querySelectorAll('.status-error').length;
+            
+            setTimeout(() => {
+                alert(`同步完成！\n成功：${successCount} 条\n失败：${errorCount} 条`);
+            }, 500);
+        }
+
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'vendorSelect') {
+                const allCheckboxes = document.querySelectorAll('input[name="vendorSelect"]');
+                const checkedCheckboxes = document.querySelectorAll('input[name="vendorSelect"]:checked');
+                const selectAllCheckbox = document.getElementById('selectAll');
+                
+                selectAllCheckbox.checked = checkedCheckboxes.length === allCheckboxes.length;
+                selectAllCheckbox.indeterminate = checkedCheckboxes.length > 0 && checkedCheckboxes.length < allCheckboxes.length;
+            }
+        });
+    </script>
+</body>
+</html> 

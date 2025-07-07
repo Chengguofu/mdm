@@ -130,9 +130,6 @@
 <body>
 
     <div class="config-container">
-        <div class="config-header">
-            数据筛选配置
-        </div>
         <div class="config-body">
             <div class="config-actions">
                 <div>
@@ -196,12 +193,27 @@
 
                 // 添加已有的条件和分组
                 let conditionIdx = 0;
+                let groupIdx = 0;
                 if (data.children) {
                     data.children.forEach((childData, idx) => {
                         if (childData.type === 'group') {
+                            // 分组前加逻辑下拉框（除第一个分组外）
+                            if (groupIdx > 0) {
+                                const logicSelect = document.createElement('select');
+                                logicSelect.className = 'form-select form-select-sm logic-between-select';
+                                logicSelect.style.width = '110px';
+                                logicSelect.style.marginBottom = '8px';
+                                logicSelect.innerHTML = `
+                                    <option value="AND" ${childData.logic === 'AND' ? 'selected' : ''}>并且 (AND)</option>
+                                    <option value="OR" ${childData.logic === 'OR' ? 'selected' : ''}>或者 (OR)</option>
+                                `;
+                                childrenContainer.appendChild(logicSelect);
+                            }
+                            
                             childData.isSubgroup = true;
                             const childGroupEl = createGroupElement(childData);
                             childrenContainer.appendChild(childGroupEl);
+                            groupIdx++;
                         } else {
                             // 条件前加逻辑下拉框（除第一个条件外）
                             const rowWrapper = document.createElement('div');
@@ -336,6 +348,7 @@
                 const children = [];
                 const childrenContainer = element.querySelector('.group-children');
                 let conditionIdx = 0;
+                let groupIdx = 0;
                 for (const child of childrenContainer.children) {
                     // 判断是否是条件
                     const conditionRow = child.querySelector('.condition-row');
@@ -349,7 +362,16 @@
                         children.push(cond);
                         conditionIdx++;
                     } else if (child.classList.contains('condition-group')) {
-                        children.push(parseGroup(child));
+                        const group = parseGroup(child);
+                        if (groupIdx > 0) {
+                            // 取分组前的logic下拉框的值
+                            const logicSelect = child.previousElementSibling;
+                            if (logicSelect && logicSelect.classList.contains('logic-between-select')) {
+                                group.logic = logicSelect.value;
+                            }
+                        }
+                        children.push(group);
+                        groupIdx++;
                     }
                 }
                 return { type: 'group', children };

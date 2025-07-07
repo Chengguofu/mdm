@@ -5,6 +5,9 @@
     <title>数据推送配置</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body, table, th, td, .form-control, .form-select, .btn, .btn-sm {
+            font-size: 13px !important;
+        }
         body {
             background-color: #f4f7fa;
             padding: 2rem;
@@ -39,11 +42,53 @@
             color: #888;
             font-size: 0.95em;
         }
+        .expr-input-custom {
+            width: 100%;
+            min-width: 0;
+            border-radius: 8px !important;
+            border: 1.2px solid #c0d3eb !important;
+            background: #f9fbfd !important;
+            box-shadow: none !important;
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+            transition: border 0.2s, box-shadow 0.2s;
+            padding-right: 30px !important;
+        }
+        .expr-input-custom:focus {
+            border-color: #2176c7 !important;
+            box-shadow: 0 0 0 2px #e3f0fc !important;
+            background: #fff !important;
+        }
+        .expr-query-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 16px;
+            color: #2176c7;
+            transition: color 0.18s;
+            z-index: 2;
+        }
+        .expr-query-btn:hover {
+            color: #185a99;
+        }
+        .page-title, h3.mb-4 {
+            font-size: 20px !important;
+        }
+        .expr-input-wrap {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        .container-fluid, .tab-content, .tab-pane, .config-table-in-tab, .config-table-in-tab *, .form-control, .form-select, .btn, .btn-sm {
+            font-size: 14px !important;
+        }
     </style>
 </head>
 <body>
 <div class="container-fluid">
-    <h3 class="mb-4">数据推送接口配置</h3>
+    <h3 class="mb-4 page-title">数据推送接口配置</h3>
     <ul class="nav nav-tabs" id="pushConfigTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="basic-config-tab" data-bs-toggle="tab" data-bs-target="#basic-config" type="button" role="tab" aria-controls="basic-config" aria-selected="true">基本配置</button>
@@ -70,26 +115,26 @@
             <table class="table table-bordered m-0 config-table-in-tab">
                 <tbody>
                     <tr>
-                        <td>业务系统（系统标识）</td>
-                        <td>
-                            <select class="form-select"><option>OA系统</option><option>ERP系统</option><option>CRM系统</option></select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>接口编码</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td style="width:18%;">业务系统（系统标识）</td>
+                        <td style="width:32%;"><select class="form-select form-control-sm" style="width:90%;display:inline-block;"><option>OA系统</option><option>ERP系统</option><option>CRM系统</option></select></td>
+                        <td style="width:18%;">接口编码</td>
+                        <td style="width:32%;"><input type="text" class="form-control form-control-sm" style="width:90%;display:inline-block;"></td>
                     </tr>
                     <tr>
                         <td>接口名称</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td><input type="text" class="form-control form-control-sm" style="width:90%;display:inline-block;"></td>
+                        <td>接口地址</td>
+                        <td><input type="text" class="form-control form-control-sm" style="width:90%;display:inline-block;"></td>
                     </tr>
                     <tr>
-                        <td>接口地址</td>
-                        <td><input type="text" class="form-control"></td>
+                        <td>接口服务IP</td>
+                        <td><input type="text" class="form-control form-control-sm" style="width:90%;display:inline-block;" placeholder="如 192.168.1.100"></td>
+                        <td>服务端口</td>
+                        <td><input type="text" class="form-control form-control-sm" style="width:90%;display:inline-block;" placeholder="如 8080"></td>
                     </tr>
                     <tr>
                         <td>接口类型</td>
-                        <td>
+                        <td colspan="1">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="apiType" id="json" checked>
                                 <label class="form-check-label" for="json">JSON</label>
@@ -99,10 +144,18 @@
                                 <label class="form-check-label" for="xml">XML</label>
                             </div>
                         </td>
+                        <td>服务方式</td>
+                        <td>
+                            <select class="form-select form-control-sm" style="width:90%;display:inline-block;">
+                                <option>手动同步</option>
+                                <option>定时同步</option>
+                                <option>实时同步</option>
+                            </select>
+                        </td>
                     </tr>
                     <tr>
                         <td>同步方式</td>
-                        <td>
+                        <td colspan="1">
                              <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="syncMode" id="sync" checked>
                                 <label class="form-check-label" for="sync">同步</label>
@@ -112,21 +165,9 @@
                                 <label class="form-check-label" for="async">异步</label>
                             </div>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>服务方式</td>
-                        <td>
-                            <select class="form-select">
-                                <option>手动同步</option>
-                                <option>定时同步</option>
-                                <option>实时同步</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
                         <td>HTTP发送方式</td>
                         <td>
-                            <select class="form-select">
+                            <select class="form-select form-control-sm" style="width:90%;display:inline-block;">
                                 <option>POST</option>
                                 <option>PUT</option>
                                 <option>PATCH</option>
@@ -136,32 +177,44 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>定时方式</td>
+                        <td colspan="3">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="scheduleType" id="scheduleTypeNormal" value="normal" checked>
+                                <label class="form-check-label" for="scheduleTypeNormal">定时配置</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="scheduleType" id="scheduleTypeCron" value="cron">
+                                <label class="form-check-label" for="scheduleTypeCron">Cron表达式</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="normalScheduleRow">
                         <td>定时配置</td>
-                        <td>
-                            <div class="row g-2 mb-2">
-                                <div class="col-md-4">
+                        <td colspan="3">
+                            <div class="row g-2 mb-2" style="display:flex;align-items:center;gap:10px;">
+                                <div style="flex:1;min-width:120px;">
                                     <label class="form-label">开始执行时间</label>
-                                    <input type="time" class="form-control">
+                                    <input type="time" class="form-control form-control-sm">
                                 </div>
-                                <div class="col-md-4">
+                                <div style="flex:1;min-width:120px;">
                                     <label class="form-label">执行时间间隔</label>
-                                    <input type="text" class="form-control" placeholder="分钟/小时/天">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">单次分发记录数</label>
-                                    <input type="number" class="form-control">
+                                    <input type="text" class="form-control form-control-sm" placeholder="分钟/小时/天">
                                 </div>
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>分发次数</td>
-                        <td><input type="number" class="form-control"></td>
+                    <tr id="cronScheduleRow" style="display:none;">
+                        <td>Cron表达式</td>
+                        <td colspan="3">
+                            <input type="text" class="form-control form-control-sm" placeholder="如 0 0 * * *，可直接录入cron表达式">
+                            <div class="desc-text">可选：直接填写cron表达式（如 0 0 * * * 表示每天0点），填写后优先使用此表达式进行定时。</div>
+                        </td>
                     </tr>
                     <tr>
-                        <td>访问频率</td>
-                        <td>
-                            <input type="number" class="form-control mb-1" placeholder="每分钟最大访问次数">
+                        <td>单次分发记录数</td>
+                        <td colspan="3">
+                            <input type="number" class="form-control form-control-sm" placeholder="请输入单次分发记录数">
                         </td>
                     </tr>
                 </tbody>
@@ -190,7 +243,13 @@
                                 <input class="form-check-input" type="radio" name="retry" id="retry-no" value="no">
                                 <label class="form-check-label" for="retry-no">否</label>
                             </div>
-                            <input id="retryCountInput" type="number" class="form-control mt-2" placeholder="重发失败数据次数">
+                            <div id="retryExtraWrap" style="margin-top:8px;display:none;">
+                                <div style="display:flex;gap:16px;align-items:center;">
+                                    <input id="retryCountInput" type="number" class="form-control" style="max-width:180px;" placeholder="重发失败数据次数">
+                                    <input id="retryIntervalInput" type="number" class="form-control" style="max-width:220px;" placeholder="重发时间间隔（秒）">
+                                </div>
+                                <div class="desc-text">设置重发次数和每次重发之间的间隔时间（单位：秒）</div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -198,45 +257,33 @@
         </div>
         <!-- 验证配置 Tab -->
         <div class="tab-pane fade" id="verify-config" role="tabpanel" aria-labelledby="verify-config-tab">
-            <table class="table table-bordered m-0 config-table-in-tab">
+            <table class="table table-bordered m-0 config-table-in-tab" style="table-layout:fixed;">
                 <tbody>
                     <tr>
-                        <td>头信息配置</td>
+                        <td style="width:12%;min-width:80px;">头信息配置</td>
                         <td>
                             <table class="table table-bordered table-sm mb-2" style="min-width:400px;">
                                 <thead class="table-light">
-                                    <tr><th style="width:35%">参数名</th><th style="width:45%">参数值</th><th style="width:20%">操作</th></tr>
+                                    <tr><th style="width:28%">参数名</th><th style="width:36%">参数值</th><th style="width:16%">操作</th></tr>
                                 </thead>
                                 <tbody id="headerParams"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-link btn-sm" onclick="addParamRow('headerParams')">＋ 新增一行</button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
+                                <tfoot></tfoot>
                             </table>
                         </td>
                     </tr>
                     <tr>
-                        <td>获取TOKEN</td>
+                        <td style="width:12%;min-width:80px;">获取TOKEN</td>
                         <td>
+                            <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+                                <label style="font-weight:500;min-width:120px;">Token获取接口地址</label>
+                                <input type="text" class="form-control form-control-sm" style="flex:1;min-width:180px;max-width:546px;" placeholder="请输入Token获取接口地址">
+                            </div>
                             <table class="table table-bordered table-sm mb-2" style="min-width:400px;">
                                 <thead class="table-light">
-                                    <tr><th style="width:35%">参数名</th><th style="width:45%">参数值</th><th style="width:20%">操作</th></tr>
+                                    <tr><th style="width:28%">参数名</th><th style="width:36%">参数值</th><th style="width:16%">操作</th></tr>
                                 </thead>
                                 <tbody id="tokenParams"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-link btn-sm" onclick="addParamRow('tokenParams')">＋ 新增一行</button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
+                                <tfoot></tfoot>
                             </table>
                         </td>
                     </tr>
@@ -259,12 +306,78 @@
                     <tr>
                         <td colspan="2" class="p-0">
                             <table class="table table-hover table-sm mb-0">
-                                <thead class="table-light"><tr><th>字段名</th><th>中文名</th><th>类型</th><th>是否选择</th></tr></thead>
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:8.8%;">字段名</th>
+                                        <th>中文名</th>
+                                        <th>类型</th>
+                                        <th style="width:12%;">引用属性</th>
+                                        <th>是否选择</th>
+                                        <th>字段映射名称</th>
+                                        <th>转换表达式</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
-                                    <tr><td>CUST_ID</td><td>客户编码</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
-                                    <tr><td>CUST_NAME</td><td>客户名称</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
-                                    <tr><td>ADDRESS</td><td>地址</td><td>String</td><td><input type="checkbox" class="form-check-input" checked></td></tr>
-                                    <tr><td>CONTACT</td><td>联系人</td><td>String</td><td><input type="checkbox" class="form-check-input"></td></tr>
+                                    <tr>
+                                        <td>CUST_ID</td>
+                                        <td>客户编码</td>
+                                        <td>String</td>
+                                        <td><select class="form-select form-select-sm" disabled><option value="">无</option></select></td>
+                                        <td><input type="checkbox" class="form-check-input" checked></td>
+                                        <td><input type="text" class="form-control form-control-sm" value="customerId"></td>
+                                        <td>
+                                            <div class="expr-input-wrap" style="position:relative;display:block;">
+                                                <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                                <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>CUST_NAME</td>
+                                        <td>客户名称</td>
+                                        <td>String</td>
+                                        <td><select class="form-select form-select-sm" disabled><option value="">无</option></select></td>
+                                        <td><input type="checkbox" class="form-check-input" checked></td>
+                                        <td><input type="text" class="form-control form-control-sm" value="customerName"></td>
+                                        <td>
+                                            <div class="expr-input-wrap" style="position:relative;display:block;">
+                                                <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                                <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ADDRESS</td>
+                                        <td>地址</td>
+                                        <td>String</td>
+                                        <td><select class="form-select form-select-sm" disabled><option value="">无</option></select></td>
+                                        <td><input type="checkbox" class="form-check-input" checked></td>
+                                        <td><input type="text" class="form-control form-control-sm" value="address"></td>
+                                        <td>
+                                            <div class="expr-input-wrap" style="position:relative;display:block;">
+                                                <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                                <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>CONTACT</td>
+                                        <td>联系人</td>
+                                        <td>String</td>
+                                        <td><select class="form-select form-select-sm">
+                                            <option value="">无</option>
+                                            <option>客户主数据.联系人电话</option>
+                                            <option>客户主数据.联系人邮箱</option>
+                                        </select></td>
+                                        <td><input type="checkbox" class="form-check-input"></td>
+                                        <td><input type="text" class="form-control form-control-sm" value="contact"></td>
+                                        <td>
+                                            <div class="expr-input-wrap" style="position:relative;display:block;">
+                                                <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                                <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </td>
@@ -320,15 +433,86 @@
         <button class="btn btn-success btn-sm">启用</button>
     </div>
 </div>
+<div class="modal fade" id="exprEditorModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">表达式编辑器</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="expr-tools" id="exprTools">
+          <select id="fieldSelectExpr"></select>
+          <select id="opSelectExpr">
+            <option value="">操作符</option>
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="||">字符拼接（||）</option>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+            <option value=">">&gt;</option>
+            <option value="<">&lt;</option>
+            <option value=">=">&gt;=</option>
+            <option value="<=">&lt;=</option>
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+            <option value="(">（</option>
+            <option value=")">）</option>
+          </select>
+          <select id="funcSelectExpr">
+            <option value="">常用函数</option>
+            <option value="LEN">LEN(字段)</option>
+            <option value="ISNULL">ISNULL(字段,默认值)</option>
+            <option value="SUBSTR">SUBSTR(字段,起始,长度)</option>
+            <option value="TRIM">TRIM(字段)</option>
+            <option value="UPPER">UPPER(字段)</option>
+            <option value="LOWER">LOWER(字段)</option>
+            <option value="REPLACE">REPLACE(字段,原,新)</option>
+            <option value="CONCAT">CONCAT(字段1,字段2,...)</option>
+            <option value="IF">IF(条件,值1,值2)</option>
+            <option value="TODATE">TODATE(字符串,格式)</option>
+            <option value="FORMATDATE">FORMATDATE(日期,格式)</option>
+            <option value="YEAR">YEAR(日期)</option>
+            <option value="MONTH">MONTH(日期)</option>
+            <option value="DAY">DAY(日期)</option>
+          </select>
+          <input id="constInputExpr" placeholder="常量/值" style="width:120px;">
+        </div>
+        <div class="form-row">
+          <div class="form-label">表达式</div>
+          <div class="form-value">
+            <textarea id="exprInputExpr" class="form-control" style="min-height:80px;"></textarea>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">实时预览</div>
+          <div class="form-value">
+            <div id="exprPreview" style="background:#f8f9fa;padding:8px 12px;border-radius:6px;color:#2176c7;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="exprOkBtn">确定</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/awesomplete/1.1.5/awesomplete.min.css" />
 <script>
 // 失败是否自动重发联动
 document.addEventListener('DOMContentLoaded', function() {
   function toggleRetryCountInput() {
     var yes = document.getElementById('retry-yes');
     var input = document.getElementById('retryCountInput');
-    if (yes && input) {
+    var intervalWrap = document.getElementById('retryIntervalWrap');
+    if (yes && input && intervalWrap) {
       input.style.display = yes.checked ? '' : 'none';
+      intervalWrap.style.display = yes.checked ? '' : 'none';
     }
   }
   var yes = document.getElementById('retry-yes');
@@ -344,10 +528,11 @@ function addParamRow(containerId) {
   var container = document.getElementById(containerId);
   var tr = document.createElement('tr');
   tr.innerHTML = `
-    <td><input type="text" class="form-control form-control-sm" placeholder="参数名"></td>
-    <td><input type="text" class="form-control form-control-sm" placeholder="参数值"></td>
+    <td><input type="text" class="form-control form-control-sm" placeholder="参数名" style="width:70%;min-width:60px;"></td>
+    <td><input type="text" class="form-control form-control-sm" placeholder="参数值" style="width:70%;min-width:60px;"></td>
     <td class="text-center">
-      <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('tr').remove()">删除</button>
+      <button type="button" class="btn btn-link btn-sm" onclick="addParamRow('${containerId}')">＋ 新增一行</button>
+      <button type="button" style="background:none;border:none;color:#e74c3c;font-size:15px;padding:0 8px;" onclick="this.closest('tr').remove()">删除</button>
     </td>
   `;
   container.appendChild(tr);
@@ -357,6 +542,88 @@ function addParamRow(containerId) {
 document.addEventListener('DOMContentLoaded', function() {
   addParamRow('headerParams');
   addParamRow('tokenParams');
+});
+
+// 自动补全内容
+const exprFields = ['CUST_ID','CUST_NAME','ADDRESS','CONTACT'];
+const exprFuncs = ['UPPER()','LOWER()','LEN()','ISNULL(,)','SUBSTR(,,)','TRIM()','REPLACE(,,)','CONCAT(,)','IF(,,)','TODATE(,yyyy-MM-dd)','FORMATDATE(,yyyy-MM-dd)','YEAR()','MONTH()','DAY()'];
+const exprOps = ['+','-','*','/','||','=','!=','>','<','>=','<=','AND','OR','（','）'];
+const exprList = exprFields.concat(exprFuncs).concat(exprOps);
+document.querySelectorAll('.expr-input-autocomplete').forEach(function(input){
+  new Awesomplete(input, { list: exprList, minChars: 1, maxItems: 10 });
+});
+
+// 字段映射名称和转换表达式输入框可编辑性联动
+function updateFieldRowEditable() {
+  document.querySelectorAll('#field-config table.table-hover tbody tr').forEach(function(tr) {
+    var checkbox = tr.querySelector('td:nth-child(5) input[type="checkbox"]');
+    var mappingInput = tr.querySelector('td:nth-child(6) input');
+    var exprInput = tr.querySelector('td:nth-child(7) input');
+    if (checkbox && mappingInput && exprInput) {
+      if (!checkbox.checked) {
+        mappingInput.disabled = true;
+        exprInput.disabled = true;
+        mappingInput.style.background = '#f1f1f1';
+        exprInput.style.background = '#f1f1f1';
+        mappingInput.style.color = '#aaa';
+        exprInput.style.color = '#aaa';
+      } else {
+        mappingInput.disabled = false;
+        exprInput.disabled = false;
+        mappingInput.style.background = '';
+        exprInput.style.background = '';
+        mappingInput.style.color = '';
+        exprInput.style.color = '';
+      }
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // 初始化
+  updateFieldRowEditable();
+  // 监听checkbox变化
+  document.querySelectorAll('#field-config table.table-hover tbody tr').forEach(function(tr) {
+    var checkbox = tr.querySelector('td:nth-child(5) input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.addEventListener('change', updateFieldRowEditable);
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  function toggleScheduleType() {
+    var normalRow = document.getElementById('normalScheduleRow');
+    var cronRow = document.getElementById('cronScheduleRow');
+    var type = document.querySelector('input[name="scheduleType"]:checked').value;
+    if (type === 'normal') {
+      normalRow.style.display = '';
+      cronRow.style.display = 'none';
+    } else {
+      normalRow.style.display = 'none';
+      cronRow.style.display = '';
+    }
+  }
+  document.getElementById('scheduleTypeNormal').addEventListener('change', toggleScheduleType);
+  document.getElementById('scheduleTypeCron').addEventListener('change', toggleScheduleType);
+  toggleScheduleType();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  function toggleRetryExtraInput() {
+    var yes = document.getElementById('retry-yes');
+    var extraWrap = document.getElementById('retryExtraWrap');
+    if (yes && extraWrap) {
+      extraWrap.style.display = yes.checked ? '' : 'none';
+    }
+  }
+  var yes = document.getElementById('retry-yes');
+  var no = document.getElementById('retry-no');
+  if (yes && no) {
+    yes.addEventListener('change', toggleRetryExtraInput);
+    no.addEventListener('change', toggleRetryExtraInput);
+    // 页面加载时立即执行一次，确保初始状态正确
+    toggleRetryExtraInput();
+  }
 });
 </script>
 </body>

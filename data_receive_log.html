@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>主数据接收日志</title>
+    <style>
+        body { margin: 0; font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f7faff; font-size: 14px; }
+        .layout { display: flex; height: 100vh; }
+        .sidebar { width: 196px; background: #fff; border-right: 1px solid #e3eaf3; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #e3eaf3; background: #f4f8fb; }
+        .sidebar-title { font-size: 17px; color: #2176c7; font-weight: 600; margin-bottom: 15px; }
+        .search-box { position: relative; padding: 0 12px 12px 12px; }
+        .search-input { width: 100%; box-sizing: border-box; padding: 8px 12px 8px 36px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 15px; background: #f9fbfd; }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; pointer-events: none; }
+        .search-icon::before { content: ''; display: block; width: 12px; height: 12px; border: 2px solid #b0c4d8; border-radius: 50%; position: absolute; left: 0; top: 0; background: none; }
+        .search-icon::after { content: ''; display: block; width: 7px; height: 2px; background: #b0c4d8; position: absolute; left: 9px; top: 10px; border-radius: 2px; transform: rotate(45deg); }
+        .data-type-list { flex: 1; overflow-y: auto; }
+        .data-type-item { cursor: pointer; padding: 12px 20px; border-bottom: 1px solid #e3eaf3; transition: background-color 0.2s; display: flex; align-items: center; justify-content: space-between; }
+        .data-type-item:hover { background-color: #f0f6fd; }
+        .data-type-item.active { background-color: #2176c7; color: white; }
+        .data-type-item.active .data-type-count { background-color: rgba(255,255,255,0.2); color: white; }
+        .data-type-info { display: flex; align-items: center; gap: 8px; }
+        .data-type-icon { font-size: 15px; }
+        .data-type-count { background: #e3eaf3; color: #2176c7; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .main-content { flex: 1; display: flex; flex-direction: column; background: #f4f8fb; }
+        .tabs-bar { display: flex; background: #fff; border-bottom: 1.5px solid #e3eaf3; }
+        .tab { padding: 16px 36px; cursor: pointer; font-size: 15px; font-weight: 600; color: #185a99; border-bottom: 2.5px solid transparent; transition: all 0.2s; }
+        .tab.active { color: #2176c7; border-bottom-color: #2176c7; background: #f8fbff; }
+        .query-section { background: #f8fbff; border: 1px solid #e3eaf3; border-radius: 8px; padding: 18px 24px; margin: 24px 24px 0 24px; display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: flex-end; }
+        .query-item { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+        .query-label { font-size: 13px; color: #666; font-weight: 500; }
+        .query-input, .query-select { padding: 7px 12px; border: 1px solid #e3eaf3; border-radius: 4px; font-size: 13px; background: #fff; }
+        .query-input:focus, .query-select:focus { border-color: #2176c7; }
+        .query-btns { display: flex; gap: 10px; }
+        .btn-main { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 7px 22px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+        .btn-main:hover { background: #185a99; }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-line { background: #fff; color: #2176c7; border: none; border-radius: 4px; padding: 7px 18px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+        .btn-line:hover { background: #f5f7fa; color: #185a99; }
+        .btn-line:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+        .btn-archive { background: #fff; color: #f57c00; border: none; border-radius: 4px; padding: 7px 18px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.18s; }
+        .btn-archive:hover { background: #fff3e0; color: #e65100; }
+        .btn-archive:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+        .btn-delete:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: #fff; min-width: 140px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); border-radius: 4px; z-index: 1000; border: 1px solid #e3eaf3; }
+        .dropdown-content.show { display: block; }
+        .dropdown-item { color: #333; padding: 10px 16px; text-decoration: none; display: block; cursor: pointer; font-size: 13px; transition: background-color 0.2s; }
+        .dropdown-item:hover { background-color: #f0f6fd; }
+        .dropdown-item.delete-selected { color: #e74c3c; }
+        .dropdown-item.delete-all { color: #e74c3c; }
+        .dropdown-item.delete-selected:hover, .dropdown-item.delete-all:hover { background-color: #ffebee; }
+        .dropdown-toggle { background: #fff; color: #e74c3c; border: none; border-radius: 4px; padding: 7px 18px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.18s; display: flex; align-items: center; gap: 6px; }
+        .dropdown-toggle:hover { background: #ffebee; color: #c62828; }
+        .dropdown-toggle:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+        .dropdown-arrow { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid currentColor; }
+        .dropdown-toggle.retry { background: #2176c7; color: #fff; }
+        .dropdown-toggle.retry:hover { background: #185a99; }
+        .dropdown-toggle.retry:disabled { background: #ccc; color: #fff; }
+        .dropdown-item.retry-selected { color: #2176c7; }
+        .dropdown-item.retry-all { color: #2176c7; }
+        .dropdown-item.retry-selected:hover, .dropdown-item.retry-all:hover { background-color: #f0f6fd; }
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); margin: 24px; overflow: hidden; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; background: #fff; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e3eaf3; text-align: left; }
+        th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f0f6fd; }
+        .checkbox { width: 16px; height: 16px; cursor: pointer; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-success { background: #e8f5e8; color: #2e7d32; }
+        .status-fail { background: #ffeaea; color: #e74c3c; }
+        .status-running { background: #fffbe6; color: #f57c00; }
+        .serial-link { color: #2176c7; cursor: pointer; text-decoration: underline; font-weight: 600; }
+        .btn-view-message { background: #fff; color: #2176c7; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .btn-view-message:hover { background: #f0f6fd; color: #185a99; }
+        .toolbar { display: flex; gap: 12px; align-items: center; margin: 0 24px 0 24px; padding: 16px 0 0 0; }
+        /* 抽屉样式 */
+        .drawer-mask { position: fixed; right: 0; top: 0; bottom: 0; left: 0; background: rgba(0,0,0,0.18); z-index: 9999; display: none; }
+        .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: 600px; max-width: 98vw; background: #fff; box-shadow: -2px 0 16px rgba(33,118,199,0.13); z-index: 10000; display: flex; flex-direction: column; }
+        .drawer-header { padding: 20px 28px 12px 28px; font-size: 17px; font-weight: 600; color: #2176c7; border-bottom: 1px solid #e3eaf3; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-close { font-size: 22px; color: #888; cursor: pointer; border: none; background: none; transition: .2s; }
+        .drawer-close:hover { color: #d33; }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 24px; }
+        .drawer-title { font-size: 16px; color: #2176c7; font-weight: 600; margin-bottom: 18px; }
+        .drawer-section { margin-bottom: 18px; }
+        .drawer-section-title { font-size: 14px; color: #185a99; font-weight: 600; margin-bottom: 8px; }
+        .code-block { background: #f8f9fa; border: 1px solid #e3eaf3; border-radius: 4px; padding: 16px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; white-space: pre; overflow-x: auto; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">主数据类型</div>
+            <div class="search-box">
+                <span class="search-icon"></span>
+                <input type="text" class="search-input" id="dataTypeSearch" placeholder="搜索主数据类型...">
+            </div>
+        </div>
+        <div class="data-type-list" id="dataTypeList">
+            <div class="data-type-item active" data-type="客户主数据"><div class="data-type-info"><span class="data-type-icon">👥</span><span>客户主数据</span></div></div>
+            <div class="data-type-item" data-type="产品主数据"><div class="data-type-info"><span class="data-type-icon">📦</span><span>产品主数据</span></div></div>
+            <div class="data-type-item" data-type="供应商主数据"><div class="data-type-info"><span class="data-type-icon">🚚</span><span>供应商主数据</span></div></div>
+            <div class="data-type-item" data-type="员工主数据"><div class="data-type-info"><span class="data-type-icon">👤</span><span>员工主数据</span></div></div>
+            <div class="data-type-item" data-type="组织主数据"><div class="data-type-info"><span class="data-type-icon">🏢</span><span>组织主数据</span></div></div>
+            <div class="data-type-item" data-type="地点主数据"><div class="data-type-info"><span class="data-type-icon">📍</span><span>地点主数据</span></div></div>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="tabs-bar">
+            <div class="tab active" id="tabSync" onclick="switchTab('sync')">同步日志</div>
+            <div class="tab" id="tabFail" onclick="switchTab('fail')">同步失败日志</div>
+        </div>
+        <div id="querySection" class="query-section"></div>
+        <div id="toolbar" class="toolbar" style="display:none;"></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th id="selectAllHeader" style="display:none;"><input type="checkbox" class="checkbox" id="selectAll" onclick="toggleSelectAll()"></th><th>序号</th><th>编码</th><th>名称</th><th>同步结果</th><th>同步信息</th><th>同步时间</th><th>操作人</th><th>操作</th></tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- 右侧抽屉 -->
+<div class="drawer-mask" id="drawerMask">
+    <div class="drawer">
+        <div class="drawer-header">
+            <span>日志详情</span>
+            <button class="drawer-close" onclick="closeDrawer()">×</button>
+        </div>
+        <div class="drawer-body">
+            <div class="drawer-title" id="drawerTitle">日志详情</div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">请求报文</div>
+                <div class="code-block" id="drawerRequest"></div>
+            </div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">响应报文</div>
+                <div class="code-block" id="drawerResponse"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// 模拟数据
+const allSyncLogs = {
+    '客户主数据': [
+        { id: 1, code: 'API_001', name: '客户主数据接收接口', result: '成功', info: '同步完成', time: '2024-06-01 10:00', user: '张三', req: { dataType: '客户主数据', op: 'CREATE' }, resp: { code: 200, msg: 'ok' } },
+        { id: 2, code: 'API_002', name: '客户主数据接收接口', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
+    ],
+    '产品主数据': [
+        { id: 3, code: 'API_003', name: '产品主数据接收接口', result: '进行中', info: '正在处理', time: '2024-05-31 17:20', user: '王五', req: { dataType: '产品主数据', op: 'CREATE' }, resp: { code: 0, msg: '' } }
+    ],
+    '供应商主数据': [],
+    '员工主数据': [],
+    '组织主数据': [],
+    '地点主数据': []
+};
+const allFailLogs = {
+    '客户主数据': [
+        { id: 2, code: 'API_002', name: '客户主数据接收接口', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
+    ],
+    '产品主数据': [],
+    '供应商主数据': [],
+    '员工主数据': [],
+    '组织主数据': [],
+    '地点主数据': []
+};
+const statusClass = { '成功': 'status-success', '失败': 'status-fail', '进行中': 'status-running' };
+let currentTab = 'sync';
+let currentType = '客户主数据';
+let query = { code: '', result: '', info: '', time: '', user: '' };
+let selectedIds = [];
+
+function renderQuerySection() {
+    document.getElementById('querySection').innerHTML = `
+        <div class="query-item">
+            <label class="query-label">编码</label>
+            <input class="query-input" id="qCode" placeholder="请输入编码" value="${query.code||''}">
+        </div>
+        <div class="query-item">
+            <label class="query-label">同步状态</label>
+            <select class="query-select" id="qResult">
+                <option value="">全部</option>
+                <option value="成功">成功</option>
+                <option value="失败">失败</option>
+                <option value="进行中">进行中</option>
+            </select>
+        </div>
+        <div class="query-item">
+            <label class="query-label">同步信息</label>
+            <input class="query-input" id="qInfo" placeholder="请输入同步信息" value="${query.info||''}">
+        </div>
+        <div class="query-item">
+            <label class="query-label">同步时间</label>
+            <input class="query-input" id="qTime" placeholder="2024-06-01" value="${query.time||''}">
+        </div>
+        <div class="query-item">
+            <label class="query-label">操作人</label>
+            <input class="query-input" id="qUser" placeholder="请输入操作人" value="${query.user||''}">
+        </div>
+        <div class="query-btns">
+            <button class="btn-main" onclick="doQuery()">查询</button>
+            <button class="btn-line" onclick="resetQuery()">重置</button>
+        </div>
+    `;
+    document.getElementById('qResult').value = query.result;
+}
+
+function filterLogs(logs) {
+    return logs.filter(l =>
+        (!query.code || l.code.includes(query.code)) &&
+        (!query.result || l.result === query.result) &&
+        (!query.info || l.info.includes(query.info)) &&
+        (!query.time || l.time.includes(query.time)) &&
+        (!query.user || l.user.includes(query.user))
+    );
+}
+
+function renderTable() {
+    const logs = currentTab === 'sync' ? filterLogs(allSyncLogs[currentType]||[]) : filterLogs(allFailLogs[currentType]||[]);
+    const tbody = document.getElementById('logTableBody');
+    const selectAllHeader = document.getElementById('selectAllHeader');
+    
+    // 显示/隐藏全选列
+    selectAllHeader.style.display = currentTab === 'fail' ? 'table-cell' : 'none';
+    
+    tbody.innerHTML = logs.length ? logs.map((l, i) => {
+        const checkboxCell = currentTab === 'fail' ? `<td><input type="checkbox" class="checkbox" value="${l.id}" onchange="toggleSelect(${l.id})" ${selectedIds.includes(l.id) ? 'checked' : ''}></td>` : '';
+        return `
+            <tr>
+                ${checkboxCell}
+                <td><span class="serial-link" onclick="openDrawer(${l.id})">${i+1}</span></td>
+                <td>${l.code}</td>
+                <td>${l.name}</td>
+                <td><span class="status-badge ${statusClass[l.result]||''}">${l.result}</span></td>
+                <td>${l.info}</td>
+                <td>${l.time}</td>
+                <td>${l.user}</td>
+                <td>
+                    <button class="btn-view-message" onclick="viewMessage(${l.id})">查看报文</button>
+                </td>
+            </tr>
+        `;
+    }).join('') : '<tr><td colspan="9" style="text-align:center;color:#aaa;">暂无日志</td></tr>';
+    
+    updateToolbarButtons();
+}
+
+function toggleSelect(id) {
+    const index = selectedIds.indexOf(id);
+    if (index > -1) {
+        selectedIds.splice(index, 1);
+    } else {
+        selectedIds.push(id);
+    }
+    updateSelectAllState();
+    updateToolbarButtons();
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('#logTableBody input[type="checkbox"]');
+    
+    if (selectAll.checked) {
+        selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        checkboxes.forEach(cb => cb.checked = true);
+    } else {
+        selectedIds = [];
+        checkboxes.forEach(cb => cb.checked = false);
+    }
+    updateToolbarButtons();
+}
+
+function updateSelectAllState() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('#logTableBody input[type="checkbox"]');
+    const checkedCount = selectedIds.length;
+    
+    if (checkedCount === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    } else if (checkedCount === checkboxes.length) {
+        selectAll.checked = true;
+        selectAll.indeterminate = false;
+    } else {
+        selectAll.checked = false;
+        selectAll.indeterminate = true;
+    }
+}
+
+function updateToolbarButtons() {
+    const retryBtn = document.getElementById('retryBtn');
+    const archiveBtn = document.getElementById('archiveBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (retryBtn) {
+        // 重新接收按钮在有失败日志时启用（支持全部重新接收）
+        const failLogs = filterLogs(allFailLogs[currentType]||[]);
+        retryBtn.disabled = failLogs.length === 0;
+    }
+    if (archiveBtn) {
+        archiveBtn.disabled = selectedIds.length === 0;
+    }
+    if (deleteBtn) {
+        // 删除按钮在有失败日志时启用（支持删除全部）
+        const failLogs = filterLogs(allFailLogs[currentType]||[]);
+        deleteBtn.disabled = failLogs.length === 0;
+    }
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    selectedIds = []; // 切换页签时清空选择
+    document.getElementById('tabSync').classList.toggle('active', tab==='sync');
+    document.getElementById('tabFail').classList.toggle('active', tab==='fail');
+    document.getElementById('toolbar').style.display = tab==='fail' ? 'flex' : 'none';
+    renderQuerySection();
+    renderTable();
+}
+
+function doQuery() {
+    query.code = document.getElementById('qCode').value.trim();
+    query.result = document.getElementById('qResult').value;
+    query.info = document.getElementById('qInfo').value.trim();
+    query.time = document.getElementById('qTime').value.trim();
+    query.user = document.getElementById('qUser').value.trim();
+    renderTable();
+}
+function resetQuery() {
+    query = { code: '', result: '', info: '', time: '', user: '' };
+    renderQuerySection();
+    renderTable();
+}
+function openDrawer(id) {
+    const logs = currentTab === 'sync' ? allSyncLogs[currentType] : allFailLogs[currentType];
+    const log = logs.find(l => l.id === id);
+    if (!log) return;
+    document.getElementById('drawerTitle').textContent = `日志详情 - ${log.code}`;
+    document.getElementById('drawerRequest').textContent = JSON.stringify({ ...log.req, example: '...报文内容...' }, null, 2);
+    document.getElementById('drawerResponse').textContent = JSON.stringify({ ...log.resp, example: '...返回内容...' }, null, 2);
+    document.getElementById('drawerMask').style.display = 'block';
+}
+function closeDrawer() {
+    document.getElementById('drawerMask').style.display = 'none';
+}
+// 工具栏按钮
+function renderToolbar() {
+    const toolbar = document.getElementById('toolbar');
+    toolbar.innerHTML = `
+        <div class="dropdown">
+            <button class="dropdown-toggle retry" id="retryBtn" onclick="toggleRetryDropdown()" disabled>
+                重新接收
+                <span class="dropdown-arrow"></span>
+            </button>
+            <div class="dropdown-content" id="retryDropdown">
+                <div class="dropdown-item retry-selected" onclick="retrySelected()">重新接收</div>
+                <div class="dropdown-item retry-all" onclick="retryAll()">全部重收</div>
+            </div>
+        </div>
+        <button class="btn-archive" id="archiveBtn" onclick="archiveSelected()" disabled>归档</button>
+        <div class="dropdown">
+            <button class="dropdown-toggle" id="deleteBtn" onclick="toggleDeleteDropdown()" disabled>
+                删除
+                <span class="dropdown-arrow"></span>
+            </button>
+            <div class="dropdown-content" id="deleteDropdown">
+                <div class="dropdown-item delete-selected" onclick="deleteSelected()">删除所选日志</div>
+                <div class="dropdown-item delete-all" onclick="deleteAll()">删除全部日志</div>
+            </div>
+        </div>
+    `;
+}
+function toggleRetryDropdown() {
+    const dropdown = document.getElementById('retryDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function retrySelected() { 
+    if (selectedIds.length > 0) {
+        alert(`已重新接收选中的 ${selectedIds.length} 条失败日志（演示）`);
+    }
+    closeRetryDropdown();
+}
+function retryAll() { 
+    const failLogs = filterLogs(allFailLogs[currentType]||[]);
+    if (failLogs.length > 0) {
+        alert(`已全部重新接收 ${failLogs.length} 条失败日志（演示）`);
+    }
+    closeRetryDropdown();
+}
+
+function closeRetryDropdown() {
+    const dropdown = document.getElementById('retryDropdown');
+    dropdown.classList.remove('show');
+}
+
+function archiveSelected() {
+    if (selectedIds.length > 0) {
+        if (confirm(`确定要归档选中的 ${selectedIds.length} 条失败日志吗？归档后将无法恢复。`)) {
+            alert(`已归档选中的 ${selectedIds.length} 条失败日志（演示）`);
+            // 这里可以添加实际的归档逻辑
+            selectedIds = [];
+            renderTable();
+        }
+    }
+}
+function toggleDeleteDropdown() {
+    const dropdown = document.getElementById('deleteDropdown');
+    dropdown.classList.toggle('show');
+}
+
+function deleteSelected() {
+    if (selectedIds.length > 0) {
+        if (confirm(`确定要删除选中的 ${selectedIds.length} 条失败日志吗？删除后将无法恢复。`)) {
+            alert(`已删除选中的 ${selectedIds.length} 条失败日志（演示）`);
+            // 这里可以添加实际的删除逻辑
+            selectedIds = [];
+            renderTable();
+        }
+    }
+    closeDeleteDropdown();
+}
+
+function deleteAll() {
+    const failLogs = filterLogs(allFailLogs[currentType]||[]);
+    if (failLogs.length > 0) {
+        if (confirm(`确定要删除当前主数据类型的全部 ${failLogs.length} 条失败日志吗？删除后将无法恢复。`)) {
+            alert(`已删除全部 ${failLogs.length} 条失败日志（演示）`);
+            // 这里可以添加实际的删除逻辑
+            selectedIds = [];
+            renderTable();
+        }
+    }
+    closeDeleteDropdown();
+}
+
+function closeDeleteDropdown() {
+    const dropdown = document.getElementById('deleteDropdown');
+    dropdown.classList.remove('show');
+}
+
+// 点击外部关闭下拉菜单
+document.addEventListener('click', function(event) {
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+            const content = dropdown.querySelector('.dropdown-content');
+            if (content) {
+                content.classList.remove('show');
+            }
+        }
+    });
+});
+// 左侧主数据类型切换
+function bindTypeList() {
+    document.querySelectorAll('.data-type-item').forEach(item => {
+        item.onclick = function() {
+            document.querySelectorAll('.data-type-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            currentType = this.querySelector('.data-type-info span:last-child').textContent;
+            renderTable();
+        };
+    });
+    document.getElementById('dataTypeSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.data-type-item').forEach(item => {
+            const text = item.querySelector('.data-type-info span:last-child').textContent.toLowerCase();
+            item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+        });
+    });
+}
+// 初始化
+renderQuerySection();
+renderToolbar();
+renderTable();
+bindTypeList();
+
+function viewMessage(id) {
+    const logs = currentTab === 'sync' ? allSyncLogs[currentType] : allFailLogs[currentType];
+    const log = logs.find(l => l.id === id);
+    if (!log) return;
+    
+    document.getElementById('drawerTitle').textContent = `报文详情 - ${log.code}`;
+    document.getElementById('drawerRequest').textContent = JSON.stringify({
+        dataType: log.req.dataType,
+        operation: log.req.op,
+        timestamp: '2024-06-01T10:30:00Z',
+        requestId: 'REQ_' + Math.random().toString(36).substr(2, 9),
+        data: {
+            example: '接收到的数据内容',
+            format: 'JSON/XML',
+            size: '2.5KB'
+        }
+    }, null, 2);
+    
+    document.getElementById('drawerResponse').textContent = JSON.stringify({
+        code: log.resp.code,
+        message: log.resp.msg,
+        timestamp: '2024-06-01T10:30:01Z',
+        responseId: 'RESP_' + Math.random().toString(36).substr(2, 9),
+        data: {
+            result: log.result === '成功' ? 'SUCCESS' : 'FAILED',
+            processedRecords: log.result === '成功' ? 1 : 0,
+            errorDetails: log.result === '失败' ? log.info : null
+        }
+    }, null, 2);
+    
+    document.getElementById('drawerMask').style.display = 'block';
+}
+</script>
+</body>
+</html> 

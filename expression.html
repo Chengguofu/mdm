@@ -5,7 +5,7 @@
   <title>表达式编辑器</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; font-size: 13px; }
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; margin:0; font-size: 14px; }
     .container {
       max-width: 616px;
       margin: 22px auto;
@@ -26,14 +26,14 @@
     }
     .main-title {
       color: #222;
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 700;
       margin-bottom: 6px;
       letter-spacing: 1px;
     }
     .sub-title {
       color: #888;
-      font-size: 10.6px;
+      font-size: 11.6px;
       margin-bottom: 0;
       font-weight: 400;
     }
@@ -53,7 +53,7 @@
       justify-content: center;
       cursor: pointer;
       transition: box-shadow 0.18s, background 0.18s;
-      font-size: 15px;
+      font-size: 16px;
       box-shadow: 0 2px 8px rgba(33,118,199,0.06);
     }
     .icon-btn:hover {
@@ -68,7 +68,7 @@
     }
     .expr-tools select, .expr-tools input {
       width: 112px;
-      font-size: 8.5px;
+      font-size: 11.5px;
       padding: 5px 7px;
       border-radius: 5.6px;
       border: 1px solid #c0d3eb;
@@ -90,7 +90,7 @@
       height: 98px;
       resize: vertical;
       padding: 14px 18px;
-      font-size: 12.5px;
+      font-size: 13.5px;
       border: 1.8px solid #e3eaf3;
       border-radius: 16px;
       background: #fafdff;
@@ -106,7 +106,7 @@
     }
     .form-value textarea::placeholder {
       color: #b0b8c1;
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.5px;
     }
     .btns-bar { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 19px; margin-right: 36px; }
@@ -118,7 +118,7 @@
       border-radius: 5.6px;
       padding: 0 22px;
       height: 28.8px;
-      font-size: 10.6px;
+      font-size: 11.6px;
       display: inline-flex;
       align-items: center;
       font-weight: 600;
@@ -133,7 +133,7 @@
       border-radius: 5.6px;
       padding: 0 17.6px;
       height: 28.8px;
-      font-size: 10.6px;
+      font-size: 11.6px;
       display: inline-flex;
       align-items: center;
       transition: background 0.18s, border 0.18s;
@@ -141,9 +141,9 @@
     .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
     @media (max-width: 650px) {
       .container { max-width: 98vw; padding: 8px 1vw; }
-      .main-title { font-size: 12px; }
-      .form-label { width: 50px; font-size: 8.5px; }
-      .expr-tools select, .expr-tools input { width: 56px; font-size: 7px; }
+      .main-title { font-size: 13px; }
+      .form-label { width: 50px; font-size: 9.5px; }
+      .expr-tools select, .expr-tools input { width: 56px; font-size: 8px; }
     }
     #refAttrSelect {
       width: 120px;
@@ -151,7 +151,7 @@
       border-radius: 6px;
       border: 1.2px solid #c0d3eb;
       background: #fafdff;
-      font-size: 10.5px;
+      font-size: 13.5px;
       color: #222;
       transition: border 0.2s, box-shadow 0.2s;
       margin-right: 0;
@@ -179,7 +179,7 @@
     </div>
     <div class="expr-tools" id="exprTools">
       <select id="fieldSelect">
-        <option value="">选择字段</option>
+        <option value="">选择模型属性</option>
         <option value="customerName">客户名称</option>
         <option value="customerCode">客户编码</option>
         <option value="supplierName">供应商名称</option>
@@ -209,6 +209,8 @@
         <option value="<=">&lt;=</option>
         <option value="AND">AND</option>
         <option value="OR">OR</option>
+        <option value="(">（</option>
+        <option value=")">）</option>
       </select>
       <select id="funcSelect">
         <option value="">常用函数</option>
@@ -221,6 +223,13 @@
         <option value="REPLACE">REPLACE(字段,原,新)</option>
         <option value="CONCAT">CONCAT(字段1,字段2,...)</option>
         <option value="IF">IF(条件,值1,值2)</option>
+        <option value="DATE_FORMAT">DATE_FORMAT(字段,格式)</option>
+        <option value="DATEDIFF">DATEDIFF(日期1,日期2)</option>
+        <option value="DATE_ADD">DATE_ADD(日期,天数)</option>
+        <option value="DATE_SUB">DATE_SUB(日期,天数)</option>
+        <option value="YEAR">YEAR(日期)</option>
+        <option value="MONTH">MONTH(日期)</option>
+        <option value="DAY">DAY(日期)</option>
       </select>
       <input id="constInput" placeholder="常量/值" style="width:120px;">
     </div>
@@ -247,7 +256,11 @@
     const refAttrMap = {
       city: [
         {name:'市编码', val:'code'},
-        {name:'市名称', val:'name'}
+        {name:'市名称', val:'name'},
+        {name:'省编码', val:'provinceCode'},
+        {name:'省名称', val:'provinceName'},
+        {name:'国家编码', val:'countryCode'},
+        {name:'国家名称', val:'countryName'}
       ],
       province: [
         {name:'省编码', val:'code'},
@@ -334,7 +347,7 @@
       }
     };
     document.getElementById('cancelBtn').onclick = function() {
-      exprInput.value = '';
+      window.close && window.close();
     };
     // 校验按钮
     document.getElementById('validateBtn').onclick = function() {

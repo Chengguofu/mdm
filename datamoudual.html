@@ -1810,6 +1810,7 @@
                 <th>审核人</th>
                 <th>状态</th>
                 <th>语言</th>
+                <th>操作</th>
               </tr>
             </thead>
             ${showQueryBar ? `<tr class='query-bar-row' style='background:#f4f8fc;'>
@@ -1842,6 +1843,7 @@
               <td><input type='text' placeholder='审核人' style='width:98%;'></td>
               <td><input type='text' placeholder='状态' style='width:98%;'></td>
               <td><input type='text' placeholder='语言' style='width:98%;'></td>
+              <td></td>
             </tr>` : ''}
             <tbody>
               <tr>
@@ -1860,6 +1862,7 @@
                 <td>张三</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_meta')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1877,6 +1880,7 @@
                 <td>李四</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_model_type')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1894,6 +1898,7 @@
                 <td>王五</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_sys_file_type')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1911,6 +1916,7 @@
                 <td>赵六</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_field_type')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1928,6 +1934,7 @@
                 <td>孙七</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_sys_if')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1945,6 +1952,7 @@
                 <td>周八</td>
                 <td>正常</td>
                 <td>英文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_op_type')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1962,6 +1970,7 @@
                 <td>吴九</td>
                 <td>正常</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_syslog')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -1979,6 +1988,7 @@
                 <td>郑十</td>
                 <td>待提交</td>
                 <td>中文</td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_system')">查看关系</button></td>
               </tr>
             </tbody>
           </table>
@@ -2525,7 +2535,7 @@
                 <td>吴九</td>
                 <td>正常</td>
                 <td>中文</td>
-                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_syslog')">查看关系</button></td>
               </tr>
               <tr>
                 <td class="checkbox-cell"><input type="checkbox"></td>
@@ -2543,7 +2553,7 @@
                 <td>郑十</td>
                 <td>待提交</td>
                 <td>中文</td>
-                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;">编辑</button></td>
+                <td><button style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:13px;padding:0;margin-right:8px;" onclick="viewRelationship('mdm_system')">查看关系</button></td>
               </tr>
             </tbody>
           </table>
@@ -3177,41 +3187,171 @@
     function openErDrawer(code) {
       document.getElementById('erDrawer').classList.add('open');
       document.getElementById('erDrawerMask').classList.add('show');
-      document.getElementById('erSvgContainer').innerHTML = `
-        <svg width="800" height="400">
-          <!-- 用户表 -->
-          <rect x="80" y="40" width="140" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
-          <text x="150" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">用户表</text>
-          <text x="95" y="90" font-size="13" fill="#333">user_id</text>
-          <text x="95" y="110" font-size="13" fill="#333">user_name</text>
-          <text x="95" y="130" font-size="13" fill="#333">email</text>
-          <!-- 订单表 -->
-          <rect x="340" y="40" width="180" height="130" fill="#f7faff" stroke="#2176c7" rx="10"/>
-          <text x="430" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">订单表</text>
-          <text x="355" y="90" font-size="13" fill="#333">order_id</text>
-          <text x="355" y="110" font-size="13" fill="#333">user_id</text>
-          <text x="355" y="130" font-size="13" fill="#333">product_id</text>
-          <text x="355" y="150" font-size="13" fill="#333">amount</text>
-          <text x="355" y="170" font-size="13" fill="#333">order_time</text>
-          <!-- 商品表（下方） -->
-          <rect x="340" y="250" width="180" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
-          <text x="430" y="270" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">商品表</text>
-          <text x="355" y="300" font-size="13" fill="#333">product_id</text>
-          <text x="355" y="320" font-size="13" fill="#333">product_name</text>
-          <!-- 连线 用户表.user_id -> 订单表.user_id -->
-          <line x1="220" y1="85" x2="340" y2="100" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
-          <text x="250" y="90" font-size="12" fill="#2176c7">user_id</text>
-          <!-- 连线 订单表.product_id -> 商品表.product_id -->
-          <line x1="430" y1="170" x2="430" y2="250" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
-          <text x="440" y="220" font-size="12" fill="#2176c7">product_id</text>
-          <defs>
-            <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
-            </marker>
-          </defs>
-        </svg>
-        <div style='margin-top:12px;color:#888;font-size:13px;text-align:center;'>示例：用户表-订单表-商品表的典型ER关系</div>
-      `;
+      
+      // 根据模型ID动态生成ER图
+      let svgContent = '';
+      let description = '';
+      
+      switch(code) {
+        case 'mdm_meta':
+          svgContent = `
+            <svg width="800" height="400">
+              <!-- 元数据表 -->
+              <rect x="80" y="40" width="160" height="120" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="160" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">元数据表</text>
+              <text x="95" y="90" font-size="13" fill="#333">meta_id</text>
+              <text x="95" y="110" font-size="13" fill="#333">meta_name</text>
+              <text x="95" y="130" font-size="13" fill="#333">meta_type</text>
+              <text x="95" y="150" font-size="13" fill="#333">create_time</text>
+              
+              <!-- 模型类型表 -->
+              <rect x="340" y="40" width="160" height="100" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="420" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">模型类型表</text>
+              <text x="355" y="90" font-size="13" fill="#333">type_id</text>
+              <text x="355" y="110" font-size="13" fill="#333">type_name</text>
+              <text x="355" y="130" font-size="13" fill="#333">type_desc</text>
+              
+              <!-- 字段类型表 -->
+              <rect x="80" y="250" width="160" height="100" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="160" y="270" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">字段类型表</text>
+              <text x="95" y="300" font-size="13" fill="#333">field_type_id</text>
+              <text x="95" y="320" font-size="13" fill="#333">field_type_name</text>
+              <text x="95" y="340" font-size="13" fill="#333">field_type_desc</text>
+              
+              <!-- 连线 -->
+              <line x1="240" y1="100" x2="340" y2="100" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="280" y="95" font-size="12" fill="#2176c7">meta_type</text>
+              
+              <line x1="160" y1="160" x2="160" y2="250" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="170" y="210" font-size="12" fill="#2176c7">field_type</text>
+              
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
+                </marker>
+              </defs>
+            </svg>
+          `;
+          description = '元数据模型关系图：元数据表与模型类型表、字段类型表的关联关系';
+          break;
+          
+        case 'mdm_model_type':
+          svgContent = `
+            <svg width="800" height="400">
+              <!-- 模型类型表 -->
+              <rect x="80" y="40" width="160" height="120" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="160" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">模型类型表</text>
+              <text x="95" y="90" font-size="13" fill="#333">type_id</text>
+              <text x="95" y="110" font-size="13" fill="#333">type_name</text>
+              <text x="95" y="130" font-size="13" fill="#333">type_desc</text>
+              <text x="95" y="150" font-size="13" fill="#333">create_time</text>
+              
+              <!-- 数据模型表 -->
+              <rect x="340" y="40" width="180" height="140" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="430" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">数据模型表</text>
+              <text x="355" y="90" font-size="13" fill="#333">model_id</text>
+              <text x="355" y="110" font-size="13" fill="#333">model_name</text>
+              <text x="355" y="130" font-size="13" fill="#333">model_code</text>
+              <text x="355" y="150" font-size="13" fill="#333">model_type_id</text>
+              <text x="355" y="170" font-size="13" fill="#333">model_desc</text>
+              
+              <!-- 连线 -->
+              <line x1="240" y1="100" x2="340" y2="150" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="280" y="130" font-size="12" fill="#2176c7">model_type_id</text>
+              
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
+                </marker>
+              </defs>
+            </svg>
+          `;
+          description = '模型类型关系图：模型类型表与数据模型表的关联关系';
+          break;
+          
+        case 'mdm_syslog':
+          svgContent = `
+            <svg width="800" height="400">
+              <!-- 系统日志表 -->
+              <rect x="80" y="40" width="160" height="140" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="160" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">系统日志表</text>
+              <text x="95" y="90" font-size="13" fill="#333">log_id</text>
+              <text x="95" y="110" font-size="13" fill="#333">log_type</text>
+              <text x="95" y="130" font-size="13" fill="#333">log_content</text>
+              <text x="95" y="150" font-size="13" fill="#333">user_id</text>
+              <text x="95" y="170" font-size="13" fill="#333">create_time</text>
+              
+              <!-- 用户表 -->
+              <rect x="340" y="40" width="140" height="100" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="410" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">用户表</text>
+              <text x="355" y="90" font-size="13" fill="#333">user_id</text>
+              <text x="355" y="110" font-size="13" fill="#333">user_name</text>
+              <text x="355" y="130" font-size="13" fill="#333">user_role</text>
+              
+              <!-- 操作类型表 -->
+              <rect x="80" y="250" width="160" height="100" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="160" y="270" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">操作类型表</text>
+              <text x="95" y="300" font-size="13" fill="#333">op_type_id</text>
+              <text x="95" y="320" font-size="13" fill="#333">op_type_name</text>
+              <text x="95" y="340" font-size="13" fill="#333">op_type_desc</text>
+              
+              <!-- 连线 -->
+              <line x1="240" y1="150" x2="340" y2="100" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="280" y="130" font-size="12" fill="#2176c7">user_id</text>
+              
+              <line x1="160" y1="180" x2="160" y2="250" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="170" y="220" font-size="12" fill="#2176c7">log_type</text>
+              
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
+                </marker>
+              </defs>
+            </svg>
+          `;
+          description = '系统日志关系图：系统日志表与用户表、操作类型表的关联关系';
+          break;
+          
+        default:
+          svgContent = `
+            <svg width="800" height="400">
+              <!-- 用户表 -->
+              <rect x="80" y="40" width="140" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="150" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">用户表</text>
+              <text x="95" y="90" font-size="13" fill="#333">user_id</text>
+              <text x="95" y="110" font-size="13" fill="#333">user_name</text>
+              <text x="95" y="130" font-size="13" fill="#333">email</text>
+              <!-- 订单表 -->
+              <rect x="340" y="40" width="180" height="130" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="430" y="60" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">订单表</text>
+              <text x="355" y="90" font-size="13" fill="#333">order_id</text>
+              <text x="355" y="110" font-size="13" fill="#333">user_id</text>
+              <text x="355" y="130" font-size="13" fill="#333">product_id</text>
+              <text x="355" y="150" font-size="13" fill="#333">amount</text>
+              <text x="355" y="170" font-size="13" fill="#333">order_time</text>
+              <!-- 商品表（下方） -->
+              <rect x="340" y="250" width="180" height="90" fill="#f7faff" stroke="#2176c7" rx="10"/>
+              <text x="430" y="270" font-size="16" fill="#2176c7" font-weight="bold" text-anchor="middle">商品表</text>
+              <text x="355" y="300" font-size="13" fill="#333">product_id</text>
+              <text x="355" y="320" font-size="13" fill="#333">product_name</text>
+              <!-- 连线 用户表.user_id -> 订单表.user_id -->
+              <line x1="220" y1="85" x2="340" y2="100" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="250" y="90" font-size="12" fill="#2176c7">user_id</text>
+              <!-- 连线 订单表.product_id -> 商品表.product_id -->
+              <line x1="430" y1="170" x2="430" y2="250" stroke="#2176c7" stroke-width="2" marker-end="url(#arrow)"/>
+              <text x="440" y="220" font-size="12" fill="#2176c7">product_id</text>
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,5 L0,10" fill="#2176c7" />
+                </marker>
+              </defs>
+            </svg>
+          `;
+          description = '示例：用户表-订单表-商品表的典型ER关系';
+      }
+      
+      document.getElementById('erSvgContainer').innerHTML = svgContent + 
+        `<div style='margin-top:12px;color:#888;font-size:13px;text-align:center;'>${description}</div>`;
     }
 
     // --- Drawer Logic ---
@@ -3576,6 +3716,10 @@
           showAdvancedSearchModal();
         };
       }
+    }
+
+    function viewRelationship(modelId) {
+      openErDrawer(modelId);
     }
   </script>
 

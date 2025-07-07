@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>推送服务配置列表</title>
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f4f7fa; padding: 2rem; }
+    .main-layout { display: flex; gap: 24px; }
+    .left-col { width: 224px; min-width: 150px; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(33,118,199,0.06); padding: 18px 12px 12px 12px; display: flex; flex-direction: column; box-sizing: border-box; }
+    .right-col { flex: 1; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(33,118,199,0.06); padding: 24px 24px 18px 24px; min-width: 0; box-sizing: border-box; }
+    .section-title { font-size: 18px; color: #2176c7; font-weight: 600; margin-bottom: 16px; }
+    .search-bar { display: flex; gap: 0; margin-bottom: 14px; width: 100%; box-sizing: border-box; }
+    .search-bar input { flex: 1; padding: 10px 16px; border: 1.2px solid #c0d3eb; border-radius: 8px 0 0 8px; font-size: 16px; background: #f9fbfd; height: 44px; box-sizing: border-box; max-width: calc(100% - 60px); }
+    .search-bar button { background: #2176c7; color: #fff; border: none; width: 60px; border-radius: 0 8px 8px 0; font-size: 18px; cursor: pointer; font-weight: 500; height: 44px; display: flex; align-items: center; justify-content: center; }
+    .search-bar button:hover { background: #185a99; }
+    .mdm-list { list-style: none; padding: 0; margin: 0; }
+    .mdm-list li { padding: 8px 10px; border-radius: 6px; cursor: pointer; color: #185a99; font-size: 15px; transition: background 0.15s; }
+    .mdm-list li.active, .mdm-list li:hover { background: #f0f6fd; color: #2176c7; }
+    .query-bar { display: flex; flex-wrap: wrap; gap: 16px 18px; align-items: center; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
+    .query-bar label { font-size: 15px; color: #185a99; margin-right: 6px; }
+    .query-bar input, .query-bar select { padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 15px; background: #f9fbfd; min-width: 100px; margin-right: 8px; }
+    .query-bar button { background: #2176c7; color: #fff; border: none; padding: 6px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: 500; margin-right: 8px; }
+    .query-bar button:hover { background: #185a99; }
+    .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    .status-active { color: #28a745; font-weight: 500; }
+    .status-inactive { color: #dc3545; font-weight: 500; }
+    .action-bar { display:flex;gap:10px;margin-bottom:12px; }
+    @keyframes drawerIn {
+      from { right: -440px; opacity: 0; }
+      to { right: 0; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="main-layout">
+  <!-- 左侧主数据列表 -->
+  <div class="left-col">
+    <div class="section-title">主数据列表</div>
+    <div class="search-bar">
+      <input type="text" id="mdmSearchInput" placeholder="搜索主数据...">
+      <button onclick="searchMdm()">搜索</button>
+    </div>
+    <ul class="mdm-list" id="mdmList">
+      <li class="active">客户主数据</li>
+      <li>供应商主数据</li>
+      <li>产品主数据</li>
+      <li>员工主数据</li>
+      <li>组织主数据</li>
+    </ul>
+  </div>
+  <!-- 右侧推送接口列表 -->
+  <div class="right-col">
+    <div class="section-title">推送接口列表</div>
+    <form class="query-bar" id="pushQueryForm" onsubmit="return false;">
+      <label>业务系统：</label>
+      <select id="querySystem">
+        <option value="">全部</option>
+        <option>OA系统</option>
+        <option>ERP系统</option>
+        <option>CRM系统</option>
+      </select>
+      <label>接口编码：</label>
+      <input type="text" id="queryCode" placeholder="接口编码">
+      <label>接口名称：</label>
+      <input type="text" id="queryName" placeholder="接口名称">
+      <label>接口地址：</label>
+      <input type="text" id="queryUrl" placeholder="接口地址">
+      <label>状态：</label>
+      <select id="queryStatus">
+        <option value="">全部</option>
+        <option value="启用">启用</option>
+        <option value="停用">停用</option>
+      </select>
+      <button onclick="doQuery()">查询</button>
+      <button type="button" onclick="resetQuery()">重置</button>
+    </form>
+    <div class="action-bar" style="display:flex;gap:10px;margin-bottom:12px;">
+      <button class="btn btn-primary btn-sm" onclick="addPush()">新增</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteSelected()">删除</button>
+      <button class="btn btn-success btn-sm" onclick="enableSelected()">启用</button>
+      <button class="btn btn-secondary btn-sm" onclick="disableSelected()">禁用</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="checkAllPush"></th>
+            <th>业务系统</th>
+            <th>接口编码</th>
+            <th>接口名称</th>
+            <th>接口地址</th>
+            <th>状态</th>
+            <th style="width:120px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="pushTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+// 示例推送接口数据
+let pushData = [
+  { system: 'OA系统', code: 'API_001', name: '客户推送接口', url: '/api/push/customer', status: '启用', mdm: '客户主数据' },
+  { system: 'ERP系统', code: 'API_002', name: '供应商推送接口', url: '/api/push/vendor', status: '启用', mdm: '供应商主数据' },
+  { system: 'CRM系统', code: 'API_003', name: '产品推送接口', url: '/api/push/product', status: '停用', mdm: '产品主数据' },
+  { system: 'OA系统', code: 'API_004', name: '员工推送接口', url: '/api/push/employee', status: '启用', mdm: '员工主数据' },
+  { system: 'ERP系统', code: 'API_005', name: '组织推送接口', url: '/api/push/org', status: '停用', mdm: '组织主数据' },
+  // 新增客户主数据相关外围系统接口示例
+  { system: '外围CRM', code: 'API_006', name: 'CRM客户同步接口', url: 'https://crm.example.com/api/customerSync', status: '启用', mdm: '客户主数据' },
+  { system: '外围电商', code: 'API_007', name: '电商客户推送', url: 'https://shop.example.com/api/customerPush', status: '停用', mdm: '客户主数据' },
+  { system: '外围BI', code: 'API_008', name: 'BI客户数据接口', url: 'https://bi.example.com/api/customer', status: '启用', mdm: '客户主数据' },
+  { system: '外围OA', code: 'API_009', name: 'OA客户同步', url: 'https://oa.example.com/api/customerSync', status: '启用', mdm: '客户主数据' }
+];
+
+function renderPushTable() {
+  const tbody = document.getElementById('pushTableBody');
+  const system = document.getElementById('querySystem').value;
+  const code = document.getElementById('queryCode').value.trim();
+  const name = document.getElementById('queryName').value.trim();
+  const url = document.getElementById('queryUrl').value.trim();
+  const status = document.getElementById('queryStatus').value;
+  const mdm = document.querySelector('.mdm-list li.active')?.textContent || '';
+
+  let rows = pushData.filter(item =>
+    (!system || item.system === system) &&
+    (!code || item.code.includes(code)) &&
+    (!name || item.name.includes(name)) &&
+    (!url || item.url.includes(url)) &&
+    (!status || item.status === status) &&
+    (!mdm || item.mdm === mdm)
+  );
+
+  tbody.innerHTML = rows.map((item, idx) => `
+    <tr>
+      <td><input type="checkbox" class="rowCheckPush" data-idx="${idx}"></td>
+      <td>${item.system}</td>
+      <td>${item.code}</td>
+      <td>${item.name}</td>
+      <td>${item.url}</td>
+      <td><span class="status-${item.status === '启用' ? 'active' : 'inactive'}">${item.status}</span></td>
+      <td>
+        <button class="btn btn-link btn-sm text-primary" onclick="editPush(${idx})">编辑</button>
+        <button class="btn btn-link btn-sm text-danger" onclick="deletePush(${idx})">删除</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function doQuery() { renderPushTable(); }
+function resetQuery() {
+  document.getElementById('querySystem').value = '';
+  document.getElementById('queryCode').value = '';
+  document.getElementById('queryName').value = '';
+  document.getElementById('queryUrl').value = '';
+  document.getElementById('queryStatus').value = '';
+  renderPushTable();
+}
+function searchMdm() {
+  // 这里只做高亮模拟，实际可做过滤
+  const val = document.getElementById('mdmSearchInput').value.trim();
+  const lis = document.querySelectorAll('#mdmList li');
+  let found = false;
+  lis.forEach(li => {
+    if (!val || li.textContent.includes(val)) {
+      li.style.display = '';
+      if (!found && val && li.textContent.includes(val)) {
+        li.classList.add('active');
+        found = true;
+      } else {
+        li.classList.remove('active');
+      }
+    } else {
+      li.style.display = 'none';
+      li.classList.remove('active');
+    }
+  });
+  if (!found && val) lis[0].classList.add('active');
+  renderPushTable();
+}
+document.querySelectorAll('#mdmList li').forEach(li => {
+  li.onclick = function() {
+    document.querySelectorAll('#mdmList li').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    renderPushTable();
+  };
+});
+renderPushTable();
+
+// 工具栏按钮事件（仅弹窗或alert模拟）
+function addPush() {
+  // 创建抽屉蒙层和内容容器
+  if (document.getElementById('drawerMask')) return;
+  const mask = document.createElement('div');
+  mask.id = 'drawerMask';
+  mask.style.cssText = 'position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(33,118,199,0.10);z-index:3000;display:flex;justify-content:flex-end;';
+  mask.onclick = function(e) { if (e.target === mask) mask.remove(); };
+  const drawer = document.createElement('div');
+  drawer.style.cssText = 'width:700px;max-width:98vw;height:100vh;background:#fff;box-shadow:-2px 0 16px rgba(33,118,199,0.18);display:flex;flex-direction:column;position:relative;animation:drawerIn .25s;';
+  drawer.innerHTML = `
+    <div style="padding:18px 24px 0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e3eaf3;">
+      <span style="font-size:18px;font-weight:600;color:#2176c7;">新增推送接口</span>
+      <button onclick="document.getElementById('drawerMask').remove()" style="background:none;border:none;font-size:24px;color:#999;cursor:pointer;">×</button>
+    </div>
+    <iframe src="data_send.html" style="flex:1;width:100%;height:calc(100vh - 56px);border:none;"></iframe>
+  `;
+  mask.appendChild(drawer);
+  document.body.appendChild(mask);
+}
+function deleteSelected() { alert('批量删除功能待实现'); }
+function enableSelected() { alert('批量启用功能待实现'); }
+function disableSelected() { alert('批量禁用功能待实现'); }
+function editPush(idx) { alert('编辑功能待实现，行号：' + idx); }
+function deletePush(idx) { alert('删除功能待实现，行号：' + idx); }
+
+// 全选功能
+document.addEventListener('DOMContentLoaded', function() {
+  const table = document.getElementById('pushTableBody');
+  const checkAll = document.getElementById('checkAllPush');
+  function updateCheckAll() {
+    const checks = table.querySelectorAll('.rowCheckPush');
+    const checked = table.querySelectorAll('.rowCheckPush:checked');
+    if (checkAll) checkAll.checked = checks.length > 0 && checks.length === checked.length;
+  }
+  if (checkAll) {
+    checkAll.onclick = function() {
+      const checked = this.checked;
+      table.querySelectorAll('.rowCheckPush').forEach(cb => cb.checked = checked);
+    };
+  }
+  table.addEventListener('change', function(e) {
+    if (e.target.classList.contains('rowCheckPush')) updateCheckAll();
+  });
+});
+</script>
+</body>
+</html> 

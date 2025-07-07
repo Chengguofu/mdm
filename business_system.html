@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>业务系统管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f7faff; font-size:15px; }
+    .container { max-width: 1200px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(33,118,199,0.08); padding: 32px 36px 28px 36px; }
+    .section-title { font-size: 20px; color: #2176c7; font-weight: 600; margin-bottom: 18px; }
+    .query-bar { display: flex; gap: 18px; align-items: center; margin-bottom: 0; flex-wrap: wrap; }
+    .query-bar label { font-size: 15px; color: #185a99; margin-right: 6px; }
+    .query-bar input, .query-bar select { padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 4px; font-size: 15px; background: #f9fbfd; min-width: 120px; margin-right: 8px; }
+    .query-bar button { background: #2176c7; color: #fff; border: none; padding: 6px 18px; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: 500; margin-right: 8px; transition: background 0.2s; }
+    .query-bar button:hover { background: #185a99; }
+    .query-btn-bar { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 18px; }
+    .action-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .btn-main { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 15px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; }
+    .btn-main:hover { background: #185a99; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
+    .btn-line:hover { background: #f5f7fa; border-color: #185a99; color: #185a99; }
+    .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+    th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f0f6fd; }
+    .table-link-edit { background: none; border: none; color: #2176c7; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-edit:hover { color: #185a99; text-decoration: underline; }
+    .table-link-delete { background: none; border: none; color: #e74c3c; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-delete:hover { color: #b71c1c; text-decoration: underline; }
+    .table-link-view { background: none; border: none; color: #28a745; font-size: 15px; cursor: pointer; padding: 0 8px; transition: color 0.18s; }
+    .table-link-view:hover { color: #1e7e34; text-decoration: underline; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:500px; max-width:98vw; min-height:200px; padding:28px 32px 22px 32px; position:relative; }
+    .modal-title { font-size:18px; font-weight:600; color:#2176c7; margin-bottom:18px; }
+    .modal-close { position:absolute; right:18px; top:12px; font-size:20px; color:#888; cursor:pointer; border:none; background:none; transition:.2s; }
+    .modal-close:hover { color:#d33; }
+    .modal-form-row { display:flex; align-items:center; margin-bottom:18px; }
+    .modal-form-label { width:100px; color:#444; font-size:15px; text-align:right; margin-right:12px; }
+    .modal-form-value { flex:1; }
+    .modal-form-value input, .modal-form-value select, .modal-form-value textarea { width:100%; padding:7px 12px; border:1.2px solid #c0d3eb; border-radius:5px; font-size:15px; background:#f9fbfd; }
+    .modal-form-value textarea { height: 80px; resize: vertical; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:12px; margin-top:10px; }
+    .status-active { color: #28a745; font-weight: 500; }
+    .status-inactive { color: #dc3545; font-weight: 500; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section-title">业务系统管理</div>
+    <div class="query-bar">
+      <label>系统编码：</label><input type="text" id="queryCode" placeholder="请输入系统编码">
+      <label>系统名称：</label><input type="text" id="queryName" placeholder="请输入系统名称">
+      <label>状态：</label>
+      <select id="queryStatus">
+        <option value="">全部</option>
+        <option value="启用">启用</option>
+        <option value="停用">停用</option>
+      </select>
+    </div>
+    <div class="query-btn-bar">
+      <button class="btn-main" onclick="doQuery()">查询</button>
+      <button class="btn-line" onclick="resetQuery()">重置</button>
+    </div>
+    <div class="action-bar">
+      <button class="btn-main" onclick="openAddModal()">新增</button>
+      <button class="btn-line" onclick="openEditModalFromSelection()">编辑</button>
+      <button class="btn-line" onclick="enableSelected()">启用</button>
+      <button class="btn-line" onclick="disableSelected()">禁用</button>
+      <button class="btn-line" onclick="deleteSelected()">删除</button>
+      <button class="btn-line" onclick="exportData()">导出</button>
+    </div>
+    <div class="table-wrap">
+      <table id="businessSystemTable">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="checkAll"></th>
+            <th>系统编码</th>
+            <th>系统名称</th>
+            <th>负责人</th>
+            <th>联系电话</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th style="width:120px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="businessSystemTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="businessSystemModalMask" style="display:none;">
+    <div class="modal-window">
+      <div class="modal-title" id="businessSystemModalTitle">新增业务系统</div>
+      <button class="modal-close" onclick="closeBusinessSystemModal()">×</button>
+      <div class="modal-form-row">
+        <div class="modal-form-label">系统编码：</div>
+        <div class="modal-form-value"><input type="text" id="modalCode" placeholder="请输入系统编码"></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">系统名称：</div>
+        <div class="modal-form-value"><input type="text" id="modalName" placeholder="请输入系统名称"></div>
+      </div>
+
+      <div class="modal-form-row">
+        <div class="modal-form-label">负责人：</div>
+        <div class="modal-form-value"><input type="text" id="modalOwner" placeholder="请输入负责人"></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">联系电话：</div>
+        <div class="modal-form-value"><input type="text" id="modalPhone" placeholder="请输入联系电话"></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">系统描述：</div>
+        <div class="modal-form-value"><textarea id="modalDescription" placeholder="请输入系统描述"></textarea></div>
+      </div>
+      <div class="modal-form-row">
+        <div class="modal-form-label">状态：</div>
+        <div class="modal-form-value">
+          <select id="modalStatus">
+            <option value="启用">启用</option>
+            <option value="停用">停用</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-main" onclick="saveBusinessSystem()">保存</button>
+        <button class="btn-line" onclick="closeBusinessSystemModal()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详情弹窗 -->
+  <div class="modal-mask" id="detailModalMask" style="display:none;">
+    <div class="modal-window" style="width:600px;">
+      <div class="modal-title">业务系统详情</div>
+      <button class="modal-close" onclick="closeDetailModal()">×</button>
+      <div id="detailContent" style="margin-bottom: 20px;">
+        <!-- 详情内容将通过JavaScript动态生成 -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-line" onclick="closeDetailModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let businessSystemData = [
+      { 
+        code: 'SYS001', 
+        name: '人力资源管理系统', 
+        owner: '张三', 
+        phone: '13800138001', 
+        status: '启用', 
+        description: '用于管理公司员工信息、薪资、考勤等核心人力资源数据',
+        createTime: '2024-01-15 10:30:00'
+      },
+      { 
+        code: 'SYS002', 
+        name: '财务管理系统', 
+        owner: '李四', 
+        phone: '13800138002', 
+        status: '启用', 
+        description: '负责公司财务核算、报表生成、成本控制等财务相关业务',
+        createTime: '2024-01-10 14:20:00'
+      },
+      { 
+        code: 'SYS003', 
+        name: '客户关系管理系统', 
+        owner: '王五', 
+        phone: '13800138003', 
+        status: '停用', 
+        description: '管理客户信息、销售机会、合同管理等客户相关业务',
+        createTime: '2024-01-20 09:15:00'
+      },
+      { 
+        code: 'SYS004', 
+        name: '供应链管理系统', 
+        owner: '赵六', 
+        phone: '13800138004', 
+        status: '启用', 
+        description: '管理供应商信息、采购订单、库存管理等供应链业务',
+        createTime: '2024-01-25 16:45:00'
+      },
+      { 
+        code: 'SYS005', 
+        name: '办公自动化系统', 
+        owner: '钱七', 
+        phone: '13800138005', 
+        status: '停用', 
+        description: '提供文档管理、工作流、邮件等办公自动化功能',
+        createTime: '2024-02-01 11:30:00'
+      }
+    ];
+    
+    let editIndex = null;
+
+    function renderTable() {
+      const tbody = document.getElementById('businessSystemTableBody');
+      const code = document.getElementById('queryCode').value.trim();
+      const name = document.getElementById('queryName').value.trim();
+      const status = document.getElementById('queryStatus').value;
+      
+      let rows = businessSystemData
+        .map((item, idx) => ({ ...item, idx }))
+        .filter(item => 
+          (!code || item.code.toLowerCase().includes(code.toLowerCase())) && 
+          (!name || item.name.toLowerCase().includes(name.toLowerCase())) && 
+          (!status || item.status === status)
+        );
+      
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td><input type="checkbox" class="rowCheck" data-idx="${item.idx}"></td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>${item.owner}</td>
+          <td>${item.phone}</td>
+          <td><span class="status-${item.status === '启用' ? 'active' : 'inactive'}">${item.status}</span></td>
+          <td>${item.createTime}</td>
+          <td>
+            <button class="table-link-view" onclick="viewDetail(${item.idx})">查看</button>
+            <button class="table-link-edit" onclick="openEditModal(${item.idx})">编辑</button>
+            <button class="table-link-delete" onclick="deleteRow(${item.idx})">删除</button>
+          </td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('checkAll').checked = false;
+    }
+
+    function doQuery() { 
+      renderTable(); 
+    }
+
+    function resetQuery() {
+      document.getElementById('queryCode').value = '';
+      document.getElementById('queryName').value = '';
+      document.getElementById('queryStatus').value = '';
+      renderTable();
+    }
+
+    function openAddModal() {
+      editIndex = null;
+      document.getElementById('businessSystemModalTitle').textContent = '新增业务系统';
+      document.getElementById('modalCode').value = '';
+      document.getElementById('modalName').value = '';
+      document.getElementById('modalOwner').value = '';
+      document.getElementById('modalPhone').value = '';
+      document.getElementById('modalDescription').value = '';
+      document.getElementById('modalStatus').value = '启用';
+      document.getElementById('businessSystemModalMask').style.display = 'flex';
+    }
+
+    function openEditModal(idx) {
+      editIndex = idx;
+      const item = businessSystemData[idx];
+      document.getElementById('businessSystemModalTitle').textContent = '编辑业务系统';
+      document.getElementById('modalCode').value = item.code;
+      document.getElementById('modalName').value = item.name;
+      document.getElementById('modalOwner').value = item.owner;
+      document.getElementById('modalPhone').value = item.phone;
+      document.getElementById('modalDescription').value = item.description;
+      document.getElementById('modalStatus').value = item.status;
+      document.getElementById('businessSystemModalMask').style.display = 'flex';
+    }
+
+    function closeBusinessSystemModal() {
+      document.getElementById('businessSystemModalMask').style.display = 'none';
+    }
+
+    function saveBusinessSystem() {
+      const code = document.getElementById('modalCode').value.trim();
+      const name = document.getElementById('modalName').value.trim();
+      const owner = document.getElementById('modalOwner').value.trim();
+      const phone = document.getElementById('modalPhone').value.trim();
+      const description = document.getElementById('modalDescription').value.trim();
+      const status = document.getElementById('modalStatus').value;
+
+      if (!code || !name || !owner) { 
+        alert('请填写必填信息（系统编码、系统名称、负责人）'); 
+        return; 
+      }
+
+      const newSystem = {
+        code,
+        name,
+        owner,
+        phone,
+        description,
+        status,
+        createTime: new Date().toLocaleString('zh-CN')
+      };
+
+      if (editIndex === null) {
+        // 检查系统编码是否已存在
+        if (businessSystemData.some(item => item.code === code)) {
+          alert('系统编码已存在，请使用其他编码');
+          return;
+        }
+        businessSystemData.push(newSystem);
+      } else {
+        // 编辑时检查系统编码是否与其他记录重复
+        if (businessSystemData.some((item, idx) => idx !== editIndex && item.code === code)) {
+          alert('系统编码已存在，请使用其他编码');
+          return;
+        }
+        businessSystemData[editIndex] = { ...businessSystemData[editIndex], ...newSystem };
+      }
+
+      closeBusinessSystemModal();
+      renderTable();
+    }
+
+    function deleteRow(idx) {
+      if (confirm('确定要删除该业务系统吗？')) {
+        businessSystemData.splice(idx, 1);
+        renderTable();
+      }
+    }
+
+    function deleteSelected() {
+      const checks = Array.from(document.querySelectorAll('.rowCheck:checked'));
+      if (checks.length === 0) { 
+        alert('请选择要删除的项'); 
+        return; 
+      }
+      if (!confirm('确定要批量删除选中的业务系统吗？')) return;
+      
+      const idxs = checks.map(cb => parseInt(cb.dataset.idx)).sort((a,b)=>b-a);
+      idxs.forEach(idx => businessSystemData.splice(idx, 1));
+      renderTable();
+    }
+
+    function enableSelected() {
+      const checks = Array.from(document.querySelectorAll('.rowCheck:checked'));
+      if (checks.length === 0) { 
+        alert('请选择要启用的项'); 
+        return; 
+      }
+      if (!confirm('确定要启用选中的业务系统吗？')) return;
+      
+      const idxs = checks.map(cb => parseInt(cb.dataset.idx));
+      idxs.forEach(idx => {
+        businessSystemData[idx].status = '启用';
+      });
+      renderTable();
+    }
+
+    function disableSelected() {
+      const checks = Array.from(document.querySelectorAll('.rowCheck:checked'));
+      if (checks.length === 0) { 
+        alert('请选择要禁用的项'); 
+        return; 
+      }
+      if (!confirm('确定要禁用选中的业务系统吗？')) return;
+      
+      const idxs = checks.map(cb => parseInt(cb.dataset.idx));
+      idxs.forEach(idx => {
+        businessSystemData[idx].status = '停用';
+      });
+      renderTable();
+    }
+
+    function openEditModalFromSelection() {
+      const checks = Array.from(document.querySelectorAll('.rowCheck:checked'));
+      if (checks.length === 0) { 
+        alert('请选择要编辑的项'); 
+        return; 
+      }
+      if (checks.length > 1) { 
+        alert('只能选择一个项目进行编辑'); 
+        return; 
+      }
+      
+      const idx = parseInt(checks[0].dataset.idx);
+      openEditModal(idx);
+    }
+
+    function viewDetail(idx) {
+      const item = businessSystemData[idx];
+      const detailContent = document.getElementById('detailContent');
+      
+      detailContent.innerHTML = `
+        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center;">
+          <div style="font-weight: 600; color: #2176c7;">系统编码：</div>
+          <div>${item.code}</div>
+          
+          <div style="font-weight: 600; color: #2176c7;">系统名称：</div>
+          <div>${item.name}</div>
+          
+          <div style="font-weight: 600; color: #2176c7;">负责人：</div>
+          <div>${item.owner}</div>
+          
+          <div style="font-weight: 600; color: #2176c7;">联系电话：</div>
+          <div>${item.phone}</div>
+          
+          <div style="font-weight: 600; color: #2176c7;">状态：</div>
+          <div><span class="status-${item.status === '启用' ? 'active' : 'inactive'}">${item.status}</span></div>
+          
+          <div style="font-weight: 600; color: #2176c7;">创建时间：</div>
+          <div>${item.createTime}</div>
+          
+          <div style="font-weight: 600; color: #2176c7;">系统描述：</div>
+          <div style="grid-column: 2; white-space: pre-wrap;">${item.description}</div>
+        </div>
+      `;
+      
+      document.getElementById('detailModalMask').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModalMask').style.display = 'none';
+    }
+
+    function exportData() {
+      const code = document.getElementById('queryCode').value.trim();
+      const name = document.getElementById('queryName').value.trim();
+      const status = document.getElementById('queryStatus').value;
+      
+      let exportData = businessSystemData.filter(item => 
+        (!code || item.code.toLowerCase().includes(code.toLowerCase())) && 
+        (!name || item.name.toLowerCase().includes(name.toLowerCase())) && 
+        (!status || item.status === status)
+      );
+
+      if (exportData.length === 0) {
+        alert('没有数据可导出');
+        return;
+      }
+
+      // 创建CSV内容
+      const headers = ['系统编码', '系统名称', '负责人', '联系电话', '状态', '创建时间', '系统描述'];
+      const csvContent = [
+        headers.join(','),
+        ...exportData.map(item => [
+          item.code,
+          item.name,
+          item.owner,
+          item.phone,
+          item.status,
+          item.createTime,
+          item.description
+        ].join(','))
+      ].join('\n');
+
+      // 下载文件
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `业务系统数据_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 全选功能
+    document.getElementById('checkAll').onclick = function() {
+      const checked = this.checked;
+      document.querySelectorAll('.rowCheck').forEach(cb => cb.checked = checked);
+    };
+
+    // 初始化表格
+    renderTable();
+  </script>
+</body>
+</html>

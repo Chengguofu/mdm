@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接收服务配置</title>
+    <style>
+        body { background: #f7faff; font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 0; font-size: 15px; }
+        .container { max-width: 1200px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(33,118,199,0.08); padding: 32px 36px 28px 36px; }
+        .section-title { font-size: 20px; color: #2176c7; font-weight: 600; margin-bottom: 18px; }
+        
+        /* 查询区域样式 */
+        .query-section { background: #f8fbff; border: 1px solid #e3eaf3; border-radius: 8px; padding: 20px; margin-bottom: 18px; }
+        .query-title { font-size: 16px; color: #2176c7; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .query-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .query-item { display: flex; flex-direction: column; gap: 6px; }
+        .query-label { font-size: 14px; color: #666; font-weight: 500; }
+        .query-input, .query-select { padding: 8px 12px; border: 1px solid #e3eaf3; border-radius: 4px; font-size: 14px; outline: none; transition: border 0.2s; }
+        .query-input:focus, .query-select:focus { border-color: #2176c7; }
+        .query-buttons { display: flex; gap: 8px; align-items: end; }
+        .btn-query { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .btn-query:hover { background: #185a99; }
+        .btn-reset { background: #fff; color: #666; border: 1px solid #e3eaf3; border-radius: 4px; padding: 8px 16px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .btn-reset:hover { background: #f5f7fa; border-color: #2176c7; color: #2176c7; }
+        
+        .action-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
+        .btn-main { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 15px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; cursor: pointer; }
+        .btn-main:hover { background: #185a99; }
+        .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-line:hover { background: #f5f7fa; border-color: #185a99; color: #185a99; }
+        .btn-danger { background: #fff; color: #d33; border: 1.5px solid #d33; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-danger:hover { background: #d33; color: #fff; }
+        .btn-success { background: #fff; color: #28a745; border: 1.5px solid #28a745; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-success:hover { background: #28a745; color: #fff; }
+        .btn-warning { background: #fff; color: #ffc107; border: 1.5px solid #ffc107; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-warning:hover { background: #ffc107; color: #fff; }
+        .btn-info { background: #fff; color: #17a2b8; border: 1.5px solid #17a2b8; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-info:hover { background: #17a2b8; color: #fff; }
+        
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(33, 118, 199, 0.06); padding: 0; overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; background: #fff; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid #e3eaf3; text-align: left; white-space: nowrap; }
+        th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f0f6fd; }
+        .action-buttons { display: flex; gap: 4px; }
+        .btn-edit { background: none; border: none; color: #2176c7; font-size: 15px; cursor: pointer; padding: 4px 8px; transition: color 0.18s; }
+        .btn-edit:hover { color: #185a99; text-decoration: underline; }
+        .btn-view { background: none; border: none; color: #17a2b8; font-size: 15px; cursor: pointer; padding: 4px 8px; transition: color 0.18s; }
+        .btn-view:hover { color: #138496; text-decoration: underline; }
+        .checkbox-cell { width: 50px; text-align: center; }
+        .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .status-enabled { color: #28a745; font-weight: 500; }
+        .status-disabled { color: #6c757d; font-weight: 500; }
+        .link-code { color: #2176c7; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .link-code:hover { color: #185a99; text-decoration: underline; }
+        
+        /* 抽屉样式 */
+        .drawer-mask { position: fixed; right: 0; top: 0; bottom: 0; left: 0; background: rgba(0,0,0,0.18); z-index: 9999; display: none; }
+        .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: 900px; max-width: 98vw; background: #fff; box-shadow: -2px 0 16px rgba(33,118,199,0.13); z-index: 10000; display: flex; flex-direction: column; }
+        .drawer-header { padding: 20px 28px 12px 28px; font-size: 18px; font-weight: 600; color: #2176c7; border-bottom: 1px solid #e3eaf3; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-close { font-size: 22px; color: #888; cursor: pointer; border: none; background: none; transition: .2s; }
+        .drawer-close:hover { color: #d33; }
+        .drawer-body { flex: 1; overflow-y: auto; }
+        .drawer-iframe { width: 100%; height: calc(100vh - 60px); border: none; background: #f7faff; }
+        
+        /* 报文格式弹窗样式 */
+        .message-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 10001; display: none; align-items: center; justify-content: center; }
+        .message-content { background: #fff; border-radius: 8px; max-width: 800px; width: 90vw; max-height: 80vh; overflow: hidden; box-shadow: 0 4px 24px rgba(33,118,199,0.13); }
+        .message-header { background: #2176c7; color: #fff; padding: 16px 24px; font-size: 18px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .message-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+        .message-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
+        .message-tabs { display: flex; border-bottom: 1px solid #e3eaf3; margin-bottom: 16px; }
+        .message-tab { padding: 12px 24px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .message-tab.active { color: #2176c7; border-bottom-color: #2176c7; }
+        .message-tab-content { display: none; }
+        .message-tab-content.active { display: block; }
+        .code-block { background: #f8f9fa; border: 1px solid #e3eaf3; border-radius: 4px; padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.5; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-title">接收服务配置</div>
+        
+        <!-- 查询区域 -->
+        <div class="query-section">
+            <div class="query-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                查询条件
+            </div>
+            <div class="query-form">
+                <div class="query-item">
+                    <label class="query-label">主数据类型</label>
+                    <select class="query-select" id="queryType">
+                        <option value="">全部</option>
+                        <option value="客户主数据">客户主数据</option>
+                        <option value="产品主数据">产品主数据</option>
+                        <option value="供应商主数据">供应商主数据</option>
+                    </select>
+                </div>
+                <div class="query-item">
+                    <label class="query-label">接口编码</label>
+                    <input type="text" class="query-input" id="queryCode" placeholder="请输入接口编码">
+                </div>
+                <div class="query-item">
+                    <label class="query-label">接口名称</label>
+                    <input type="text" class="query-input" id="queryName" placeholder="请输入接口名称">
+                </div>
+                <div class="query-item">
+                    <label class="query-label">接口状态</label>
+                    <select class="query-select" id="queryStatus">
+                        <option value="">全部</option>
+                        <option value="启用">启用</option>
+                        <option value="禁用">禁用</option>
+                    </select>
+                </div>
+                <div class="query-item">
+                    <label class="query-label">业务系统</label>
+                    <select class="query-select" id="querySystem">
+                        <option value="">全部</option>
+                        <option value="OA系统">OA系统</option>
+                        <option value="ERP系统">ERP系统</option>
+                        <option value="CRM系统">CRM系统</option>
+                    </select>
+                </div>
+                <div class="query-item">
+                    <label class="query-label">接口类型</label>
+                    <select class="query-select" id="queryApiType">
+                        <option value="">全部</option>
+                        <option value="JSON">JSON</option>
+                        <option value="XML">XML</option>
+                        <option value="SOAP">SOAP</option>
+                    </select>
+                </div>
+                <div class="query-buttons">
+                    <button class="btn-query" onclick="searchData()">查询</button>
+                    <button class="btn-reset" onclick="resetQuery()">重置</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-bar">
+            <button class="btn-main" onclick="openDrawer('新增')">新增</button>
+            <button class="btn-success" onclick="enableSelected()">启用</button>
+            <button class="btn-warning" onclick="disableSelected()">禁用</button>
+            <button class="btn-danger" onclick="deleteSelected()">删除</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        </th>
+                        <th>主数据类型</th>
+                        <th>业务系统</th>
+                        <th>接口服务编码</th>
+                        <th>接口服务名称</th>
+                        <th>接口类型</th>
+                        <th>同步方式</th>
+                        <th>状态</th>
+                        <th style="width:120px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="mainTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 抽屉 -->
+    <div class="drawer-mask" id="drawerMask">
+        <div class="drawer">
+            <div class="drawer-header">
+                <span id="drawerTitle">编辑</span>
+                <button class="drawer-close" onclick="closeDrawer()">×</button>
+            </div>
+            <div class="drawer-body">
+                <iframe id="drawerIframe" class="drawer-iframe"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 报文格式弹窗 -->
+    <div class="message-modal" id="messageModal">
+        <div class="message-content">
+            <div class="message-header">
+                <span id="messageTitle">接口报文格式</span>
+                <button class="message-close" onclick="closeMessageModal()">×</button>
+            </div>
+            <div class="message-body">
+                <div class="message-tabs">
+                    <div class="message-tab active" onclick="switchMessageTab('request')">接收报文格式</div>
+                    <div class="message-tab" onclick="switchMessageTab('response')">返回数据格式</div>
+                </div>
+                <div class="message-tab-content active" id="requestContent">
+                    <div class="code-block" id="requestCode">
+                        {
+  "dataType": "客户主数据",
+  "operation": "CREATE",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "customerId": "CUST001",
+    "customerName": "示例客户",
+    "contactPhone": "13800138000",
+    "email": "example@company.com"
+  }
+}
+                    </div>
+                </div>
+                <div class="message-tab-content" id="responseContent">
+                    <div class="code-block" id="responseCode">
+                        {
+  "code": 200,
+  "message": "success",
+  "data": {
+    "result": "SUCCESS",
+    "recordId": "REC001",
+    "timestamp": "2024-01-15T10:30:05Z"
+  }
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    const data = [
+        { id: 1, type: '客户主数据', system: 'OA系统', code: 'API_00123', name: '客户主数据接收接口', apiType: 'JSON', sync: '同步', status: '启用' },
+        { id: 2, type: '产品主数据', system: 'ERP系统', code: 'API_00234', name: '产品主数据接收接口', apiType: 'XML', sync: '异步', status: '禁用' },
+        { id: 3, type: '供应商主数据', system: 'ERP系统', code: 'API_00345', name: '供应商主数据接收接口', apiType: 'JSON', sync: '同步', status: '启用' },
+        { id: 4, type: '客户主数据', system: 'CRM系统', code: 'API_00456', name: '客户信息同步接口', apiType: 'SOAP', sync: '异步', status: '启用' }
+    ];
+    
+    let filteredData = [...data];
+    
+    function renderTable() {
+        const tbody = document.getElementById('mainTableBody');
+        tbody.innerHTML = filteredData.map((row, idx) => `
+            <tr>
+                <td class="checkbox-cell">
+                    <input type="checkbox" class="row-checkbox" value="${row.id}" onchange="updateSelectAll()">
+                </td>
+                <td>${row.type}</td>
+                <td>${row.system}</td>
+                <td><a href="#" class="link-code" onclick="viewInterfaceDetail(${row.id})">${row.code}</a></td>
+                <td>${row.name}</td>
+                <td>${row.apiType}</td>
+                <td>${row.sync}</td>
+                <td class="${row.status === '启用' ? 'status-enabled' : 'status-disabled'}">${row.status}</td>
+                <td class="action-buttons">
+                    <button class="btn-edit" onclick="openDrawer('编辑', ${idx})">编辑</button>
+                    <button class="btn-view" onclick="viewMessageFormat(${row.id})">查看报文格式</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    function searchData() {
+        const type = document.getElementById('queryType').value;
+        const code = document.getElementById('queryCode').value.toLowerCase();
+        const name = document.getElementById('queryName').value.toLowerCase();
+        const status = document.getElementById('queryStatus').value;
+        const system = document.getElementById('querySystem').value;
+        const apiType = document.getElementById('queryApiType').value;
+        
+        filteredData = data.filter(item => {
+            return (!type || item.type === type) &&
+                   (!code || item.code.toLowerCase().includes(code)) &&
+                   (!name || item.name.toLowerCase().includes(name)) &&
+                   (!status || item.status === status) &&
+                   (!system || item.system === system) &&
+                   (!apiType || item.apiType === apiType);
+        });
+        
+        renderTable();
+    }
+    
+    function resetQuery() {
+        document.getElementById('queryType').value = '';
+        document.getElementById('queryCode').value = '';
+        document.getElementById('queryName').value = '';
+        document.getElementById('queryStatus').value = '';
+        document.getElementById('querySystem').value = '';
+        document.getElementById('queryApiType').value = '';
+        
+        filteredData = [...data];
+        renderTable();
+    }
+    
+    function viewInterfaceDetail(id) {
+        const row = data.find(item => item.id === id);
+        if (row) {
+            openDrawer(`接口详情 - ${row.code}`, null, row);
+        }
+    }
+    
+    function viewMessageFormat(id) {
+        const row = data.find(item => item.id === id);
+        if (row) {
+            document.getElementById('messageTitle').textContent = `${row.name} - 报文格式`;
+            document.getElementById('messageModal').style.display = 'flex';
+            
+            if (row.apiType === 'XML') {
+                document.getElementById('requestCode').textContent = `<?xml version="1.0" encoding="UTF-8"?>\n<request>\n  <dataType>${row.type}</dataType>\n  <operation>CREATE</operation>\n  <timestamp>2024-01-15T10:30:00Z</timestamp>\n  <data>\n    <customerId>CUST001</customerId>\n    <customerName>示例客户</customerName>\n  </data>\n</request>`;
+                document.getElementById('responseCode').textContent = `<?xml version="1.0" encoding="UTF-8"?>\n<response>\n  <code>200</code>\n  <message>success</message>\n  <data>\n    <result>SUCCESS</result>\n    <recordId>REC001</recordId>\n  </data>\n</response>`;
+            } else if (row.apiType === 'SOAP') {
+                document.getElementById('requestCode').textContent = `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\n  <soap:Body>\n    <CreateCustomer xmlns="http://example.com/">\n      <customerData>\n        <customerId>CUST001</customerId>\n        <customerName>示例客户</customerName>\n      </customerData>\n    </CreateCustomer>\n  </soap:Body>\n</soap:Envelope>`;
+                document.getElementById('responseCode').textContent = `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\n  <soap:Body>\n    <CreateCustomerResponse xmlns="http://example.com/">\n      <result>SUCCESS</result>\n      <recordId>REC001</recordId>\n    </CreateCustomerResponse>\n  </soap:Body>\n</soap:Envelope>`;
+            } else {
+                const requestJson = {
+                    dataType: row.type,
+                    operation: "CREATE",
+                    timestamp: "2024-01-15T10:30:00Z",
+                    data: {
+                        customerId: "CUST001",
+                        customerName: "示例客户",
+                        contactPhone: "13800138000",
+                        email: "example@company.com"
+                    }
+                };
+                const responseJson = {
+                    code: 200,
+                    message: "success",
+                    data: {
+                        result: "SUCCESS",
+                        recordId: "REC001",
+                        timestamp: "2024-01-15T10:30:05Z"
+                    }
+                };
+                document.getElementById('requestCode').textContent = JSON.stringify(requestJson, null, 2);
+                document.getElementById('responseCode').textContent = JSON.stringify(responseJson, null, 2);
+            }
+        }
+    }
+    
+    function switchMessageTab(tab) {
+        // 切换标签页样式
+        document.querySelectorAll('.message-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.message-tab-content').forEach(c => c.classList.remove('active'));
+        
+        if (tab === 'request') {
+            document.querySelector('.message-tab:first-child').classList.add('active');
+            document.getElementById('requestContent').classList.add('active');
+        } else {
+            document.querySelector('.message-tab:last-child').classList.add('active');
+            document.getElementById('responseContent').classList.add('active');
+        }
+    }
+    
+    function closeMessageModal() {
+        document.getElementById('messageModal').style.display = 'none';
+    }
+    
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+        });
+    }
+    
+    function updateSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+        const totalCount = checkboxes.length;
+        
+        if (checkedCount === 0) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        } else if (checkedCount === totalCount) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = true;
+        }
+    }
+    
+    function getSelectedIds() {
+        const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+        return Array.from(checkboxes).map(cb => parseInt(cb.value));
+    }
+    
+    function enableSelected() {
+        const selectedIds = getSelectedIds();
+        if (selectedIds.length === 0) {
+            alert('请选择要启用的记录');
+            return;
+        }
+        if (confirm(`确定要启用选中的 ${selectedIds.length} 条记录吗？`)) {
+            selectedIds.forEach(id => {
+                const row = data.find(item => item.id === id);
+                if (row) row.status = '启用';
+            });
+            searchData(); // 重新应用查询条件
+            alert('启用成功');
+        }
+    }
+    
+    function disableSelected() {
+        const selectedIds = getSelectedIds();
+        if (selectedIds.length === 0) {
+            alert('请选择要禁用的记录');
+            return;
+        }
+        if (confirm(`确定要禁用选中的 ${selectedIds.length} 条记录吗？`)) {
+            selectedIds.forEach(id => {
+                const row = data.find(item => item.id === id);
+                if (row) row.status = '禁用';
+            });
+            searchData(); // 重新应用查询条件
+            alert('禁用成功');
+        }
+    }
+    
+    function deleteSelected() {
+        const selectedIds = getSelectedIds();
+        if (selectedIds.length === 0) {
+            alert('请选择要删除的记录');
+            return;
+        }
+        if (confirm(`确定要删除选中的 ${selectedIds.length} 条记录吗？此操作不可恢复！`)) {
+            selectedIds.forEach(id => {
+                const index = data.findIndex(item => item.id === id);
+                if (index > -1) data.splice(index, 1);
+            });
+            searchData(); // 重新应用查询条件
+            alert('删除成功');
+        }
+    }
+    
+    function openDrawer(title, idx, rowData) {
+        document.getElementById('drawerTitle').textContent = title;
+        document.getElementById('drawerMask').style.display = 'block';
+        // 这里可以根据idx传递参数给iframe，实际项目可用URL参数或postMessage
+        document.getElementById('drawerIframe').src = 'data_receive.html';
+    }
+    
+    function closeDrawer() {
+        document.getElementById('drawerMask').style.display = 'none';
+        document.getElementById('drawerIframe').src = '';
+    }
+    
+    // 点击弹窗外部关闭
+    document.getElementById('messageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeMessageModal();
+        }
+    });
+    
+    renderTable();
+    </script>
+</body>
+</html> 

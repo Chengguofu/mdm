@@ -1035,33 +1035,6 @@ function renderAttrDetailBox() {
         <div class='form-row'><div class='form-label'>检验正则表达式</div><div class='form-value'><button type='button' class='btn-line-modern' style='padding:4px 12px;font-size:13px;'>选择正则</button></div></div>
       </form>
     </div>
-    <div style='font-size:15px;font-weight:600;color:#2176c7;margin-bottom:6px;margin-top:8px;display:flex;align-items:center;cursor:pointer;user-select:none;' id='advancedConfigToggle'>
-      <svg width='16' height='16' viewBox='0 0 1024 1024'><path d='M384 192l256 320-256 320z' fill='#2176c7'/></svg>
-      高级配置
-    </div>
-    <div class='section-content' id='advancedConfigPanel' style='display:${collapse.advanced?'none':'block'};'>
-      <form class='form-2col' style='padding-bottom:8px;'>
-        <div class='form-row'>
-          <div class='form-label'>开启智能联想</div>
-          <div class='form-value'>
-            <select class='form-control' id='enableSmartSuggest'>
-              <option value='否'>否</option>
-              <option value='是'>是</option>
-            </select>
-          </div>
-        </div>
-        <div class='form-row' id='smartSuggestServiceRow' style='display:none;'>
-          <div class='form-label'>智能联想服务</div>
-          <div class='form-value'>
-            <select class='form-control' id='smartSuggestService'>
-              <option value='服务A'>服务A</option>
-              <option value='服务B'>服务B</option>
-              <option value='服务C'>服务C</option>
-            </select>
-          </div>
-        </div>
-      </form>
-    </div>
   `;
   // 折叠/展开事件
   setTimeout(()=>{
@@ -1073,21 +1046,6 @@ function renderAttrDetailBox() {
       window.attrPanelCollapse.validate = !window.attrPanelCollapse.validate;
       renderAttrDetailBox();
     };
-    document.getElementById('advancedConfigToggle').onclick = function(){
-      if(typeof window.attrPanelCollapse.advanced === 'undefined') window.attrPanelCollapse.advanced = false;
-      window.attrPanelCollapse.advanced = !window.attrPanelCollapse.advanced;
-      renderAttrDetailBox();
-    };
-    // 智能联想服务下拉显示逻辑
-    const smartSelect = document.getElementById('enableSmartSuggest');
-    const serviceRow = document.getElementById('smartSuggestServiceRow');
-    if(smartSelect && serviceRow) {
-      function updateServiceRow() {
-        serviceRow.style.display = smartSelect.value==='是' ? '' : 'none';
-      }
-      smartSelect.onchange = updateServiceRow;
-      updateServiceRow();
-    }
   },0);
 }
 function renderAttrFieldList() {

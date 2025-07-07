@@ -30,7 +30,12 @@
     .btn-main:hover { background: #399488; }
     .btn-line { background: #fff; color: #444; border: 1px solid #d0d7de; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 14px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; }
     .btn-line:hover { background: #f5f7fa; border-color: #b0b8c1; }
-    .field-config-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .field-config-row {
+      display: flex;
+      align-items: center;
+      gap: 16px; /* 增大间距 */
+      margin-bottom: 8px;
+    }
     .field-config-row label { min-width: 60px; }
     .field-config-row input, .field-config-row select { width: 90px; }
     .tab-preview-bar { display:flex; gap:0; border-bottom:2px solid #e0e6ed; margin-bottom:18px; }
@@ -148,6 +153,162 @@
       width:18px;height:18px;accent-color:#2176c7;vertical-align:middle;
     }
     #previewModal, #previewDrawer { z-index: 9999 !important; }
+    /* Switch-mini样式 */
+    .switch-mini {
+      position: relative;
+      display: inline-block;
+      width: 44px;  /* 更宽 */
+      height: 26px; /* 更高 */
+      vertical-align: middle;
+    }
+    .switch-mini input { opacity: 0; width: 0; height: 0; }
+    .slider-mini {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #c0d3eb;
+      border-radius: 26px;
+      transition: .2s;
+    }
+    .switch-mini input:checked + .slider-mini { background: #4db6ac; }
+    .slider-mini:before {
+      position: absolute;
+      content: "";
+      height: 20px; width: 20px;
+      left: 3px; bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: .2s;
+      box-shadow: 0 1px 3px rgba(33,118,199,0.10);
+    }
+    .switch-mini input:checked + .slider-mini:before { transform: translateX(18px); }
+    /* 智能服务数据映射抽屉样式优化 */
+    .mapping-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 8px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(33,118,199,0.06);
+    }
+    .mapping-table th, .mapping-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e3eaf3;
+      text-align: left;
+      font-size: 14px;
+    }
+    .mapping-table th {
+      background: #f4f8fb;
+      font-weight: 600;
+      color: #2176c7;
+    }
+    .mapping-table tr:last-child td {
+      border-bottom: none;
+    }
+    .mapping-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    .add-mapping-btn {
+      margin-top: 10px;
+      background: #4db6ac;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .add-mapping-btn:hover {
+      background: #399488;
+    }
+    .remove-mapping-btn {
+      background: #fff;
+      color: #f44336;
+      border: 1.5px solid #f44336;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, border 0.18s;
+    }
+    .remove-mapping-btn:hover {
+      background: #fbe9e7;
+      color: #b71c1c;
+      border-color: #b71c1c;
+    }
+    #smartMappingDrawerContent .form-input, #smartMappingDrawerContent .form-select {
+      border: 1.5px solid #c0d3eb;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 14px;
+      background: #f9fbfd;
+      transition: border 0.18s, box-shadow 0.18s;
+      outline: none;
+    }
+    #smartMappingDrawerContent .form-input:focus, #smartMappingDrawerContent .form-select:focus {
+      border-color: #2176c7;
+      box-shadow: 0 0 0 2px #e3eaf3;
+    }
+    #smartMappingDrawerContent .form-select {
+      min-width: 80px;
+    }
+    #smartMappingDrawerContent .mapping-table input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: #4db6ac;
+    }
+    #smartMappingDrawerContent .mapping-table td {
+      vertical-align: middle;
+    }
+    #smartMappingDrawerContent .mapping-table th {
+      font-size: 15px;
+    }
+    #smartMappingDrawerContent .mapping-table {
+      margin-bottom: 0;
+    }
+    #smartMappingDrawerContent .mapping-table tr td:last-child {
+      text-align: center;
+    }
+    #smartMappingDrawerContent .mapping-table tr td button {
+      margin: 0 2px;
+    }
+    #smartMappingDrawerContent .add-mapping-btn {
+      margin-bottom: 12px;
+    }
+    #smartMappingDrawerContent .mapping-table tr td input,
+    #smartMappingDrawerContent .mapping-table tr td select {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #smartMappingDrawerContent .mapping-table tr td input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+    #smartMappingDrawerContent .mapping-table tr td {
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+    #smartMappingDrawerContent .mapping-table tr th {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    #smartMappingDrawerContent .mapping-table tr td button.remove-mapping-btn {
+      min-width: 54px;
+    }
+    #smartMappingDrawerContent .mapping-table tr td {
+      font-size: 14px;
+    }
+    #smartMappingDrawerContent .mapping-table tr th {
+      font-size: 15px;
+    }
+    #smartMappingDrawerContent > div[style*='font-size:17px'] {
+      font-size: 17px !important;
+      font-weight: 600;
+      color: #2176c7;
+      margin-bottom: 12px;
+      margin-top: 18px;
+    }
   </style>
 </head>
 <body>
@@ -164,7 +325,6 @@
         <button id="tabDetail" onclick="switchTab('detail')">详情页布局</button>
       </div>
       <div id="listConfig" class="config-section">
-        <div class="config-row"><label><input type="checkbox" id="autoFit">宽度自适应</label></div>
         <div style="margin-top:16px;">
           <div class="tab-preview-bar" style="margin-bottom:0;">
             <button id="tabListFields" class="tab-preview-btn active" onclick="switchListTab('fields')">列表配置</button>
@@ -201,8 +361,9 @@
             <div id="detailCanvasTabs"></div>
           </div>
           <!-- 第三栏：属性配置 -->
-          <div style="flex:1;min-width:180px;max-width:260px;background:#f8fafc;border:1px solid #e0e6ed;border-radius:8px;padding:12px 14px;">
+          <div style="flex:1;min-width:180px;max-width:286px;background:#f8fafc;border:1px solid #e0e6ed;border-radius:8px;padding:12px 14px;">
             <div style="font-weight:600;color:#2176c7;margin-bottom:10px;">属性配置</div>
+            <div id="canvasFieldPropsSmart" style="margin-bottom:12px;"></div>
             <div id="canvasFieldProps"></div>
           </div>
         </div>
@@ -237,6 +398,127 @@
     </div>
   </div>
   <script>
+    // 智能服务相关变量和函数，必须放在所有用到它们的函数之前
+    const smartServices = [
+      { id: 'svc1', name: '企查查' },
+      { id: 'svc2', name: '天眼查' },
+      { id: 'svc3', name: 'AI智能联想' }
+    ];
+    let smartQueryEnabled = false;
+    let smartQueryService = '';
+    let smartFillEnabled = false;
+    let smartFillService = '';
+    function renderSmartServicePropsHtml() {
+      let html = '';
+      html += `<div class='field-config-row'><label>智能联想</label><label class="switch-mini"><input type="checkbox" ${smartQueryEnabled?'checked':''} onchange="toggleSmartQuery(this.checked)"><span class="slider-mini"></span></label></div>`;
+      if(smartQueryEnabled) {
+        html += `<div class='field-config-row'><select class='modern-select' style='width:140px;' onchange='setSmartQueryService(this.value)'>`;
+        html += `<option value=''>请选择服务</option>`;
+        html += smartServices.map(s=>`<option value='${s.id}' ${smartQueryService===s.id?'selected':''}>${s.name}</option>`).join('');
+        html += `</select></div>`;
+      }
+      html += `<div class='field-config-row'><label>智能填写</label><label class="switch-mini"><input type="checkbox" ${smartFillEnabled?'checked':''} onchange="toggleSmartFill(this.checked)"><span class="slider-mini"></span></label></div>`;
+      if(smartFillEnabled) {
+        html += `<div class='field-config-row'><select class='modern-select' style='width:140px;margin-right:8px;' onchange='setSmartFillService(this.value)'>`;
+        html += `<option value=''>请选择服务</option>`;
+        html += smartServices.map(s=>`<option value='${s.id}' ${smartFillService===s.id?'selected':''}>${s.name}</option>`).join('');
+        html += `</select>`;
+        html += `<button class='btn-modern' style='margin-left:4px;' onclick='openSmartMappingDrawer()'>数据映射</button></div>`;
+      }
+      return html;
+    }
+    function toggleSmartQuery(val) { smartQueryEnabled = val; if(!val) smartQueryService=''; renderDetailCanvasFieldProps(); }
+    function setSmartQueryService(val) { smartQueryService = val; }
+    function toggleSmartFill(val) { smartFillEnabled = val; if(!val) smartFillService=''; renderDetailCanvasFieldProps(); }
+    function setSmartFillService(val) { smartFillService = val; }
+    function openSmartMappingDrawer() {
+      document.getElementById('smartMappingDrawerMask').style.display = 'block';
+      document.getElementById('smartMappingDrawer').style.display = 'block';
+      renderSmartMappingDrawerContent();
+    }
+    function closeSmartMappingDrawer() {
+      document.getElementById('smartMappingDrawerMask').style.display = 'none';
+      document.getElementById('smartMappingDrawer').style.display = 'none';
+    }
+    function renderSmartMappingDrawerContent() {
+      const content = document.getElementById('smartMappingDrawerContent');
+      if (!content) return;
+      content.innerHTML = `
+        <div style=\"font-size:17px;font-weight:600;color:#2176c7;margin-bottom:12px;\">输入参数配置</div>
+        <div style=\"margin-bottom:18px;\">
+          <table class=\"mapping-table\" id=\"inputMappingTable\" style=\"margin-bottom:8px;\">
+            <thead>
+              <tr>
+                <th>参数名</th>
+                <th>主数据字段</th>
+                <th>默认值</th>
+              </tr>
+            </thead>
+            <tbody id=\"inputMappingBody\">
+            </tbody>
+          </table>
+        </div>
+        <div style=\"font-size:17px;font-weight:600;color:#2176c7;margin-bottom:12px;\">字段映射配置</div>
+        <div>
+          <table class=\"mapping-table\" id=\"outputMappingTable\" style=\"margin-bottom:8px;\">
+            <thead>
+              <tr>
+                <th>主数据字段</th>
+                <th>接口返回字段</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id=\"outputMappingBody\">
+            </tbody>
+          </table>
+          <button class=\"add-mapping-btn\" onclick=\"addOutputMapping()\">添加字段映射</button>
+        </div>
+      `;
+      renderInputMappingRows();
+      renderOutputMappingRows();
+    }
+    function renderInputMappingRows() {
+      const tbody = document.getElementById('inputMappingBody');
+      if (!tbody) return;
+      tbody.innerHTML = smartInputMappings.map((row, idx) => `
+        <tr>
+          <td><input type=\"text\" class=\"form-input\" style=\"width:100%;\" value=\"${row.paramName||''}\" onchange=\"updateInputMapping(${idx},'paramName',this.value)\"></td>
+          <td><input type=\"text\" class=\"form-input\" style=\"width:100%;\" value=\"${row.dataField||''}\" onchange=\"updateInputMapping(${idx},'dataField',this.value)\"></td>
+          <td><input type=\"text\" class=\"form-input\" style=\"width:100%;\" value=\"${row.defaultValue||''}\" onchange=\"updateInputMapping(${idx},'defaultValue',this.value)\"></td>
+        </tr>
+      `).join('');
+    }
+    // 输入参数配置数据
+    let smartInputMappings = [
+      { paramName: 'keyword', paramType: '查询关键字', dataField: 'vendorName', defaultValue: '' }
+    ];
+    // 字段映射配置数据
+    let smartOutputMappings = [
+      { dataField: '供应商名称', fieldType: '文本', apiField: 'name', transform: '', required: true },
+      { dataField: '统一社会信用代码', fieldType: '文本', apiField: 'creditCode', transform: '', required: false }
+    ];
+    function renderOutputMappingRows() {
+      const tbody = document.getElementById('outputMappingBody');
+      if (!tbody) return;
+      tbody.innerHTML = smartOutputMappings.map((row, idx) => `
+        <tr>
+          <td><input type=\"text\" class=\"form-input\" style=\"width:100%;\" value=\"${row.dataField||''}\" onchange=\"updateOutputMapping(${idx},'dataField',this.value)\"></td>
+          <td><input type=\"text\" class=\"form-input\" style=\"width:100%;\" value=\"${row.apiField||''}\" onchange=\"updateOutputMapping(${idx},'apiField',this.value)\"></td>
+          <td><button class=\"remove-mapping-btn\" onclick=\"removeOutputMapping(${idx})\">删除</button></td>
+        </tr>
+      `).join('');
+    }
+    function addOutputMapping() {
+      smartOutputMappings.push({ dataField: '', fieldType: '', apiField: '', transform: '', required: false });
+      renderOutputMappingRows();
+    }
+    function removeOutputMapping(idx) {
+      smartOutputMappings.splice(idx, 1);
+      renderOutputMappingRows();
+    }
+    function updateOutputMapping(idx, key, value) {
+      smartOutputMappings[idx][key] = value;
+    }
     // 示例字段
     const defaultListFields = [
       { key: 'code', label: '编码', width: 120 },
@@ -294,13 +576,24 @@
     function renderDraggableList(list, containerId, type) {
       const container = document.getElementById(containerId);
       container.innerHTML = '';
-      const autoFit = document.getElementById('autoFit') && document.getElementById('autoFit').checked;
       list.forEach((field, idx) => {
         const item = document.createElement('div');
         item.className = 'draggable-item';
         item.draggable = true;
-        let widthVal = autoFit ? 0 : field.width;
-        item.innerHTML = `<span class='drag-handle'>☰</span>${field.label} <input type='number' min='40' max='400' value='${widthVal}' style='width:50px;margin-left:8px;' onchange='updateFieldWidth("${type}",${idx},this.value)' ${autoFit?'disabled':''}>`;
+        
+        // 为每个字段添加autoFit属性，如果不存在则默认为false
+        if (field.autoFit === undefined) field.autoFit = false;
+        let widthVal = field.autoFit ? 0 : field.width;
+        
+        item.innerHTML = `
+          <span class='drag-handle'>☰</span>
+          ${field.label} 
+          <label style='margin-left:8px;font-size:12px;color:#666;'>
+            <input type='checkbox' ${field.autoFit?'checked':''} onchange='updateFieldAutoFit("${type}",${idx},this.checked)' style='margin-right:4px;'>宽度自适应
+          </label>
+          <input type='number' min='40' max='400' value='${widthVal}' style='width:50px;margin-left:8px;' onchange='updateFieldWidth("${type}",${idx},this.value)' ${field.autoFit?'disabled':''}>
+        `;
+        
         item.ondragstart = e => {
           e.dataTransfer.setData('text/plain', idx);
         };
@@ -321,6 +614,15 @@
     function updateFieldWidth(type, idx, value) {
       if (type === 'list') listFields[idx].width = +value;
       else detailFields[idx].width = +value;
+    }
+    
+    function updateFieldAutoFit(type, idx, checked) {
+      const arr = type === 'list' ? listFields : detailFields;
+      arr[idx].autoFit = checked;
+      if (checked) {
+        arr[idx].width = 0; // 设置为自适应时，宽度设为0
+      }
+      renderDraggableList(arr, type === 'list' ? 'listFields' : 'detailFields', type);
     }
     // 字段属性配置
     function renderFieldProps() {
@@ -359,6 +661,7 @@
         document.getElementById('tabDetail').classList.add('active');
         renderDetailModelFieldPool();
         renderDetailCanvasTabs();
+        renderSmartServiceProps(); // 保证每次切换详情tab都刷新智能服务选项
         renderDetailCanvasFieldProps();
       }
     }
@@ -379,7 +682,8 @@
         if(detailMode==='drawer') {
           html += `<table style='width:100%;border-collapse:collapse;'><tr>`;
           listFields.forEach(f=>{
-            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${f.width}px;'>${f.label}</th>`;
+            const width = f.autoFit ? 'auto' : `${f.width}px`;
+            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${width};'>${f.label}</th>`;
           });
           html += `</tr>`;
           for(let i=0;i<3;i++) {
@@ -401,7 +705,8 @@
           html += `<div style='background:#fff;border:1px solid #c0d3eb;border-radius:6px;padding:12px;'>`;
           html += `<table style='width:100%;border-collapse:collapse;'><tr>`;
           listFields.forEach(f=>{
-            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${f.width}px;'>${f.label}</th>`;
+            const width = f.autoFit ? 'auto' : `${f.width}px`;
+            html += `<th style='border:1px solid #c0d3eb;padding:6px;width:${width};'>${f.label}</th>`;
           });
           html += `</tr>`;
           for(let i=0;i<3;i++) {
@@ -602,12 +907,7 @@
       closeSortFieldModal();
       renderSortFieldsConfig();
     }
-    // 监听autoFit变化，实时刷新主表列配置并统一宽度为0
-    const autoFitBox = document.getElementById('autoFit');
-    autoFitBox && autoFitBox.addEventListener('change', function(){
-      if(this.checked) listFields.forEach(f=>f.width=0);
-      renderDraggableList(listFields, 'listFields', 'list');
-    });
+
     // 新增抽屉弹出/关闭逻辑
     function openPreviewDrawer() {
       const drawer = document.getElementById('previewDrawer');
@@ -726,14 +1026,31 @@
       const area = document.getElementById('canvasArea');
       let html = '';
       const totalSlots = Math.max(conf.fields.length, conf.cols); // 至少一行
+      
       for(let i=0;i<totalSlots;i+=conf.cols) {
         html += `<div class='canvas-row' style='display:flex;gap:12px;margin-bottom:8px;'>`;
+        let skipSlots = 0; // 跳过被合并的槽位
+        
         for(let j=0;j<conf.cols;j++) {
           const idx = i+j;
           const f = conf.fields[idx];
-          html += `<div class='canvas-slot' data-slot='${idx}' style='flex:1;min-width:0;min-height:48px;background:${['#eaf6ff','#f9fbe7','#fffbe7','#fce4ec'][j%4]};border:2px dashed #b0c4de;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;'>`;
+          
+          // 如果当前槽位被前面的字段合并了，则跳过
+          if (skipSlots > 0) {
+            skipSlots--;
+            continue;
+          }
+          
+          // 计算字段占用的列数
+          const colSpan = f && f.colSpan ? Math.min(f.colSpan, conf.cols - j) : 1;
+          const slotStyle = colSpan > 1 ? `flex:${colSpan};` : 'flex:1;';
+          
+          html += `<div class='canvas-slot' data-slot='${idx}' style='${slotStyle}min-width:0;min-height:48px;background:${['#eaf6ff','#f9fbe7','#fffbe7','#fce4ec'][j%4]};border:2px dashed #b0c4de;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;'>`;
+          
           if(f) {
-            html += `<div class='canvas-field-item' data-key='${f.key}' draggable='true' data-idx='${idx}' style='width:90%;padding:8px 10px;background:#fff;border:2px solid ${detailSelectedCanvasField===f.key?'#2176c7':'#c0d3eb'};border-radius:5px;cursor:grab;margin-bottom:0;text-align:center;position:relative;'>${f.label}<span class='canvas-field-remove' data-remove-idx='${idx}' style='position:absolute;right:4px;top:2px;color:#e74c3c;cursor:pointer;font-size:16px;'>×</span></div>`;
+            const colSpanText = colSpan > 1 ? ` (${colSpan}列)` : '';
+            html += `<div class='canvas-field-item' data-key='${f.key}' draggable='true' data-idx='${idx}' style='width:90%;padding:8px 10px;background:#fff;border:2px solid ${detailSelectedCanvasField===f.key?'#2176c7':'#c0d3eb'};border-radius:5px;cursor:grab;margin-bottom:0;text-align:center;position:relative;'>${f.label}${colSpanText}<span class='canvas-field-remove' data-remove-idx='${idx}' style='position:absolute;right:4px;top:2px;color:#e74c3c;cursor:pointer;font-size:16px;'>×</span></div>`;
+            skipSlots = colSpan - 1; // 设置需要跳过的槽位数
           } else {
             html += `<span style='color:#bbb;font-size:13px;'>拖拽字段到此处</span>`;
           }
@@ -770,10 +1087,11 @@
           const label = e.dataTransfer.getData('fieldLabel');
           const from = e.dataTransfer.getData('from');
           const idx = parseInt(slot.getAttribute('data-slot'));
+          
           if (from === 'pool') {
             if (!key || conf.fields.some(f => f && f.key === key) || conf.fields[idx]) return;
             while (conf.fields.length < idx) conf.fields.push(null);
-            conf.fields[idx] = { key, label };
+            conf.fields[idx] = { key, label, colSpan: 1 }; // 默认占1列
           } else if (from === 'canvas') {
             const fromIdx = parseInt(e.dataTransfer.getData('fromIdx'));
             if (fromIdx === idx) return;
@@ -814,9 +1132,54 @@
     // 渲染属性配置
     function renderDetailCanvasFieldProps() {
       const propsDiv = document.getElementById('canvasFieldProps');
-      if(!detailSelectedCanvasField) { propsDiv.innerHTML = '<div style="color:#aaa;">请选择画布中的字段</div>'; return; }
+      // 展开收缩状态（全局变量）
+      if (window.__attrCollapseState === undefined) {
+        window.__attrCollapseState = { base: true, smart: true };
+      }
+      const collapseState = window.__attrCollapseState;
+      // 基本配置分组
+      let html = `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("base")'>
+        <span style='display:inline-block;transform:rotate(${collapseState.base?"90deg":"0deg"});transition:.2s;'>▶</span> 基本配置
+      </div>`;
+      html += `<div id='attrBaseGroup' style='margin-bottom:18px;${collapseState.base?"":"display:none;"}'>`;
+      if(!detailSelectedCanvasField) {
+        html += '<div style="color:#aaa;">请选择画布中的字段</div>';
+        html += '</div>';
+        // 智能服务分组
+        html += `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("smart")'>
+          <span style='display:inline-block;transform:rotate(${collapseState.smart?"90deg":"0deg"});transition:.2s;'>▶</span> 智能服务
+        </div>`;
+        html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>${renderSmartServicePropsHtml()}</div>`;
+        propsDiv.innerHTML = html;
+        return;
+      }
+      const conf = detailCanvasConfig[detailSelectedView];
+      const fieldIndex = conf.fields.findIndex(f => f && f.key === detailSelectedCanvasField);
+      if (fieldIndex === -1) {
+        html += '<div style="color:#aaa;">字段不存在</div>';
+        html += '</div>';
+        // 智能服务分组
+        html += `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("smart")'>
+          <span style='display:inline-block;transform:rotate(${collapseState.smart?"90deg":"0deg"});transition:.2s;'>▶</span> 智能服务
+        </div>`;
+        html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>${renderSmartServicePropsHtml()}</div>`;
+        propsDiv.innerHTML = html;
+        return;
+      }
       const field = [...detailBasicFields, ...detailFinanceFields, ...detailHRFields].find(f=>f.key===detailSelectedCanvasField);
-      if (!field) { propsDiv.innerHTML = '<div style="color:#aaa;">字段不存在</div>'; return; }
+      if (!field) {
+        html += '<div style="color:#aaa;">字段不存在</div>';
+        html += '</div>';
+        // 智能服务分组
+        html += `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("smart")'>
+          <span style='display:inline-block;transform:rotate(${collapseState.smart?"90deg":"0deg"});transition:.2s;'>▶</span> 智能服务
+        </div>`;
+        html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>${renderSmartServicePropsHtml()}</div>`;
+        propsDiv.innerHTML = html;
+        return;
+      }
+      const currentField = conf.fields[fieldIndex];
+      const colSpan = currentField.colSpan || 1;
       if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', format: '' };
       const props = fieldProps[field.key];
       let formatInput = '';
@@ -825,13 +1188,27 @@
       } else {
         formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 #,##0.00' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
       }
-      propsDiv.innerHTML = `
+      const rowStart = Math.floor(fieldIndex / conf.cols) * conf.cols;
+      const maxColSpan = conf.cols - (fieldIndex - rowStart);
+      html += `
         <div class='field-config-row'><label>字段标题</label><input type='text' class='input-modern' value='${field.label}' disabled style='background:#f4f8fb;'></div>
         <div class='field-config-row'><label>显示标题</label><input type='checkbox' class='checkbox-modern' ${props.showLabel?'checked':''} onchange="setDetailFieldProp('${field.key}','showLabel',this.checked)"></div>
         <div class='field-config-row'><label>字段宽度</label><input type='number' class='input-modern' min='40' max='400' value='${props.width||120}' onchange="setDetailFieldProp('${field.key}','width',this.value)"></div>
+        <div class='field-config-row'><label>合并栏数</label><select class='modern-select' onchange="updateFieldColSpan(${fieldIndex}, this.value)">
+          ${Array.from({length: maxColSpan}, (_, i) => i + 1).map(num => 
+            `<option value='${num}' ${colSpan === num ? 'selected' : ''}>${num}列</option>`
+          ).join('')}
+        </select></div>
         <div class='field-config-row'><label>提示文字</label><input type='text' class='input-modern' value='${props.placeholder||''}' placeholder='请输入提示文字' onchange="setDetailFieldProp('${field.key}','placeholder',this.value)"></div>
         ${formatInput}
       `;
+      html += '</div>';
+      // 智能服务分组
+      html += `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("smart")'>
+        <span style='display:inline-block;transform:rotate(${collapseState.smart?"90deg":"0deg"});transition:.2s;'>▶</span> 智能服务
+      </div>`;
+      html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>${renderSmartServicePropsHtml()}</div>`;
+      propsDiv.innerHTML = html;
     }
     function setDetailFieldProp(key, prop, value) {
       if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', format: '' };
@@ -839,6 +1216,15 @@
       else if (prop === 'width') fieldProps[key][prop] = +value;
       else fieldProps[key][prop] = value;
       renderDetailCanvasFieldProps();
+    }
+    
+    function updateFieldColSpan(fieldIndex, colSpan) {
+      const conf = detailCanvasConfig[detailSelectedView];
+      if (conf.fields[fieldIndex]) {
+        conf.fields[fieldIndex].colSpan = parseInt(colSpan);
+        renderDetailCanvasTabs();
+        renderDetailCanvasFieldProps();
+      }
     }
     // 新增全局变量保存布局方式
     function setDetailLayoutType(type) {
@@ -851,12 +1237,25 @@
       if(!conf || !conf.fields) return '<div style="color:#aaa;">暂无字段</div>';
       let html = `<div style='display:flex;flex-direction:column;gap:12px;'>`;
       const cols = conf.cols || 2;
+      
       for(let i=0;i<conf.fields.length;i+=cols) {
         html += `<div style='display:flex;gap:16px;'>`;
+        let skipSlots = 0; // 跳过被合并的槽位
+        
         for(let j=0;j<cols;j++) {
           const f = conf.fields[i+j];
+          
+          // 如果当前槽位被前面的字段合并了，则跳过
+          if (skipSlots > 0) {
+            skipSlots--;
+            continue;
+          }
+          
           if(f) {
-            html += `<div style='flex:1;min-width:0;'><div style='font-weight:500;color:#2176c7;margin-bottom:2px;'>${f.label}</div><div style='border:1px solid #c0d3eb;background:#fff;padding:6px 10px;border-radius:4px;'>示例${f.label}</div></div>`;
+            const colSpan = f.colSpan || 1;
+            const flexStyle = colSpan > 1 ? `flex:${colSpan};` : 'flex:1;';
+            html += `<div style='${flexStyle}min-width:0;'><div style='font-weight:500;color:#2176c7;margin-bottom:2px;'>${f.label}</div><div style='border:1px solid #c0d3eb;background:#fff;padding:6px 10px;border-radius:4px;'>示例${f.label}</div></div>`;
+            skipSlots = colSpan - 1; // 设置需要跳过的槽位数
           }
         }
         html += `</div>`;
@@ -869,9 +1268,18 @@
     renderDraggableList(detailFields, 'detailFields', 'detail');
     renderFieldProps();
     renderDetailModelFieldPool();
-    enableFieldDragDrop();
     renderDetailCanvasTabs();
+    renderSmartServiceProps(); // 初始化时也刷新
     renderDetailCanvasFieldProps();
   </script>
 </body>
+<!-- 智能数据映射抽屉结构 -->
+<div id="smartMappingDrawerMask" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:99999;"></div>
+<div id="smartMappingDrawer" style="display:none;position:fixed;top:0;right:0;width:720px;height:100vh;background:#fff;box-shadow:-2px 0 16px rgba(33,118,199,0.12);z-index:100000;overflow:auto;transition:right 0.3s;">
+  <div style="padding:24px 28px 18px 28px;position:relative;">
+    <span style="font-size:18px;color:#2176c7;font-weight:600;">智能服务数据映射</span>
+    <span onclick="closeSmartMappingDrawer()" style="position:absolute;right:18px;top:18px;font-size:22px;cursor:pointer;color:#888;">×</span>
+    <div id="smartMappingDrawerContent" style="margin-top:18px;"></div>
+  </div>
+</div>
 </html> 

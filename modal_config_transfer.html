@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>配置迁移管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background:#fafbfc; margin:0; font-size: 13px; color:#222; }
+    .topbar { background: #fff; border-bottom: 1.5px solid #f0f1f3; padding: 0 0 0 0; }
+    .topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; height: 68px; }
+    .topbar-title { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin-left: 0; }
+    .tab-nav {
+      display: flex;
+      align-items: flex-end;
+      background: none;
+      border-radius: 0;
+      margin: 32px 0 0 0;
+      width: auto;
+      height: 44px;
+      box-sizing: border-box;
+      box-shadow: none;
+      gap: 0;
+      justify-content: flex-start;
+      border-bottom: 2px solid #e3eaf3;
+      padding-left: 188px;
+    }
+    .tab-nav-btn {
+      flex: none;
+      border: none;
+      background: none;
+      font-size: 15px;
+      color: #888;
+      font-weight: 600;
+      border-radius: 0;
+      height: 42px;
+      cursor: pointer;
+      transition: color 0.18s, border 0.18s, background 0.18s;
+      margin: 0 32px 0 0;
+      outline: none;
+      border-bottom: 2px solid transparent;
+      padding: 0 8px;
+      position: relative;
+      box-shadow: none;
+    }
+    .tab-nav-btn.active {
+      color: #2176c7;
+      font-weight: 700;
+      border-bottom: 2.5px solid #2176c7;
+      background: none;
+    }
+    .tab-nav-btn:not(.active):hover {
+      color: #2176c7;
+      background: none;
+    }
+    .main-wrap { max-width: 1100px; margin: 0 auto; margin-top: 32px; }
+    .wizard-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(33,118,199,0.08); padding: 36px 38px 32px 38px; font-size: 13px; }
+    .wizard-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 8px; }
+    .wizard-desc { color: #888; font-size: 13px; margin-bottom: 24px; }
+    .step-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      position: relative;
+      width: 100%;
+      padding: 0 10px;
+      background: none;
+      box-shadow: none;
+    }
+    .step-bar::before { display: none; }
+    .step-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+    .step-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      color: #b0b8c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      border: 2px solid #dbe3ed;
+      margin-right: 12px;
+      transition: background 0.18s, color 0.18s, border 0.18s;
+      flex-shrink: 0;
+    }
+    .step-item.active .step-circle {
+      background: #2176c7;
+      color: #fff;
+      border: 2px solid #2176c7;
+    }
+    .step-labels {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .step-title {
+      font-size: 14px;
+      color: #888;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      transition: color 0.18s;
+    }
+    .step-item.active .step-title {
+      color: #2176c7;
+    }
+    .step-desc {
+      font-size: 9px;
+      color: #b0b8c7;
+      font-weight: 400;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .step-arrow {
+      font-size: 18px;
+      color: #b0b8c7;
+      margin: 0 18px;
+      user-select: none;
+      font-weight: 700;
+      transition: color 0.18s;
+      margin-top: 10px;
+    }
+    .step-item.active + .step-arrow {
+      color: #2176c7;
+    }
+    .step-item:not(:last-child) {
+      margin-right: 0;
+    }
+    .step-line { position:absolute; top:16px; left:100%; width:100%; height:2px; background:#e3eaf3; z-index:0; }
+    .step-item:last-child .step-line { display:none; }
+    .step-item.done .step-line { background:#2176c7; }
+    /* 表格样式 */
+    .table-wrap { background: #fafbfc; border-radius: 10px; border: 1.5px solid #e3eaf3; margin-top: 18px; margin-bottom: 18px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; background: #fafbfc; }
+    th, td { padding: 14px 10px; text-align: left; font-size: 13px; }
+    th { background: #f5f6fa; color: #888; font-weight: 600; border-bottom: 1.5px solid #e3eaf3; }
+    tr { border-bottom: 1px solid #f0f1f3; }
+    tr:last-child { border-bottom: none; }
+    tr.selected { background: #eaf3fb; }
+    .tag { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+    .tag-main { background: #eaf3fb; color: #2176c7; }
+    .tag-dict { background: #f7e7e7; color: #d23c3c; }
+    .tag-ref { background: #eafbe7; color: #3cb371; }
+    .tag-required { background: #fff0f0; color: #d23c3c; border:1px solid #ffd6d6; margin-left:8px; }
+    .stat-list { background: #f5f6fa; border-radius: 8px; padding: 18px 18px 10px 18px; margin-bottom: 0; }
+    .stat-list .stat-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+    .stat-list .stat-label { color: #888; }
+    .stat-list .stat-value { color: #222; font-weight: 700; font-size: 14px; }
+    .export-list { background: #f5f6fa; border-radius: 8px; padding: 18px; }
+    .export-list-title { font-size: 13px; color: #888; font-weight: 600; margin-bottom: 8px; }
+    .export-list-group { margin-bottom: 10px; }
+    .export-list-group:last-child { margin-bottom: 0; }
+    .export-list-group .group-title { font-size: 13px; color: #2176c7; font-weight: 700; margin-bottom: 4px; }
+    .export-list-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+    .export-list-item:last-child { margin-bottom: 0; }
+    .export-list-item .tag { margin-right: 0; }
+    .export-list-item .tag-ref { margin-left: 4px; }
+    .export-list-item .tag-dict { margin-left: 4px; }
+    .export-list-item .en { color: #888; font-size: 11px; margin-left: 2px; }
+    .btn-outline, .btn-main {
+      width: 120px;
+      height: 48px;
+      font-size: 16px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      font-weight: 600;
+      padding: 0;
+    }
+    .btn-outline {
+      background: #fff;
+      color: #2176c7;
+      border: 2px solid #2176c7;
+      cursor: pointer;
+      margin-right: 18px;
+      transition: border 0.18s, color 0.18s, background 0.18s;
+    }
+    .btn-outline:hover {
+      background: #2176c7;
+      color: #fff;
+      border: 2px solid #2176c7;
+    }
+    .btn-main {
+      background: #2176c7;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-top: 0;
+    }
+    .btn-main:hover { background: #185a99; }
+    .btn-group { display: flex; align-items: center; justify-content: flex-end; gap: 0; margin-top: 0; }
+    .checkbox { accent-color: #2176c7; width: 18px; height: 18px; }
+    .export-options { margin-top: 18px; }
+    .export-options label { display: flex; align-items: center; font-size: 15px; color: #222; margin-bottom: 8px; }
+    .export-options input[type=checkbox] { margin-right: 8px; accent-color: #2176c7; }
+    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #eafbe7; color: #3cb371; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 18px auto; }
+    .export-result-title { font-size: 18px; font-weight: 700; color: #222; text-align: center; margin-bottom: 8px; }
+    .export-result-desc { color: #888; font-size: 13px; text-align: center; margin-bottom: 24px; }
+    .export-file-card { background: #f5f6fa; border-radius: 10px; padding: 18px 0; text-align: center; margin-bottom: 18px; }
+    .export-file-name { font-size: 15px; font-weight: 600; color: #2176c7; margin-bottom: 4px; }
+    .export-file-desc { color: #888; font-size: 12px; }
+    .btn-download { background: #222; color: #fff; border: none; border-radius: 8px; padding: 10px 38px; font-size: 14px; font-weight: 600; cursor: pointer; margin: 0 auto; display: block; margin-bottom: 18px; }
+    .btn-download:hover { background: #2176c7; }
+    .export-tips { background: #f5f6fa; border-radius: 8px; padding: 14px 18px; color: #888; font-size: 12px; margin: 0 auto; max-width: 600px; }
+    .export-tips li { margin-bottom: 4px; }
+    /* 导入流程样式 */
+    .import-step-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 32px;
+      margin-left: 38px;
+      gap: 0;
+    }
+    .import-step-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      min-width: 0;
+    }
+    .import-step-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      color: #b0b8c7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      border: 2px solid #dbe3ed;
+      margin-right: 10px;
+      transition: background 0.18s, color 0.18s, border 0.18s;
+      flex-shrink: 0;
+    }
+    .import-step-item.active .import-step-circle {
+      background: #2176c7;
+      color: #fff;
+      border: 2px solid #2176c7;
+    }
+    .import-step-labels {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .import-step-title {
+      font-size: 14px;
+      color: #888;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      transition: color 0.18s;
+    }
+    .import-step-item.active .import-step-title {
+      color: #2176c7;
+    }
+    .import-step-desc {
+      font-size: 9px;
+      color: #b0b8c7;
+      font-weight: 400;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .import-step-arrow {
+      font-size: 18px;
+      color: #b0b8c7;
+      margin: 0 18px;
+      user-select: none;
+      font-weight: 700;
+      transition: color 0.18s;
+      margin-top: 10px;
+    }
+    .import-step-item.active + .import-step-arrow {
+      color: #2176c7;
+    }
+    .import-upload-card {
+      background: #f7f8fa;
+      border: 2px dashed #d3d6de;
+      border-radius: 16px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 24px 0 0 0;
+      position: relative;
+      transition: border 0.18s;
+      cursor: pointer;
+    }
+    .import-upload-card.dragover {
+      border: 2px solid #2176c7;
+      background: #eaf3fb;
+    }
+    .import-upload-icon {
+      font-size: 54px;
+      color: #b0b8c7;
+      margin-bottom: 12px;
+    }
+    .import-upload-title {
+      font-size: 20px;
+      color: #222;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .import-upload-desc {
+      font-size: 13px;
+      color: #b0b8c7;
+      margin-bottom: 18px;
+    }
+    .import-upload-btn {
+      background: #fff;
+      color: #2176c7;
+      border: 2px solid #d3d6de;
+      border-radius: 10px;
+      padding: 8px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: border 0.18s, color 0.18s, background 0.18s;
+    }
+    .import-upload-btn:hover {
+      border: 2px solid #2176c7;
+      color: #2176c7;
+      background: #f4f8fb;
+    }
+    .import-preview-wrap { margin-top: 18px; }
+    .import-success-icon { width: 64px; height: 64px; border-radius: 50%; background: #eafbe7; color: #3cb371; display: flex; align-items: center; justify-content: center; font-size: 38px; margin: 0 auto 18px auto; }
+    .import-success-title { font-size: 18px; font-weight: 700; color: #222; text-align: center; margin-bottom: 8px; }
+    .import-success-desc { color: #888; font-size: 13px; text-align: center; margin-bottom: 24px; }
+    @media (max-width: 900px) {
+      .main-wrap, .wizard-card { padding: 12px !important; }
+      .topbar-inner, .main-wrap { max-width: 100% !important; }
+    }
+    /* 导入流程按钮专用样式 */
+    #importStepBtnGroup {
+      margin-top: 32px !important;
+    }
+    #importStepBtnGroup .btn-outline, #importStepBtnGroup .btn-main {
+      width: 96px;
+      height: 36px;
+      font-size: 14px;
+      border-radius: 8px;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span class="topbar-title">配置迁移管理</span>
+    </div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-nav-btn active" id="tabExport" onclick="switchTab('export')">&#8681; 配置导出</button>
+    <button class="tab-nav-btn" id="tabImport" onclick="switchTab('import')">&#8635; 配置导入</button>
+  </div>
+  <div class="main-wrap">
+    <div class="wizard-card" id="exportPanel">
+      <div class="wizard-title">配置迁移向导</div>
+      <div class="wizard-desc">导出主数据模型配置及其依赖，支持跨环境迁移</div>
+      <div class="step-bar">
+        <div class="step-item active" id="step1">
+          <div class="step-circle">1</div>
+          <div class="step-labels">
+            <div class="step-title">选择模型</div>
+            <div class="step-desc">选择需要导出的主数据模型</div>
+          </div>
+        </div>
+        <div class="step-arrow">&gt;</div>
+        <div class="step-item" id="step2">
+          <div class="step-circle">2</div>
+          <div class="step-labels">
+            <div class="step-title">依赖分析</div>
+            <div class="step-desc">分析模型依赖关系</div>
+          </div>
+        </div>
+        <div class="step-arrow">&gt;</div>
+        <div class="step-item" id="step3">
+          <div class="step-circle">3</div>
+          <div class="step-labels">
+            <div class="step-title">导出文件</div>
+            <div class="step-desc">生成并下载配置文件</div>
+          </div>
+        </div>
+      </div>
+      <div id="stepContent">
+        <!-- 步骤1：模型多选表格 -->
+        <div id="step1Content">
+          <div class="wizard-title" style="font-size:18px;margin-bottom:2px;">选择要导出的模型</div>
+          <div class="wizard-desc" style="margin-bottom:10px;">请选择需要导出的主数据模型，系统将自动分析相关依赖</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px;">选择</th>
+                  <th>模型名称</th>
+                  <th>类型</th>
+                  <th>描述</th>
+                </tr>
+              </thead>
+              <tbody id="modelTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- 步骤2、3、4内容后续JS动态渲染 -->
+      </div>
+      <div class="btn-group" id="stepBtnGroup">
+        <button class="btn-outline" id="btnPrev" onclick="prevStep()" style="display:none;">上一步</button>
+        <button class="btn-main" id="btnNext" onclick="nextStep()">下一步</button>
+      </div>
+    </div>
+    <div class="wizard-card" id="importPanel" style="display:none;">
+      <div class="wizard-title">配置导入向导</div>
+      <div class="wizard-desc">导入配置文件，恢复主数据模型配置及其依赖</div>
+      <div class="import-step-bar">
+        <div class="import-step-item active" id="importStep1">
+          <div class="import-step-circle">1</div>
+          <div class="import-step-labels">
+            <div class="import-step-title">选择配置文件</div>
+            <div class="import-step-desc">请选择要导入的配置文件</div>
+          </div>
+        </div>
+        <div class="import-step-arrow">&gt;</div>
+        <div class="import-step-item" id="importStep2">
+          <div class="import-step-circle">2</div>
+          <div class="import-step-labels">
+            <div class="import-step-title">预览内容</div>
+            <div class="import-step-desc">预览导入文件内容</div>
+          </div>
+        </div>
+        <div class="import-step-arrow">&gt;</div>
+        <div class="import-step-item" id="importStep3">
+          <div class="import-step-circle">3</div>
+          <div class="import-step-labels">
+            <div class="import-step-title">导入完成</div>
+            <div class="import-step-desc">导入结果提示</div>
+          </div>
+        </div>
+      </div>
+      <div id="importStepContent"></div>
+      <div class="btn-group" id="importStepBtnGroup">
+        <button class="btn-outline" id="importBtnPrev" style="display:none;">上一步</button>
+        <button class="btn-main" id="importBtnNext">下一步</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Tab切换
+    function switchTab(tab) {
+      document.getElementById('tabExport').classList.remove('active');
+      document.getElementById('tabImport').classList.remove('active');
+      document.getElementById('exportPanel').style.display = tab==='export'?'block':'none';
+      document.getElementById('importPanel').style.display = tab==='import'?'block':'none';
+      if(tab==='export') document.getElementById('tabExport').classList.add('active');
+      else document.getElementById('tabImport').classList.add('active');
+    }
+    // 步骤条与内容
+    let currentStep = 1;
+    const totalStep = 3;
+    function updateStepBar() {
+      for(let i=1;i<=3;i++) {
+        const item = document.getElementById('step'+i);
+        if(item) {
+          item.classList.remove('active','done');
+          if(i===currentStep) item.classList.add('active');
+        }
+      }
+    }
+    function prevStep() {
+      if(currentStep>1) {
+        currentStep--;
+        renderStep();
+      }
+    }
+    function nextStep() {
+      if(currentStep<totalStep) {
+        currentStep++;
+        renderStep();
+      }
+    }
+    // 模型数据
+    const allModels = [
+      { key: 'user', name: '用户模型', en:'User', type: '主数据', desc: '系统用户基础信息模型', dep: 3 },
+      { key: 'dept', name: '部门模型', en:'Department', type: '主数据', desc: '组织架构部门信息', dep: 1 },
+      { key: 'product', name: '产品模型', en:'Product', type: '主数据', desc: '产品基础信息模型', dep: 4 }
+    ];
+    let selectedModels = [];
+    // 步骤1表格渲染
+    function renderModelTable() {
+      const tbody = document.getElementById('modelTableBody');
+      tbody.innerHTML = allModels.map(m=>`
+        <tr${selectedModels.includes(m.key)?' class="selected"':''}>
+          <td><input type="checkbox" class="checkbox" value="${m.key}" ${selectedModels.includes(m.key)?'checked':''} onchange="toggleModelSelect('${m.key}')"></td>
+          <td><b>${m.name}</b><div class="en">${m.en}</div></td>
+          <td><span class="tag tag-main">${m.type}</span></td>
+          <td>${m.desc}</td>
+        </tr>
+      `).join('');
+    }
+    function toggleModelSelect(key) {
+      if(selectedModels.includes(key)) selectedModels = selectedModels.filter(k=>k!==key);
+      else selectedModels.push(key);
+      renderModelTable();
+    }
+    // 步骤2依赖分析模拟
+    function renderStep2() {
+      document.getElementById('stepContent').innerHTML = `
+        <div class="wizard-title" style="font-size:18px;margin-bottom:2px;">依赖关系分析</div>
+        <div class="wizard-desc" style="margin-bottom:10px;">系统已自动分析所选出相关依赖模型，请确认导出范围</div>
+        <div style="display:flex;gap:32px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
+            <div class="export-list-title">已选择的模型</div>
+            <div class="export-list" style="padding:12px 18px;">
+              ${selectedModels.map(k=>{
+                const m=allModels.find(x=>x.key===k);
+                return `<div class='export-list-item'><b>${m.name}</b> <span class='en'>${m.en}</span> <span class='tag tag-main'>主数据</span></div>`;
+              }).join('')}
+            </div>
+          </div>
+          <div style="flex:2;min-width:320px;">
+            <div class="export-list-title">依赖模型</div>
+            <div class="export-list" style="padding:12px 18px;">
+              <div class='export-list-item'><b>部门模型</b> <span class='en'>Department</span> <span class='tag tag-ref'>引用</span></div>
+              <div class='export-list-item'><b>部门类型字典</b> <span class='en'>DeptTypeDict</span> <span class='tag tag-dict'>字典</span></div>
+              <div class='export-list-item'><b>角色模型</b> <span class='en'>Role</span> <span class='tag tag-ref'>引用</span></div>
+              <div class='export-list-item'><b>状态字典</b> <span class='en'>StatusDict</span> <span class='tag tag-dict'>字典</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="export-options">
+          <label><input type="checkbox" id="optDictData" ${window.optDictData!==false?'checked':''}>包含字典数据 <span style='color:#888;font-size:13px;'>(导出字典的具体数据内容)</span></label>
+          <label><input type="checkbox" id="optSysDict" ${window.optSysDict?'checked':''}>包含系统字典表数据 <span style='color:#888;font-size:13px;'>(包含系统内置字典配置)</span></label>
+        </div>
+      `;
+      document.getElementById('optDictData').onchange = e => { window.optDictData = e.target.checked; };
+      document.getElementById('optSysDict').onchange = e => { window.optSysDict = e.target.checked; };
+    }
+    // 步骤3预览
+    function renderStep3() {
+      document.getElementById('stepContent').innerHTML = `
+        <div class="wizard-title" style="font-size:18px;margin-bottom:2px;">导出内容预览</div>
+        <div class="wizard-desc" style="margin-bottom:10px;">请确认以下导出内容，确认无误后可进行导出</div>
+        <div style="display:flex;gap:32px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
+            <div class="export-list-title">导出统计</div>
+            <div class="stat-list">
+              <div class="stat-row"><span class="stat-label">主数据模型</span><span class="stat-value">2</span></div>
+              <div class="stat-row"><span class="stat-label">依赖模型</span><span class="stat-value">4</span></div>
+              <div class="stat-row"><span class="stat-label">字典模型</span><span class="stat-value">2</span></div>
+              <div class="stat-row"><span class="stat-label">总计</span><span class="stat-value">6</span></div>
+            </div>
+          </div>
+          <div style="flex:2;min-width:320px;">
+            <div class="export-list-title">导出清单</div>
+            <div class="export-list">
+              <div class="export-list-group">
+                <div class="group-title">主数据模型</div>
+                <div class='export-list-item'>用户模型 (User)</div>
+                <div class='export-list-item'>部门模型 (Department)</div>
+              </div>
+              <div class="export-list-group">
+                <div class="group-title" style="color:#3cb371;">依赖模型</div>
+                <div class='export-list-item'>部门模型 (Department) <span class='tag tag-ref'>reference</span></div>
+                <div class='export-list-item'>部门类型字典 (DeptTypeDict) <span class='tag tag-dict'>dictionary</span></div>
+                <div class='export-list-item'>角色模型 (Role) <span class='tag tag-ref'>reference</span></div>
+                <div class='export-list-item'>状态字典 (StatusDict) <span class='tag tag-dict'>dictionary</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    // 步骤4导出完成
+    function renderStep4() {
+      document.getElementById('stepContent').innerHTML = `
+        <div class="success-icon">✔</div>
+        <div class="export-result-title">配置导出完成</div>
+        <div class="export-result-desc">配置文件已生成，包含 2 个主模型和 4 个依赖模型</div>
+        <div class="export-file-card">
+          <div class="export-file-name">config-export.json</div>
+          <div class="export-file-desc">配置迁移文件</div>
+        </div>
+        <button class="btn-download" onclick="alert('模拟下载')">下载配置文件</button>
+      `;
+    }
+    // 步骤渲染主控
+    function renderStep() {
+      updateStepBar();
+      document.getElementById('btnPrev').style.display = currentStep>1?'inline-block':'none';
+      document.getElementById('btnNext').style.display = currentStep<3?'inline-block':'none';
+      if(currentStep===1) {
+        document.getElementById('stepContent').innerHTML = document.getElementById('step1Content').outerHTML;
+        renderModelTable();
+      } else if(currentStep===2) {
+        renderStep2();
+      } else if(currentStep===3) {
+        renderStep4();
+      }
+      // 重新绑定按钮事件，防止切换后失效
+      const btnPrev = document.getElementById('btnPrev');
+      if(btnPrev) btnPrev.onclick = prevStep;
+      const btnNext = document.getElementById('btnNext');
+      if(btnNext) btnNext.onclick = nextStep;
+    }
+    // 初始化
+    renderModelTable();
+    // 绑定全局
+    window.toggleModelSelect = toggleModelSelect;
+    window.prevStep = prevStep;
+    window.nextStep = nextStep;
+
+    // 导入Tab三步流程
+    let importCurrentStep = 1;
+    const importTotalStep = 3;
+    let importFileData = null;
+    function updateImportStepBar() {
+      for(let i=1;i<=3;i++) {
+        const item = document.getElementById('importStep'+i);
+        if(item) {
+          item.classList.remove('active');
+          if(i===importCurrentStep) item.classList.add('active');
+        }
+      }
+    }
+    function renderImportStep() {
+      updateImportStepBar();
+      document.getElementById('importBtnPrev').style.display = importCurrentStep>1?'inline-block':'none';
+      document.getElementById('importBtnNext').style.display = importCurrentStep<importTotalStep?'inline-block':'none';
+      if(importCurrentStep===1) {
+        document.getElementById('importStepContent').innerHTML = `
+          <div class="wizard-title" style="font-size:18px;margin-bottom:2px;">选择配置文件</div>
+          <div class="wizard-desc" style="margin-bottom:10px;">请选择要导入的配置文件（JSON格式）</div>
+          <div class="import-upload-card" id="importUploadCard">
+            <div class="import-upload-icon">&#128228;</div>
+            <div class="import-upload-title">拖拽文件到此处或点击选择</div>
+            <div class="import-upload-desc">支持 JSON 格式的配置文件</div>
+            <input type="file" id="importFileInput" accept=".json" style="display:none;">
+            <button class="import-upload-btn" id="importFileBtn">&#8681; 选择文件</button>
+          </div>
+        `;
+        // 拖拽和点击上传
+        const card = document.getElementById('importUploadCard');
+        const fileInput = document.getElementById('importFileInput');
+        document.getElementById('importFileBtn').onclick = ()=>fileInput.click();
+        card.ondragover = e=>{e.preventDefault();card.classList.add('dragover');};
+        card.ondragleave = e=>{e.preventDefault();card.classList.remove('dragover');};
+        card.ondrop = e=>{
+          e.preventDefault();card.classList.remove('dragover');
+          if(e.dataTransfer.files&&e.dataTransfer.files[0]) handleImportFileSelect(e.dataTransfer.files[0]);
+        };
+        card.onclick = e=>{if(e.target===card) fileInput.click();};
+        fileInput.onchange = e=>{if(e.target.files&&e.target.files[0]) handleImportFileSelect(e.target.files[0]);};
+      } else if(importCurrentStep===2) {
+        // 预览内容，结构与导出依赖分析一致
+        document.getElementById('importStepContent').innerHTML = `
+          <div class="wizard-title" style="font-size:18px;margin-bottom:2px;">预览内容</div>
+          <div class="wizard-desc" style="margin-bottom:10px;">请确认以下导入内容，确认无误后可进行导入</div>
+          <div style="display:flex;gap:32px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:220px;">
+              <div class="export-list-title">主数据模型</div>
+              <div class="export-list" style="padding:12px 18px;">
+                <div class='export-list-item'>用户模型 <span class='en'>(User)</span></div>
+                <div class='export-list-item'>部门模型 <span class='en'>(Department)</span></div>
+              </div>
+            </div>
+            <div style="flex:2;min-width:320px;">
+              <div class="export-list-title">依赖模型</div>
+              <div class="export-list" style="padding:12px 18px;">
+                <div class='export-list-item'>部门模型 <span class='en'>(Department)</span> <span class='tag tag-ref'>引用</span></div>
+                <div class='export-list-item'>部门类型字典 <span class='en'>(DeptTypeDict)</span> <span class='tag tag-dict'>字典</span></div>
+                <div class='export-list-item'>角色模型 <span class='en'>(Role)</span> <span class='tag tag-ref'>引用</span></div>
+                <div class='export-list-item'>状态字典 <span class='en'>(StatusDict)</span> <span class='tag tag-dict'>字典</span></div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if(importCurrentStep===3) {
+        document.getElementById('importStepContent').innerHTML = `
+          <div class="import-success-icon">✔</div>
+          <div class="import-success-title">导入完成</div>
+          <div class="import-success-desc">配置文件已成功导入，模型和依赖已生效</div>
+        `;
+      }
+      // 重新绑定按钮事件
+      const btnPrev = document.getElementById('importBtnPrev');
+      if(btnPrev) btnPrev.onclick = importPrevStep;
+      const btnNext = document.getElementById('importBtnNext');
+      if(btnNext) btnNext.onclick = importNextStep;
+    }
+    function importPrevStep() {
+      if(importCurrentStep>1) {
+        importCurrentStep--;
+        renderImportStep();
+      }
+    }
+    function importNextStep() {
+      if(importCurrentStep<importTotalStep) {
+        // 步骤1必须选文件
+        if(importCurrentStep===1 && !importFileData) {
+          alert('请先选择配置文件');
+          return;
+        }
+        importCurrentStep++;
+        renderImportStep();
+      }
+    }
+    // 处理文件选择（仅模拟）
+    function handleImportFileSelect(file) {
+      // 实际可用FileReader解析内容
+      importFileData = file;
+      importCurrentStep = 2;
+      renderImportStep();
+    }
+    // Tab切换时初始化导入流程
+    const oldSwitchTab = switchTab;
+    switchTab = function(tab) {
+      oldSwitchTab(tab);
+      if(tab==='import') {
+        importCurrentStep = 1;
+        importFileData = null;
+        renderImportStep();
+      }
+    }
+  </script>
+</body>
+</html> 

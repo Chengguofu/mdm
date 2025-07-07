@@ -2,87 +2,488 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>智能服务管理</title>
+  <title>智能服务注册与管理</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { background: #f7faff; font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 0; }
-    .container { max-width: 900px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.08); padding: 32px; }
+    .container { max-width: 1100px; margin: 32px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(33,118,199,0.08); padding: 32px; }
     .title { font-size: 22px; font-weight: 700; color: #2176c7; margin-bottom: 24px; }
-    .service-list { margin-bottom: 24px; }
-    .service-item { background: #f6f8fa; border-radius: 6px; padding: 16px 18px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-    .service-name { font-size: 16px; color: #185a99; font-weight: 600; }
-    .service-desc { color: #666; font-size: 14px; margin-left: 18px; flex: 1; }
-    .add-btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-size: 15px; padding: 8px 28px; cursor: pointer; font-weight: 500; transition: background 0.18s; }
-    .add-btn:hover { background: #185a99; }
-    .empty-tip { color: #bbb; font-size: 15px; text-align: center; margin: 32px 0; }
-    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
-    .modal-box { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:400px; max-width:98vw; min-height:180px; padding:28px 32px 22px 32px; }
-    .modal-title { font-size:18px; color:#2176c7; font-weight:600; margin-bottom:16px; }
-    .modal-row { margin-bottom:18px; }
-    .modal-label { display:inline-block; width:80px; color:#185a99; font-size:15px; text-align:right; margin-right:8px; }
-    .modal-input { width:220px; padding:6px 10px; border:1.5px solid #c0d3eb; border-radius:6px; font-size:15px; }
-    .modal-actions { text-align:right; }
-    .modal-btn { background:#2176c7; color:#fff; border:none; border-radius:6px; font-size:15px; padding:6px 22px; margin-left:6px; cursor:pointer; }
-    .modal-btn:hover { background:#185a99; }
-    .modal-btn.cancel { background:#fff; color:#2176c7; border:1.5px solid #2176c7; }
-    .modal-btn.cancel:hover { background:#f7faff; color:#185a99; border-color:#185a99; }
+    .service-list-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .service-list-table th, .service-list-table td { padding: 12px 10px; border-bottom: 1px solid #e3eaf3; text-align: left; font-size: 15px; }
+    .service-list-table th { background: #f4f8fb; color: #2176c7; font-weight: 600; }
+    .service-list-table tr:hover { background: #f0f6fd; }
+    .btn-main, .btn-line, .btn-success, .btn-danger { border: none; border-radius: 6px; font-size: 15px; padding: 7px 22px; cursor: pointer; font-weight: 500; transition: background 0.18s; margin-right: 8px; }
+    .btn-main { background: #2176c7; color: #fff; }
+    .btn-main:hover { background: #185a99; }
+    .btn-line, .btn-danger {
+      background: none;
+      border: none;
+      color: #2176c7;
+      font-size: 15px;
+      padding: 0 16px 0 0;
+      margin: 0;
+      border-radius: 0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.18s;
+      white-space: nowrap;
+      box-shadow: none;
+    }
+    .btn-line:hover {
+      color: #185a99;
+      background: none;
+    }
+    .btn-danger {
+      color: #2176c7;
+    }
+    .btn-danger:hover {
+      color: #f44336;
+      background: none;
+    }
+    .add-btn-bar { display: flex; gap: 12px; margin-bottom: 18px; }
+    .drawer-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:none; }
+    .drawer-box { position: fixed; right:0; top:0; bottom:0; background:#fff; box-shadow:-4px 0 24px rgba(0,0,0,0.18); width:780px; max-width:90vw; padding:28px 32px 22px 32px; transform:translateX(100%); transition:transform 0.3s ease; overflow-y:auto; }
+    .drawer-box.show { transform:translateX(0); }
+    .drawer-title { font-size:18px; color:#2176c7; font-weight:600; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+    .drawer-close { background:none; border:none; font-size:20px; color:#999; cursor:pointer; padding:0; width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+    .drawer-close:hover { color:#2176c7; }
+    .drawer-row { margin-bottom:18px; display:flex; align-items:center; }
+    .drawer-row.two-col { display:flex; gap:20px; }
+    .drawer-row.three-col { display: flex; gap: 16px; }
+    .drawer-col { flex:1; display:flex; align-items:center; }
+    .drawer-col-third { flex: 1; display: flex; align-items: center; }
+    .drawer-label { display:inline-block; width:110px; color:#185a99; font-size:15px; text-align:right; margin-right:8px; flex-shrink:0; }
+    .drawer-input, .drawer-select { flex:1; min-width:0; padding:6px 10px; border:1.5px solid #c0d3eb; border-radius:6px; font-size:15px; box-sizing:border-box; }
+    .drawer-select { background: #fff; }
+    .drawer-actions { text-align:right; margin-top: 18px; }
+    .drawer-btn { background:#2176c7; color:#fff; border:none; border-radius:6px; font-size:15px; padding:6px 22px; margin-left:6px; cursor:pointer; }
+    .drawer-btn:hover { background:#185a99; }
+    .drawer-btn.cancel { background:#fff; color:#2176c7; border:1.5px solid #2176c7; }
+    .drawer-btn.cancel:hover { background:#f7faff; color:#185a99; border-color:#185a99; }
+    .param-table { width:100%; border-collapse:collapse; margin-top:8px; }
+    .param-table th, .param-table td { border:1px solid #e3eaf3; padding:6px 8px; font-size:14px; }
+    .param-table th { background:#f4f8fb; color:#2176c7; font-weight:600; }
+    .param-table td input, .param-table td select { width:100%; box-sizing:border-box; padding:4px 6px; border-radius:4px; border:1px solid #c0d3eb; font-size:14px; }
+    .param-table th.param-action, .param-table td.param-action { width:24px; min-width:24px; max-width:24px; white-space:nowrap; text-align:right; padding-right:4px; }
+    .param-table .btn-danger { padding:2px 6px; font-size:13px; margin:0; height:28px; line-height:1; border-radius:4px; min-width:unset; max-width:100%; display:inline-flex; align-items:center; justify-content:center; white-space:nowrap; }
+    .detail-drawer-box { width: 520px; max-width:90vw; padding: 28px 32px 22px 32px; }
+    .detail-row { margin-bottom: 12px; font-size: 15px; }
+    .detail-label { color: #185a99; font-weight: 500; width: 110px; display: inline-block; }
+    .detail-value { color: #333; }
+    .detail-section-title { color: #2176c7; font-weight: 600; margin: 18px 0 8px 0; font-size: 16px; }
+    .param-table th.param-name, .param-table td.param-name { width:36%; }
+    .param-table th.param-type, .param-table td.param-type { width:18%; }
+    .param-table th.param-desc, .param-table td.param-desc { width:36%; }
+    .param-table th.param-action, .param-table td.param-action { width:35px; white-space:nowrap; text-align:right; }
+    .param-table + .btn-line, .param-table + .btn-line {
+      display: block;
+      margin: 12px auto 0 auto;
+      font-size: 14px;
+      padding: 5px 20px;
+      min-width: 120px;
+    }
+    /* 操作按钮所在单元格不折行 */
+    .service-list-table td:last-child { white-space: nowrap; }
+    /* 迷你开关样式 */
+    .switch-mini { position: relative; display: inline-block; width: 38px; height: 20px; vertical-align: middle; }
+    .switch-mini input { opacity: 0; width: 0; height: 0; }
+    .slider-mini { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 20px; }
+    .slider-mini:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider-mini { background-color: #2176c7; }
+    input:checked + .slider-mini:before { transform: translateX(18px); }
+    .test-result { margin-top: 16px; padding: 16px; border-radius: 6px; background: #f8f9fa; border-left: 4px solid #2176c7; font-size: 16px; }
+    .test-result.success { background: #e8f5e8; border-left-color: #4caf50; }
+    .test-result.error { background: #ffebee; border-left-color: #f44336; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="title">智能服务管理</div>
-    <div class="service-list" id="serviceList"></div>
-    <button class="add-btn" id="addServiceBtn">＋ 新增智能服务</button>
+    <div class="title">智能服务注册与管理</div>
+    <div class="add-btn-bar">
+      <button class="btn-main" id="addServiceBtn">＋ 注册智能服务</button>
+    </div>
+    <table class="service-list-table" id="serviceListTable">
+      <thead>
+        <tr>
+          <th>服务名称</th>
+          <th>接口地址</th>
+          <th>请求方法</th>
+          <th>描述</th>
+          <th>状态</th>
+          <th style="width:120px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="serviceListBody"></tbody>
+    </table>
   </div>
-  <div id="addServiceModal" class="modal-mask" style="display:none;">
-    <div class="modal-box">
-      <div class="modal-title">新增智能服务</div>
-      <div class="modal-row">
-        <span class="modal-label">服务名称：</span>
-        <input class="modal-input" id="serviceNameInput" placeholder="请输入服务名称" />
+  <!-- 注册/编辑服务抽屉 -->
+  <div id="serviceDrawer" class="drawer-mask">
+    <div class="drawer-box" id="serviceDrawerBox">
+      <div class="drawer-title">
+        <span id="serviceDrawerTitle">注册智能服务</span>
+        <button class="drawer-close" onclick="closeServiceDrawer()">×</button>
       </div>
-      <div class="modal-row">
-        <span class="modal-label">服务描述：</span>
-        <input class="modal-input" id="serviceDescInput" placeholder="请输入服务描述" />
+      <!-- 去除服务类型字段，直接从服务名称开始 -->
+      <div class="drawer-row">
+        <span class="drawer-label">服务名称：</span>
+        <input class="drawer-input" id="serviceNameInput" placeholder="请输入服务名称" />
       </div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" id="cancelAddBtn">取消</button>
-        <button class="modal-btn" id="confirmAddBtn">确定</button>
+      <div class="drawer-row">
+        <span class="drawer-label">接口地址：</span>
+        <input class="drawer-input" id="apiUrlInput" placeholder="请输入接口地址" />
+      </div>
+      <div class="drawer-row three-col">
+        <div class="drawer-col-third">
+          <span class="drawer-label">请求方法：</span>
+          <select class="drawer-select" id="httpMethodInput">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+          </select>
+        </div>
+        <div class="drawer-col-third">
+          <span class="drawer-label">请求超时(秒)：</span>
+          <input class="drawer-input" id="timeoutInput" type="number" min="1" max="300" value="30" />
+        </div>
+        <div class="drawer-col-third">
+          <span class="drawer-label">API Key：</span>
+          <input class="drawer-input" id="apiKeyInput" placeholder="请输入API Key" />
+        </div>
+      </div>
+      <div class="drawer-row">
+        <span class="drawer-label">服务描述：</span>
+        <textarea class="drawer-input" id="serviceDescInput" placeholder="请输入服务描述" style="min-height:70px;"></textarea>
+      </div>
+      <div class="drawer-row" id="testApiRow" style="flex-direction:column;align-items:flex-start;gap:0;">
+        <button class="btn-main" id="testApiBtn" type="button" style="margin-top:8px;">
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#2176c7"/></svg>
+            测试接口连接
+          </span>
+        </button>
+        <div style="height:8px;"></div>
+        <div id="testApiResult" class="test-result" style="display:none;margin-top:0;"></div>
+      </div>
+      <div class="drawer-row" style="align-items:flex-start;">
+        <span class="drawer-label">输入参数：</span>
+        <div style="flex:1;">
+          <table class="param-table" id="inputParamTable">
+            <thead><tr><th class='param-name'>参数名</th><th class='param-type'>类型</th><th class='param-desc'>描述</th><th class='param-action'></th></tr></thead>
+            <tbody id="inputParamBody"></tbody>
+          </table>
+          <button class="btn-line" type="button" onclick="addInputParamRow()">＋ 添加参数</button>
+        </div>
+      </div>
+      <div class="drawer-row" style="align-items:flex-start;">
+        <span class="drawer-label">返回值：</span>
+        <div style="flex:1;">
+          <table class="param-table" id="outputParamTable">
+            <thead><tr><th class='param-name'>参数名</th><th class='param-type'>类型</th><th class='param-desc'>描述</th><th class='param-action'></th></tr></thead>
+            <tbody id="outputParamBody"></tbody>
+          </table>
+          <button class="btn-line" type="button" onclick="addOutputParamRow()">＋ 添加字段</button>
+        </div>
+      </div>
+      <div class="drawer-actions">
+        <button class="drawer-btn" id="saveServiceBtn" type="button">保存</button>
+        <button class="drawer-btn cancel" id="closeServiceBtn" type="button">取消</button>
+      </div>
+      <div id="testResult" style="margin-top:10px;font-size:14px;color:#2176c7;display:none;"></div>
+    </div>
+  </div>
+  <!-- 服务详情抽屉 -->
+  <div id="serviceDetailDrawer" class="drawer-mask">
+    <div class="drawer-box detail-drawer-box" id="serviceDetailDrawerBox">
+      <div class="drawer-title">
+        <span>服务详情</span>
+        <button class="drawer-close" onclick="closeDetailDrawer()">×</button>
+      </div>
+      <div id="serviceDetailContent"></div>
+      <div class="drawer-actions">
+        <button class="drawer-btn cancel" id="closeDetailBtn">关闭</button>
       </div>
     </div>
   </div>
+
+
   <script>
-    let services = JSON.parse(localStorage.getItem('smartServices')||'[]');
+    // 数据存储
+    let defaultServices = [
+      {
+        name: '天眼查',
+        apiUrl: 'https://api.tianyancha.com/service',
+        apiKey: '',
+        httpMethod: 'POST',
+        timeout: 30,
+        desc: '天眼查企业信息查询服务',
+        inputParams: [],
+        outputParams: [],
+        status: true
+      },
+      {
+        name: '企查查',
+        apiUrl: 'https://api.qichacha.com/service',
+        apiKey: '',
+        httpMethod: 'POST',
+        timeout: 30,
+        desc: '企查查企业信息查询服务',
+        inputParams: [],
+        outputParams: [],
+        status: true
+      },
+      {
+        name: 'AI智能联想',
+        apiUrl: 'https://api.ai-suggest.com/service',
+        apiKey: '',
+        httpMethod: 'POST',
+        timeout: 30,
+        desc: 'AI智能联想服务',
+        inputParams: [],
+        outputParams: [],
+        status: true
+      }
+    ];
+    let services = JSON.parse(localStorage.getItem('smartServicesV2')||'[]');
+    // 自动补齐三条内置服务（按名称唯一）
+    defaultServices.forEach(def => {
+      if (!services.some(s => s.name === def.name)) {
+        services.push(def);
+      }
+    });
+    localStorage.setItem('smartServicesV2', JSON.stringify(services));
+    let editingIndex = -1;
     function renderServiceList() {
-      const list = document.getElementById('serviceList');
+      const body = document.getElementById('serviceListBody');
       if (!services.length) {
-        list.innerHTML = '<div class="empty-tip">暂无智能服务，请点击下方按钮新增</div>';
+        body.innerHTML = '<tr><td colspan="6" style="color:#bbb;text-align:center;padding:32px 0;">暂无智能服务，请点击上方按钮注册</td></tr>';
         return;
       }
-      list.innerHTML = services.map((s,i)=>`
-        <div class="service-item">
-          <span class="service-name">${s.name}</span>
-          <span class="service-desc">${s.desc||''}</span>
-        </div>
+      body.innerHTML = services.map((s,i)=>`
+        <tr>
+          <td><a href="#" style="color:#2176c7;text-decoration:underline;" onclick="showServiceDetail(${i})">${s.name}</a></td>
+          <td>${s.apiUrl}</td>
+          <td>${s.httpMethod}</td>
+          <td>${s.desc||''}</td>
+          <td><label class="switch-mini"><input type="checkbox" ${s.status!==false?'checked':''} onchange="toggleServiceStatus(${i},this.checked)"><span class="slider-mini"></span></label></td>
+          <td>
+            <button class="btn-line" onclick="editService(${i})">编辑</button>
+            <button class="btn-danger" onclick="deleteService(${i})">删除</button>
+          </td>
+        </tr>
       `).join('');
     }
+    function getServiceTypeLabel(type) {
+      if(type==='qcc') return '企查查';
+      if(type==='ai') return 'AI服务';
+      if(type==='tianyan') return '天眼查';
+      if(type==='custom') return '自定义';
+      return type;
+    }
     document.getElementById('addServiceBtn').onclick = function() {
-      document.getElementById('addServiceModal').style.display = 'flex';
-      document.getElementById('serviceNameInput').value = '';
-      document.getElementById('serviceDescInput').value = '';
+      editingIndex = -1;
+      openServiceDrawer();
     };
-    document.getElementById('cancelAddBtn').onclick = function() {
-      document.getElementById('addServiceModal').style.display = 'none';
-    };
-    document.getElementById('confirmAddBtn').onclick = function() {
+    function openServiceDrawer(data={}) {
+      document.getElementById('serviceDrawerTitle').textContent = editingIndex===-1?'注册智能服务':'编辑智能服务';
+      document.getElementById('serviceDrawer').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('serviceDrawerBox').classList.add('show');
+      }, 10);
+      // 移除type相关JS
+      document.getElementById('serviceNameInput').value = data.name||'';
+      document.getElementById('apiUrlInput').value = data.apiUrl||'';
+      document.getElementById('apiKeyInput').value = data.apiKey||'';
+      document.getElementById('httpMethodInput').value = data.httpMethod||'GET';
+      document.getElementById('timeoutInput').value = data.timeout||30;
+      document.getElementById('serviceDescInput').value = data.desc||'';
+      // 状态开关
+      if(!document.getElementById('serviceStatusRow')) {
+        const row = document.createElement('div');
+        row.className = 'drawer-row';
+        row.id = 'serviceStatusRow';
+        row.innerHTML = '<span class="drawer-label">状态：</span><label class="switch-mini"><input type="checkbox" id="serviceStatusInput"><span class="slider-mini"></span></label>';
+        const descRow = document.getElementById('serviceDescInput').parentNode.parentNode;
+        descRow.parentNode.insertBefore(row, descRow.nextSibling);
+      }
+      document.getElementById('serviceStatusInput').checked = data.status!==false;
+      renderParamTable('inputParamBody', data.inputParams||[]);
+      renderParamTable('outputParamBody', data.outputParams||[]);
+      document.getElementById('testResult').style.display = 'none';
+    }
+    function closeServiceDrawer() {
+      document.getElementById('serviceDrawerBox').classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('serviceDrawer').style.display = 'none';
+      }, 300);
+    }
+    document.getElementById('closeServiceBtn').onclick = closeServiceDrawer;
+    function renderParamTable(tbodyId, params) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = params.map((p,i)=>`
+        <tr>
+          <td><input value="${p.name||''}" onchange="updateParam('${tbodyId}',${i},'name',this.value)"></td>
+          <td><select onchange="updateParam('${tbodyId}',${i},'type',this.value)">
+            <option value="string" ${p.type==='string'?'selected':''}>字符串</option>
+            <option value="number" ${p.type==='number'?'selected':''}>数字</option>
+            <option value="boolean" ${p.type==='boolean'?'selected':''}>布尔</option>
+            <option value="object" ${p.type==='object'?'selected':''}>对象</option>
+            <option value="array" ${p.type==='array'?'selected':''}>数组</option>
+          </select></td>
+          <td><input value="${p.desc||''}" onchange="updateParam('${tbodyId}',${i},'desc',this.value)"></td>
+          <td><button class="btn-danger" type="button" onclick="removeParamRow('${tbodyId}',${i})">删除</button></td>
+        </tr>
+      `).join('');
+    }
+    function addInputParamRow() {
+      let params = getParamsFromTable('inputParamBody');
+      params.push({name:'',type:'string',desc:''});
+      renderParamTable('inputParamBody', params);
+    }
+    function addOutputParamRow() {
+      let params = getParamsFromTable('outputParamBody');
+      params.push({name:'',type:'string',desc:''});
+      renderParamTable('outputParamBody', params);
+    }
+    function removeParamRow(tbodyId, idx) {
+      let params = getParamsFromTable(tbodyId);
+      params.splice(idx,1);
+      renderParamTable(tbodyId, params);
+    }
+    function updateParam(tbodyId, idx, key, value) {
+      let params = getParamsFromTable(tbodyId);
+      params[idx][key] = value;
+      renderParamTable(tbodyId, params);
+    }
+    function getParamsFromTable(tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      return Array.from(tbody.querySelectorAll('tr')).map(tr=>{
+        const tds = tr.querySelectorAll('td');
+        return {
+          name: tds[0].querySelector('input').value,
+          type: tds[1].querySelector('select').value,
+          desc: tds[2].querySelector('input').value
+        };
+      });
+    }
+    document.getElementById('saveServiceBtn').onclick = function() {
+      // 保存时不再存type
       const name = document.getElementById('serviceNameInput').value.trim();
+      const apiUrl = document.getElementById('apiUrlInput').value.trim();
+      const apiKey = document.getElementById('apiKeyInput').value.trim();
+      const httpMethod = document.getElementById('httpMethodInput').value;
+      const timeout = document.getElementById('timeoutInput').value;
       const desc = document.getElementById('serviceDescInput').value.trim();
+      const inputParams = getParamsFromTable('inputParamBody');
+      const outputParams = getParamsFromTable('outputParamBody');
+      const status = document.getElementById('serviceStatusInput') ? document.getElementById('serviceStatusInput').checked : true;
       if(!name) { alert('请输入服务名称'); return; }
-      services.push({name, desc});
-      localStorage.setItem('smartServices', JSON.stringify(services));
+      if(!apiUrl) { alert('请输入接口地址'); return; }
+      const data = {name, apiUrl, apiKey, httpMethod, timeout, desc, inputParams, outputParams, status};
+      if(editingIndex===-1) {
+        services.push(data);
+      } else {
+        services[editingIndex] = data;
+      }
+      localStorage.setItem('smartServicesV2', JSON.stringify(services));
       renderServiceList();
-      document.getElementById('addServiceModal').style.display = 'none';
+      closeServiceDrawer();
     };
+    // 测试接口连接按钮逻辑（参考smart_service_config.html）
+    document.getElementById('testApiBtn').onclick = function() {
+      const testResult = document.getElementById('testApiResult');
+      const apiUrl = document.getElementById('apiUrlInput').value;
+      const apiKey = document.getElementById('apiKeyInput').value;
+      if (!apiUrl) {
+        showTestResult('请输入接口地址', 'error');
+        return;
+      }
+      if (!apiKey) {
+        showTestResult('请输入API Key', 'error');
+        return;
+      }
+      testResult.style.display = 'block';
+      testResult.className = 'test-result';
+      testResult.innerHTML = '<div>正在测试接口连接...</div>';
+      setTimeout(() => {
+        const success = Math.random() > 0.3;
+        if (success) {
+          const ms = Math.floor(Math.random()*200+100);
+          showTestResult('接口连接成功！响应时间: ' + ms + 'ms', 'success');
+        } else {
+          showTestResult('接口连接失败：API Key无效或网络超时', 'error');
+        }
+      }, 1500);
+    };
+    function showTestResult(message, type) {
+      const testResult = document.getElementById('testApiResult');
+      testResult.style.display = 'block';
+      testResult.className = `test-result ${type}`;
+      testResult.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  ${type === 'success' ? '<polyline points="20,6 9,17 4,12"></polyline>' : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'}
+              </svg>
+              ${message}
+          </div>
+      `;
+    }
+    function editService(idx) {
+      editingIndex = idx;
+      openServiceDrawer(services[idx]);
+    }
+    function deleteService(idx) {
+      if(confirm('确定要删除该服务吗？')) {
+        services.splice(idx,1);
+        localStorage.setItem('smartServicesV2', JSON.stringify(services));
+        renderServiceList();
+      }
+    }
+    function showServiceDetail(idx) {
+      const s = services[idx];
+      let html = '';
+      html += `<div class='detail-row'><span class='detail-label'>服务类型：</span><span class='detail-value'>${getServiceTypeLabel(s.type)}</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>服务名称：</span><span class='detail-value'>${s.name}</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>接口地址：</span><span class='detail-value'>${s.apiUrl}</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>API Key：</span><span class='detail-value'>${s.apiKey}</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>请求方法：</span><span class='detail-value'>${s.httpMethod}</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>请求超时：</span><span class='detail-value'>${s.timeout} 秒</span></div>`;
+      html += `<div class='detail-row'><span class='detail-label'>服务描述：</span><span class='detail-value'>${s.desc}</span></div>`;
+      html += `<div class='detail-section-title'>输入参数</div>`;
+      if(s.inputParams && s.inputParams.length) {
+        html += `<table class='param-table'><thead><tr><th class='param-name'>参数名</th><th class='param-type'>类型</th><th class='param-desc'>描述</th><th class='param-action'></th></tr></thead><tbody>`;
+        html += s.inputParams.map(p=>`<tr><td class='param-name'>${p.name}</td><td class='param-type'>${p.type}</td><td class='param-desc'>${p.desc}</td><td class='param-action'><button class="btn-danger" type="button" onclick="removeParamRow('inputParamBody',${i})">删除</button></td></tr>`).join('');
+        html += `</tbody></table>`;
+      } else {
+        html += `<div style='color:#bbb;font-size:14px;margin-bottom:8px;'>无</div>`;
+      }
+      html += `<div class='detail-section-title'>返回值</div>`;
+      if(s.outputParams && s.outputParams.length) {
+        html += `<table class='param-table'><thead><tr><th class='param-name'>参数名</th><th class='param-type'>类型</th><th class='param-desc'>描述</th><th class='param-action'></th></tr></thead><tbody>`;
+        html += s.outputParams.map(p=>`<tr><td class='param-name'>${p.name}</td><td class='param-type'>${p.type}</td><td class='param-desc'>${p.desc}</td><td class='param-action'><button class="btn-danger" type="button" onclick="removeParamRow('outputParamBody',${i})">删除</button></td></tr>`).join('');
+        html += `</tbody></table>`;
+      } else {
+        html += `<div style='color:#bbb;font-size:14px;margin-bottom:8px;'>无</div>`;
+      }
+      document.getElementById('serviceDetailContent').innerHTML = html;
+      document.getElementById('serviceDetailDrawer').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('serviceDetailDrawerBox').classList.add('show');
+      }, 10);
+    }
+    function closeDetailDrawer() {
+      document.getElementById('serviceDetailDrawerBox').classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('serviceDetailDrawer').style.display = 'none';
+      }, 300);
+    }
+    document.getElementById('closeDetailBtn').onclick = closeDetailDrawer;
+    function toggleServiceStatus(idx, checked) {
+      services[idx].status = checked;
+      localStorage.setItem('smartServicesV2', JSON.stringify(services));
+      renderServiceList();
+    }
+
+
+
     renderServiceList();
   </script>
 </body>

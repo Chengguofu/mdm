@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>数据采集配置</title>
+    <title>主数据服务订阅</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -51,7 +51,7 @@
 <body>
 
 <div class="container-fluid">
-    <h3 class="mb-4">接收服务配置</h3>
+    <h3 class="mb-4">主数据查询服务配置</h3>
 
     <!-- Tab navigation -->
     <ul class="nav nav-tabs" id="configTab" role="tablist">
@@ -59,16 +59,19 @@
             <button class="nav-link active" id="basic-config-tab" data-bs-toggle="tab" data-bs-target="#basic-config" type="button" role="tab" aria-controls="basic-config" aria-selected="true">基本配置</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="exception-handling-tab" data-bs-toggle="tab" data-bs-target="#exception-handling" type="button" role="tab" aria-controls="exception-handling" aria-selected="false">异常处理</button>
-        </li>
-        <li class="nav-item" role="presentation">
             <button class="nav-link" id="api-auth-tab" data-bs-toggle="tab" data-bs-target="#api-auth" type="button" role="tab" aria-controls="api-auth" aria-selected="false">接口授权</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="field-config-tab" data-bs-toggle="tab" data-bs-target="#field-config" type="button" role="tab" aria-controls="field-config" aria-selected="false">接口字段配置</button>
+            <button class="nav-link" id="query-condition-config-tab" data-bs-toggle="tab" data-bs-target="#query-condition-config" type="button" role="tab" aria-controls="query-condition-config" aria-selected="false">查询条件配置</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="format-preview-tab" data-bs-toggle="tab" data-bs-target="#format-preview" type="button" role="tab" aria-controls="format-preview" aria-selected="false">格式预览</button>
+            <button class="nav-link" id="field-config-tab" data-bs-toggle="tab" data-bs-target="#field-config" type="button" role="tab" aria-controls="field-config" aria-selected="false">查询结果配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="data-scope-tab" data-bs-toggle="tab" data-bs-target="#data-scope" type="button" role="tab" aria-controls="data-scope" aria-selected="false">数据范围配置</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="format-preview-tab" data-bs-toggle="tab" data-bs-target="#format-preview" type="button" role="tab" aria-controls="format-preview" aria-selected="false">服务接口预览</button>
         </li>
     </ul>
 
@@ -92,7 +95,7 @@
                     </tr>
                     <tr>
                         <td>接口类型</td>
-                        <td>
+                        <td colspan="3">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="apiType" id="json" checked>
                                 <label class="form-check-label" for="json">JSON</label>
@@ -101,54 +104,6 @@
                                 <input class="form-check-input" type="radio" name="apiType" id="xml">
                                 <label class="form-check-label" for="xml">XML</label>
                             </div>
-                        </td>
-                        <td>同步方式</td>
-                        <td>
-                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="syncMode" id="sync" checked>
-                                <label class="form-check-label" for="sync">同步</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="syncMode" id="async">
-                                <label class="form-check-label" for="async">异步</label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>是否审批</td>
-                        <td>
-                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="needsApproval" checked>
-                            </div>
-                        </td>
-                        <td>校验方式</td>
-                        <td>
-                            <select class="form-select">
-                                <option>不校验</option>
-                                <option>新增不校验</option>
-                                <option>更新不校验</option>
-                                <option selected>校验</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 异常处理 Tab -->
-        <div class="tab-pane fade" id="exception-handling" role="tabpanel" aria-labelledby="exception-handling-tab">
-            <table class="table table-bordered m-0 config-table-in-tab">
-                <tbody>
-                    <tr>
-                        <td>消息提醒</td>
-                        <td>
-                            <select class="form-select"><option>指定用户</option></select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>邮件提醒</td>
-                        <td>
-                            <select class="form-select"><option>指定用户</option></select>
                         </td>
                     </tr>
                 </tbody>
@@ -171,7 +126,71 @@
             </table>
         </div>
 
-        <!-- 接口字段配置 Tab -->
+        <!-- 查询条件配置 Tab -->
+        <div class="tab-pane fade" id="query-condition-config" role="tabpanel" aria-labelledby="query-condition-config-tab">
+             <table class="table table-bordered m-0 config-table-in-tab">
+                <tbody>
+                    <tr>
+                        <td>模型所有属性</td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" value="" id="childTableSelectableQuery" checked>
+                                <label class="form-check-label" for="childTableSelectableQuery">
+                                    包含子表
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td colspan="2" class="p-0">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>字段名</th>
+                                        <th>中文名</th>
+                                        <th>类型</th>
+                                        <th>是否选择</th>
+                                        <th>字段映射名称</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>CUST_ID</td>
+                                        <td>客户编码</td>
+                                        <td>String</td>
+                                        <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
+                                        <td><input type="text" class="form-control form-control-sm mapping-input" value="customerId"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>CUST_NAME</td>
+                                        <td>客户名称</td>
+                                        <td>String</td>
+                                        <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
+                                        <td><input type="text" class="form-control form-control-sm mapping-input" value="customerName"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>ADDRESS</td>
+                                        <td>地址</td>
+                                        <td>String</td>
+                                        <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
+                                        <td><input type="text" class="form-control form-control-sm mapping-input" value="address"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>CONTACT</td>
+                                        <td>联系人</td>
+                                        <td>String</td>
+                                        <td><input type="checkbox" class="form-check-input" onchange="toggleMappingEditable(this)"></td>
+                                        <td><input type="text" class="form-control form-control-sm mapping-input" value="contact"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 查询结果配置 Tab -->
         <div class="tab-pane fade" id="field-config" role="tabpanel" aria-labelledby="field-config-tab">
              <table class="table table-bordered m-0 config-table-in-tab">
                 <tbody>
@@ -196,13 +215,7 @@
                                         <th>类型</th>
                                         <th>是否选择</th>
                                         <th>字段映射名称</th>
-                                        <th>
-                                            是否可改
-                                            <i class="bi bi-question-circle text-muted ms-1" 
-                                               data-bs-toggle="tooltip" 
-                                               data-bs-placement="top" 
-                                               title="如果不允许修改，则忽略传入的属性值"></i>
-                                        </th>
+                                        <th>转换表达式</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -212,7 +225,12 @@
                                         <td>String</td>
                                         <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
                                         <td><input type="text" class="form-control form-control-sm mapping-input" value="customerId"></td>
-                                        <td><input type="checkbox" class="form-check-input editable-checkbox" checked></td>
+                                        <td>
+                                          <div class="expr-input-wrap" style="position:relative;display:block;">
+                                            <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                            <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                          </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>CUST_NAME</td>
@@ -220,7 +238,12 @@
                                         <td>String</td>
                                         <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
                                         <td><input type="text" class="form-control form-control-sm mapping-input" value="customerName"></td>
-                                        <td><input type="checkbox" class="form-check-input editable-checkbox" checked></td>
+                                        <td>
+                                          <div class="expr-input-wrap" style="position:relative;display:block;">
+                                            <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                            <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                          </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>ADDRESS</td>
@@ -228,7 +251,12 @@
                                         <td>String</td>
                                         <td><input type="checkbox" class="form-check-input" checked onchange="toggleMappingEditable(this)"></td>
                                         <td><input type="text" class="form-control form-control-sm mapping-input" value="address"></td>
-                                        <td><input type="checkbox" class="form-check-input editable-checkbox" checked></td>
+                                        <td>
+                                          <div class="expr-input-wrap" style="position:relative;display:block;">
+                                            <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                            <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                          </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>CONTACT</td>
@@ -236,7 +264,12 @@
                                         <td>String</td>
                                         <td><input type="checkbox" class="form-check-input" onchange="toggleMappingEditable(this)"></td>
                                         <td><input type="text" class="form-control form-control-sm mapping-input" value="contact"></td>
-                                        <td><input type="checkbox" class="form-check-input editable-checkbox" checked></td>
+                                        <td>
+                                          <div class="expr-input-wrap" style="position:relative;display:block;">
+                                            <input type="text" class="form-control form-control-sm" placeholder="请输入转换表达式" style="width:100%;padding-right:30px;">
+                                            <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:16px;color:#2176c7;z-index:2;" title="表达式编辑" onclick="window.open('expression.html','_blank','width=700,height=500')">🔍</span>
+                                          </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -246,22 +279,25 @@
             </table>
         </div>
 
-        <!-- 格式预览 Tab -->
+        <!-- 数据范围配置 Tab -->
+        <div class="tab-pane fade" id="data-scope" role="tabpanel" aria-labelledby="data-scope-tab">
+            <iframe src="condition.html" style="width:100%;min-height:600px;border:none;border-radius:8px;"></iframe>
+        </div>
+
+        <!-- 服务接口预览 Tab -->
         <div class="tab-pane fade" id="format-preview" role="tabpanel" aria-labelledby="format-preview-tab">
             <table class="table table-bordered m-0 config-table-in-tab">
                  <tbody>
                     <tr>
-                        <td>接收数据格式</td>
+                        <td>查询服务格式</td>
                         <td>
 <pre class="bg-light p-3 rounded"><code>{
   "dataType": "客户主数据",
-  "operation": "CREATE",
+  "operation": "QUERY",
   "timestamp": "2024-01-15T10:30:00Z",
-  "data": {
+  "query": {
     "customerId": "CUST001",
-    "customerName": "示例客户",
-    "contactPhone": "13800138000",
-    "email": "example@company.com"
+    "customerName": "张三"
   }
 }</code></pre>
                         </td>
@@ -270,8 +306,39 @@
                         <td>返回数据格式</td>
                         <td>
 <pre class="bg-light p-3 rounded"><code>{
-  "success": true,
-  "message": "处理成功"
+  "data": [
+    {
+      "customerId": "CUST001",
+      "customerName": "张三",
+      "contactPhone": "13800138000",
+      "email": "zhangsan@example.com",
+      "orders": [
+        {
+          "orderId": "ORD1001",
+          "orderDate": "2024-01-10",
+          "amount": 1200.5
+        },
+        {
+          "orderId": "ORD1002",
+          "orderDate": "2024-01-12",
+          "amount": 800.0
+        }
+      ]
+    },
+    {
+      "customerId": "CUST002",
+      "customerName": "李四",
+      "contactPhone": "13900139000",
+      "email": "lisi@example.com",
+      "orders": [
+        {
+          "orderId": "ORD1003",
+          "orderDate": "2024-01-15",
+          "amount": 500.0
+        }
+      ]
+    }
+  ]
 }</code></pre>
                         </td>
                     </tr>

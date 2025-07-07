@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据推送接口日志</title>
+    <style>
+        :root {
+            --theme-bg: #f7faff;
+            --theme-content: #f4f8fb;
+            --theme-table-header: #f4f8fb;
+            --theme-table-header-font: #2176c7;
+            --theme-table-row-hover: #f0f6fd;
+            --theme-table-border: #e3eaf3;
+            --theme-btn: #2176c7;
+            --theme-btn-hover: #185a99;
+            --theme-content-text: #185a99;
+            --theme-shadow-color: rgba(33, 118, 199, 0.06);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: var(--theme-bg);
+            color: #222;
+            padding: 0;
+        }
+
+        .pushlog-layout {
+            display: flex;
+            gap: 18px;
+            height: 100vh;
+            padding: 18px;
+        }
+
+        .pushlog-left {
+            width: 208px;
+            min-width: 200px;
+            background: #f8fbff;
+            border-radius: 8px 0 0 8px;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(33,118,199,0.06);
+            overflow: auto;
+            border-right: 1px solid #e3eaf3;
+        }
+
+        .pushlog-right {
+            flex: 1;
+            min-width: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(33,118,199,0.06);
+            padding: 0 0 18px 0;
+            overflow: auto;
+        }
+
+        .pushlog-tab-bar {
+            display: flex;
+            gap: 2px;
+            border-bottom: 1.5px solid #e3eaf3;
+        }
+
+        .pushlog-tab {
+            padding: 12px 28px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #185a99;
+            transition: color 0.2s;
+        }
+
+        .pushlog-tab.active {
+            color: #2176c7;
+            border-bottom: 2px solid #2176c7;
+        }
+
+        .pushlog-tab:hover {
+            color: #2176c7;
+        }
+
+        .pushlog-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2176c7;
+            padding: 28px 0 10px 32px;
+            letter-spacing: 1px;
+        }
+
+        .pushlog-search {
+            padding: 0 24px 18px 24px;
+        }
+
+        .pushlog-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .pushlog-search input {
+            width: 100%;
+            padding: 10px 12px 10px 38px;
+            border: 2px solid #dbe7f5;
+            border-radius: 8px;
+            font-size: 11px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .pushlog-search input:focus {
+            border-color: #2176c7;
+        }
+
+        .pushlog-search .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b0b8c1;
+            font-size: 18px;
+        }
+
+        .pushlog-mdm-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .pushlog-mdm-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px 8px 32px;
+            font-size: 15px;
+            color: #185a99;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s, color 0.2s;
+            background: none;
+        }
+
+        .pushlog-mdm-list li.active {
+            background: #2176c7;
+            color: #fff;
+        }
+
+        .pushlog-mdm-list li:hover:not(.active) {
+            background: #e3eaf3;
+            color: #2176c7;
+        }
+
+        .pushlog-mdm-list .mdm-icon {
+            font-size: 20px;
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pushlog-nav-divider {
+            height: 1px;
+            background: #e3eaf3;
+            margin: 10px 0 10px 0;
+        }
+
+        .pushlog-submenu {
+            list-style: none;
+            margin: 0;
+            padding: 0 0 0 48px;
+        }
+
+        .pushlog-submenu li {
+            font-size: 13px;
+            color: #2176c7;
+            padding: 8px 0 8px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .pushlog-submenu li:hover {
+            background: #f4f8fb;
+            color: #185a99;
+        }
+
+        .action-bar {
+            margin: 18px 0 10px 0;
+            display: flex;
+            gap: 10px;
+            padding: 0 18px;
+        }
+
+        .action-bar button {
+            background: var(--theme-btn);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-bar button:hover {
+            background: var(--theme-btn-hover);
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            position: relative;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(33,118,199,0.04);
+            margin-bottom: 16px;
+        }
+
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .model-table th, .model-table td {
+            padding: 10px 8px;
+            border: 1px solid #e3eaf3;
+            text-align: left;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .model-table thead {
+            background-color: var(--theme-table-header);
+            font-weight: 600;
+        }
+
+        .model-table thead th {
+            color: var(--theme-table-header-font);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .model-table tbody tr:hover {
+            background-color: var(--theme-table-row-hover);
+        }
+
+        .checkbox-cell {
+            width: 36px;
+            text-align: center;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .table-pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px 8px 0;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+        }
+
+        .table-pagination button {
+            border: 1px solid #e3eaf3;
+            background: #f7faff;
+            color: #2176c7;
+            border-radius: 4px;
+            padding: 2px 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .table-pagination button.active {
+            background: #2176c7;
+            color: #fff;
+        }
+
+        .table-pagination button:disabled {
+            color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="pushlog-layout">
+        <div class="pushlog-left">
+            <div class="pushlog-title">主数据类型</div>
+            <div class="pushlog-search">
+                <div class="pushlog-search-box">
+                    <input type="text" placeholder="搜索...">
+                    <span class="search-icon">&#128269;</span>
+                </div>
+            </div>
+            <ul class="pushlog-mdm-list" id="mdmTypeList">
+                <!-- 一级菜单和二级菜单动态渲染 -->
+            </ul>
+        </div>
+        <div class="pushlog-right">
+            <div class="pushlog-tab-bar">
+                <div class="pushlog-tab active" data-tab="can-sync">可同步数据</div>
+                <div class="pushlog-tab" data-tab="wait-sync">待同步数据列表</div>
+                <div class="pushlog-tab" data-tab="push-log">推送日志</div>
+                <div class="pushlog-tab" data-tab="push-fail-log">推送失败日志</div>
+            </div>
+            <div class="pushlog-tab-content" id="pushlogTabContent">
+                <!-- 标签页内容将通过JavaScript动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化显示可同步数据标签页
+            renderCanSyncTable();
+            bindPushLogTabEvents();
+            bindMdmListEvents();
+            bindSearchEvents();
+        });
+
+        function renderCanSyncTable() {
+            const tabContent = document.getElementById('pushlogTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button>快速查询</button>
+                    <button>高级查询</button>
+                    <button>手动分发</button>
+                    <button>添加到待同步列表</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox"></th>
+                                <th>同步状态</th>
+                                <th>客户编码</th>
+                                <th>客户名称</th>
+                                <th>客户类型</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[
+                                {status:'已同步',code:'CUST001',name:'北京华信科技有限公司',type:'企业',contact:'张三',phone:'13800138000',addr:'北京市海淀区中关村大街1号',state:'启用',ctime:'2024-06-01 09:00:00',utime:'2024-06-10 15:23:11'},
+                                {status:'未同步',code:'CUST002',name:'上海睿智贸易有限公司',type:'企业',contact:'李四',phone:'13900139000',addr:'上海市浦东新区世纪大道88号',state:'停用',ctime:'2024-05-15 10:30:00',utime:'2024-06-09 11:12:45'},
+                                {status:'已同步',code:'CUST003',name:'王五个人',type:'个人',contact:'王五',phone:'13700137000',addr:'深圳市南山区科技园南区',state:'启用',ctime:'2024-04-20 08:20:00',utime:'2024-06-08 09:45:30'},
+                                {status:'未同步',code:'CUST007',name:'天津泰达实业',type:'企业',contact:'周九',phone:'13300133000',addr:'天津市滨海新区开发区西区',state:'启用',ctime:'2024-03-12 10:00:00',utime:'2024-06-07 14:22:10'},
+                                {status:'已同步',code:'CUST008',name:'重庆明日科技',type:'企业',contact:'吴十',phone:'13200132000',addr:'重庆市渝北区红锦大道99号',state:'停用',ctime:'2024-02-28 09:10:00',utime:'2024-06-06 13:11:00'},
+                                {status:'未同步',code:'CUST009',name:'苏州工业园区管理委员会',type:'政府',contact:'郑十一',phone:'13100131000',addr:'苏州市工业园区星湖街1号',state:'启用',ctime:'2024-01-15 11:30:00',utime:'2024-06-05 12:00:00'},
+                                {status:'已同步',code:'CUST010',name:'南京大学',type:'高校',contact:'钱十二',phone:'13000130000',addr:'南京市鼓楼区汉口路22号',state:'启用',ctime:'2023-12-01 08:00:00',utime:'2024-06-04 10:10:00'}
+                            ].map(row => `
+                                <tr>
+                                    <td class='checkbox-cell'><input type='checkbox'></td>
+                                    <td>${row.status}</td>
+                                    <td><a href="javascript:void(0)" class="can-sync-code-link" data-code="${row.code}">${row.code}</a></td>
+                                    <td>${row.name}</td>
+                                    <td>${row.type}</td>
+                                    <td>${row.contact}</td>
+                                    <td>${row.phone}</td>
+                                    <td>${row.addr}</td>
+                                    <td>${row.state}</td>
+                                    <td>${row.ctime}</td>
+                                    <td>${row.utime}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button disabled>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <span>...</span>
+                        <button>10</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+                <div id="drawerMask" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.15);z-index:1000;"></div>
+                <div id="drawerDetail" style="display:none;position:fixed;top:0;right:0;width:420px;height:100vh;background:#fff;box-shadow:-2px 0 12px rgba(0,0,0,0.08);z-index:1001;transition:right 0.3s;overflow:auto;">
+                    <div style="padding:24px 28px 12px 28px;font-size:20px;font-weight:600;color:#2176c7;">客户详情</div>
+                    <div style="padding:0 28px 24px 28px;font-size:15px;color:#222;">
+                        <div><b>客户编码：</b><span id="drawerCode"></span></div>
+                        <div><b>客户名称：</b><span id="drawerName"></span></div>
+                        <div><b>客户类型：</b><span id="drawerType"></span></div>
+                        <div><b>联系人：</b><span id="drawerContact"></span></div>
+                        <div><b>联系电话：</b><span id="drawerPhone"></span></div>
+                        <div><b>地址：</b><span id="drawerAddr"></span></div>
+                        <div><b>状态：</b><span id="drawerState"></span></div>
+                        <div><b>创建时间：</b><span id="drawerCtime"></span></div>
+                        <div><b>更新时间：</b><span id="drawerUtime"></span></div>
+                    </div>
+                    <div style="text-align:right;padding:0 28px 18px 28px;">
+                        <button id="drawerCloseBtn" style="background:#2176c7;color:#fff;border:none;border-radius:4px;padding:6px 22px;font-size:15px;cursor:pointer;">关闭</button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                document.querySelectorAll('.can-sync-code-link').forEach(link => {
+                    link.onclick = function() {
+                        const code = this.getAttribute('data-code');
+                        const row = [
+                            {status:'已同步',code:'CUST001',name:'北京华信科技有限公司',type:'企业',contact:'张三',phone:'13800138000',addr:'北京市海淀区中关村大街1号',state:'启用',ctime:'2024-06-01 09:00:00',utime:'2024-06-10 15:23:11'},
+                            {status:'未同步',code:'CUST002',name:'上海睿智贸易有限公司',type:'企业',contact:'李四',phone:'13900139000',addr:'上海市浦东新区世纪大道88号',state:'停用',ctime:'2024-05-15 10:30:00',utime:'2024-06-09 11:12:45'},
+                            {status:'已同步',code:'CUST003',name:'王五个人',type:'个人',contact:'王五',phone:'13700137000',addr:'深圳市南山区科技园南区',state:'启用',ctime:'2024-04-20 08:20:00',utime:'2024-06-08 09:45:30'},
+                            {status:'未同步',code:'CUST007',name:'天津泰达实业',type:'企业',contact:'周九',phone:'13300133000',addr:'天津市滨海新区开发区西区',state:'启用',ctime:'2024-03-12 10:00:00',utime:'2024-06-07 14:22:10'},
+                            {status:'已同步',code:'CUST008',name:'重庆明日科技',type:'企业',contact:'吴十',phone:'13200132000',addr:'重庆市渝北区红锦大道99号',state:'停用',ctime:'2024-02-28 09:10:00',utime:'2024-06-06 13:11:00'},
+                            {status:'未同步',code:'CUST009',name:'苏州工业园区管理委员会',type:'政府',contact:'郑十一',phone:'13100131000',addr:'苏州市工业园区星湖街1号',state:'启用',ctime:'2024-01-15 11:30:00',utime:'2024-06-05 12:00:00'},
+                            {status:'已同步',code:'CUST010',name:'南京大学',type:'高校',contact:'钱十二',phone:'13000130000',addr:'南京市鼓楼区汉口路22号',state:'启用',ctime:'2023-12-01 08:00:00',utime:'2024-06-04 10:10:00'}
+                        ].find(r => r.code === code);
+                        if(row){
+                            document.getElementById('drawerCode').innerText = row.code;
+                            document.getElementById('drawerName').innerText = row.name;
+                            document.getElementById('drawerType').innerText = row.type;
+                            document.getElementById('drawerContact').innerText = row.contact;
+                            document.getElementById('drawerPhone').innerText = row.phone;
+                            document.getElementById('drawerAddr').innerText = row.addr;
+                            document.getElementById('drawerState').innerText = row.state;
+                            document.getElementById('drawerCtime').innerText = row.ctime;
+                            document.getElementById('drawerUtime').innerText = row.utime;
+                            document.getElementById('drawerMask').style.display = 'block';
+                            document.getElementById('drawerDetail').style.display = 'block';
+                        }
+                    }
+                });
+                document.getElementById('drawerMask').onclick = closeDrawer;
+                document.getElementById('drawerCloseBtn').onclick = closeDrawer;
+                function closeDrawer(){
+                    document.getElementById('drawerMask').style.display = 'none';
+                    document.getElementById('drawerDetail').style.display = 'none';
+                }
+            }, 0);
+        }
+
+        function renderWaitSyncTable() {
+            const tabContent = document.getElementById('pushlogTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button>快速查询</button>
+                    <button>高级查询</button>
+                    <button>手动分发</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox"></th>
+                                <th>客户编码</th>
+                                <th>客户名称</th>
+                                <th>客户类型</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[
+                                {code:'CUST004',name:'广州新视界有限公司',type:'企业',contact:'赵六',phone:'13600136000',addr:'广州市天河区体育西路123号',state:'启用',ctime:'2024-06-05 14:00:00',utime:'2024-06-10 16:00:00'},
+                                {code:'CUST011',name:'厦门蓝天贸易',type:'企业',contact:'孙十三',phone:'12900129000',addr:'厦门市思明区环岛东路88号',state:'停用',ctime:'2024-03-18 09:00:00',utime:'2024-06-03 09:00:00'},
+                                {code:'CUST012',name:'青岛海洋大学',type:'高校',contact:'李十四',phone:'12800128000',addr:'青岛市崂山区松岭路123号',state:'启用',ctime:'2024-02-10 10:10:00',utime:'2024-06-02 08:30:00'},
+                                {code:'CUST013',name:'武汉光谷科技园',type:'园区',contact:'周十五',phone:'12700127000',addr:'武汉市东湖高新区光谷大道1号',state:'启用',ctime:'2024-01-05 11:00:00',utime:'2024-06-01 07:20:00'},
+                                {code:'CUST014',name:'合肥高新技术企业',type:'企业',contact:'吴十六',phone:'12600126000',addr:'合肥市高新区创新大道88号',state:'启用',ctime:'2023-11-20 12:00:00',utime:'2024-05-31 06:10:00'}
+                            ].map(row => `
+                                <tr>
+                                    <td class='checkbox-cell'><input type='checkbox'></td>
+                                    <td><a href="javascript:void(0)" class="wait-sync-code-link" data-code="${row.code}">${row.code}</a></td>
+                                    <td>${row.name}</td>
+                                    <td>${row.type}</td>
+                                    <td>${row.contact}</td>
+                                    <td>${row.phone}</td>
+                                    <td>${row.addr}</td>
+                                    <td>${row.state}</td>
+                                    <td>${row.ctime}</td>
+                                    <td>${row.utime}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button disabled>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <span>...</span>
+                        <button>10</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+                <div id="drawerMaskWait" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.15);z-index:1000;"></div>
+                <div id="drawerDetailWait" style="display:none;position:fixed;top:0;right:0;width:420px;height:100vh;background:#fff;box-shadow:-2px 0 12px rgba(0,0,0,0.08);z-index:1001;transition:right 0.3s;overflow:auto;">
+                    <div style="padding:24px 28px 12px 28px;font-size:20px;font-weight:600;color:#2176c7;">客户详情</div>
+                    <div style="padding:0 28px 24px 28px;font-size:15px;color:#222;">
+                        <div><b>客户编码：</b><span id="drawerCodeWait"></span></div>
+                        <div><b>客户名称：</b><span id="drawerNameWait"></span></div>
+                        <div><b>客户类型：</b><span id="drawerTypeWait"></span></div>
+                        <div><b>联系人：</b><span id="drawerContactWait"></span></div>
+                        <div><b>联系电话：</b><span id="drawerPhoneWait"></span></div>
+                        <div><b>地址：</b><span id="drawerAddrWait"></span></div>
+                        <div><b>状态：</b><span id="drawerStateWait"></span></div>
+                        <div><b>创建时间：</b><span id="drawerCtimeWait"></span></div>
+                        <div><b>更新时间：</b><span id="drawerUtimeWait"></span></div>
+                    </div>
+                    <div style="text-align:right;padding:0 28px 18px 28px;">
+                        <button id="drawerCloseBtnWait" style="background:#2176c7;color:#fff;border:none;border-radius:4px;padding:6px 22px;font-size:15px;cursor:pointer;">关闭</button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                document.querySelectorAll('.wait-sync-code-link').forEach(link => {
+                    link.onclick = function() {
+                        const code = this.getAttribute('data-code');
+                        const row = [
+                            {code:'CUST004',name:'广州新视界有限公司',type:'企业',contact:'赵六',phone:'13600136000',addr:'广州市天河区体育西路123号',state:'启用',ctime:'2024-06-05 14:00:00',utime:'2024-06-10 16:00:00'},
+                            {code:'CUST011',name:'厦门蓝天贸易',type:'企业',contact:'孙十三',phone:'12900129000',addr:'厦门市思明区环岛东路88号',state:'停用',ctime:'2024-03-18 09:00:00',utime:'2024-06-03 09:00:00'},
+                            {code:'CUST012',name:'青岛海洋大学',type:'高校',contact:'李十四',phone:'12800128000',addr:'青岛市崂山区松岭路123号',state:'启用',ctime:'2024-02-10 10:10:00',utime:'2024-06-02 08:30:00'},
+                            {code:'CUST013',name:'武汉光谷科技园',type:'园区',contact:'周十五',phone:'12700127000',addr:'武汉市东湖高新区光谷大道1号',state:'启用',ctime:'2024-01-05 11:00:00',utime:'2024-06-01 07:20:00'},
+                            {code:'CUST014',name:'合肥高新技术企业',type:'企业',contact:'吴十六',phone:'12600126000',addr:'合肥市高新区创新大道88号',state:'启用',ctime:'2023-11-20 12:00:00',utime:'2024-05-31 06:10:00'}
+                        ].find(r => r.code === code);
+                        if(row){
+                            document.getElementById('drawerCodeWait').innerText = row.code;
+                            document.getElementById('drawerNameWait').innerText = row.name;
+                            document.getElementById('drawerTypeWait').innerText = row.type;
+                            document.getElementById('drawerContactWait').innerText = row.contact;
+                            document.getElementById('drawerPhoneWait').innerText = row.phone;
+                            document.getElementById('drawerAddrWait').innerText = row.addr;
+                            document.getElementById('drawerStateWait').innerText = row.state;
+                            document.getElementById('drawerCtimeWait').innerText = row.ctime;
+                            document.getElementById('drawerUtimeWait').innerText = row.utime;
+                            document.getElementById('drawerMaskWait').style.display = 'block';
+                            document.getElementById('drawerDetailWait').style.display = 'block';
+                        }
+                    }
+                });
+                document.getElementById('drawerMaskWait').onclick = closeDrawerWait;
+                document.getElementById('drawerCloseBtnWait').onclick = closeDrawerWait;
+                function closeDrawerWait(){
+                    document.getElementById('drawerMaskWait').style.display = 'none';
+                    document.getElementById('drawerDetailWait').style.display = 'none';
+                }
+            }, 0);
+        }
+
+        function renderPushLogTable() {
+            const tabContent = document.getElementById('pushlogTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button>快速查询</button>
+                    <button>高级查询</button>
+                    <button>手动分发</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox"></th>
+                                <th>同步结果状态</th>
+                                <th>同步结果信息</th>
+                                <th>同步时间</th>
+                                <th>同步操作人</th>
+                                <th>客户编码</th>
+                                <th>客户名称</th>
+                                <th>客户类型</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[
+                                {status:'成功',result:'成功',time:'2024-06-10 17:10:00',user:'admin',code:'CUST005',name:'成都智联科技',type:'企业',contact:'钱七',phone:'13500135000',addr:'成都市高新区天府大道100号',state:'启用',ctime:'2024-06-02 13:00:00',utime:'2024-06-10 17:00:00',req:'{"name":"成都智联科技"}',resp:'{"code":0,"msg":"ok"}'},
+                                {status:'失败',result:'失败：网络异常',time:'2024-06-10 16:50:00',user:'zhangsan',code:'CUST015',name:'福州新材料有限公司',type:'企业',contact:'郑十七',phone:'12500125000',addr:'福州市鼓楼区五四路66号',state:'停用',ctime:'2024-04-01 14:00:00',utime:'2024-05-30 05:00:00',req:'{"name":"福州新材料有限公司"}',resp:'{"code":1,"msg":"网络异常"}'},
+                                {status:'成功',result:'成功',time:'2024-06-10 16:30:00',user:'lisi',code:'CUST016',name:'西安交通大学',type:'高校',contact:'钱十八',phone:'12400124000',addr:'西安市碑林区咸宁西路28号',state:'启用',ctime:'2024-03-10 15:00:00',utime:'2024-05-29 04:00:00',req:'{"name":"西安交通大学"}',resp:'{"code":0,"msg":"ok"}'},
+                                {status:'系统异常',result:'系统异常：超时',time:'2024-06-10 16:10:00',user:'admin',code:'CUST017',name:'沈阳机床集团',type:'企业',contact:'孙十九',phone:'12300123000',addr:'沈阳市铁西区建设东路77号',state:'启用',ctime:'2024-02-18 16:00:00',utime:'2024-05-28 03:00:00',req:'{"name":"沈阳机床集团"}',resp:'{"code":2,"msg":"超时"}'},
+                                {status:'成功',result:'成功',time:'2024-06-10 15:50:00',user:'wangwu',code:'CUST018',name:'哈尔滨冰雪旅游公司',type:'企业',contact:'李二十',phone:'12200122000',addr:'哈尔滨市道里区中央大街199号',state:'停用',ctime:'2024-01-25 17:00:00',utime:'2024-05-27 02:00:00',req:'{"name":"哈尔滨冰雪旅游公司"}',resp:'{"code":0,"msg":"ok"}'}
+                            ].map(row => `
+                                <tr>
+                                    <td class='checkbox-cell'><input type='checkbox'></td>
+                                    <td>${row.status}</td>
+                                    <td>${row.result}</td>
+                                    <td>${row.time}</td>
+                                    <td>${row.user}</td>
+                                    <td>${row.code}</td>
+                                    <td>${row.name}</td>
+                                    <td>${row.type}</td>
+                                    <td>${row.contact}</td>
+                                    <td>${row.phone}</td>
+                                    <td>${row.addr}</td>
+                                    <td>${row.state}</td>
+                                    <td>${row.ctime}</td>
+                                    <td>${row.utime}</td>
+                                    <td><button class="view-msg-btn" data-code="${row.code}" style="color:#2176c7;background:none;border:none;cursor:pointer;">查看报文</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button disabled>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <span>...</span>
+                        <button>10</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+                <div id="drawerMaskMsg" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.15);z-index:1000;"></div>
+                <div id="drawerMsgDetail" style="display:none;position:fixed;top:0;right:0;width:480px;height:100vh;background:#fff;box-shadow:-2px 0 12px rgba(0,0,0,0.08);z-index:1001;transition:right 0.3s;overflow:auto;">
+                    <div style="padding:24px 28px 12px 28px;font-size:20px;font-weight:600;color:#2176c7;">报文详情</div>
+                    <div style="padding:0 28px 24px 28px;font-size:15px;color:#222;">
+                        <div style="margin-bottom:12px;"><b>请求报文：</b></div>
+                        <pre id="drawerReqMsg" style="background:#f7faff;padding:12px 14px;border-radius:6px;font-size:13px;overflow:auto;"></pre>
+                        <div style="margin:18px 0 12px 0;"><b>响应结果报文：</b></div>
+                        <pre id="drawerRespMsg" style="background:#f7faff;padding:12px 14px;border-radius:6px;font-size:13px;overflow:auto;"></pre>
+                    </div>
+                    <div style="text-align:right;padding:0 28px 18px 28px;">
+                        <button id="drawerCloseBtnMsg" style="background:#2176c7;color:#fff;border:none;border-radius:4px;padding:6px 22px;font-size:15px;cursor:pointer;">关闭</button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                document.querySelectorAll('.view-msg-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        const code = this.getAttribute('data-code');
+                        const row = [
+                            {code:'CUST005',req:'{"name":"成都智联科技"}',resp:'{"code":0,"msg":"ok"}'},
+                            {code:'CUST015',req:'{"name":"福州新材料有限公司"}',resp:'{"code":1,"msg":"网络异常"}'},
+                            {code:'CUST016',req:'{"name":"西安交通大学"}',resp:'{"code":0,"msg":"ok"}'},
+                            {code:'CUST017',req:'{"name":"沈阳机床集团"}',resp:'{"code":2,"msg":"超时"}'},
+                            {code:'CUST018',req:'{"name":"哈尔滨冰雪旅游公司"}',resp:'{"code":0,"msg":"ok"}'}
+                        ].find(r => r.code === code);
+                        if(row){
+                            document.getElementById('drawerReqMsg').innerText = row.req;
+                            document.getElementById('drawerRespMsg').innerText = row.resp;
+                            document.getElementById('drawerMaskMsg').style.display = 'block';
+                            document.getElementById('drawerMsgDetail').style.display = 'block';
+                        }
+                    }
+                });
+                document.getElementById('drawerMaskMsg').onclick = closeDrawerMsg;
+                document.getElementById('drawerCloseBtnMsg').onclick = closeDrawerMsg;
+                function closeDrawerMsg(){
+                    document.getElementById('drawerMaskMsg').style.display = 'none';
+                    document.getElementById('drawerMsgDetail').style.display = 'none';
+                }
+            }, 0);
+        }
+
+        function renderPushFailLogTable() {
+            const tabContent = document.getElementById('pushlogTabContent');
+            tabContent.innerHTML = `
+                <div class="action-bar">
+                    <button>快速查询</button>
+                    <button>高级查询</button>
+                    <button>手动分发</button>
+                    <button>添加到待同步列表</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell"><input type="checkbox"></th>
+                                <th>同步时间</th>
+                                <th>同步结果信息</th>
+                                <th>客户编码</th>
+                                <th>客户名称</th>
+                                <th>客户类型</th>
+                                <th>联系人</th>
+                                <th>联系电话</th>
+                                <th>地址</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${[
+                                {time:'2024-06-10 18:00:00',result:'失败：接口超时',code:'CUST006',name:'杭州未来科技有限公司',type:'企业',contact:'孙八',phone:'13400134000',addr:'杭州市滨江区江南大道88号',state:'停用',ctime:'2024-05-28 09:30:00',utime:'2024-06-10 18:00:00',req:'{"name":"杭州未来科技有限公司"}',resp:'{"code":1,"msg":"接口超时"}'},
+                                {time:'2024-06-09 17:30:00',result:'失败：系统异常',code:'CUST019',name:'济南泉城集团',type:'企业',contact:'周二一',phone:'12100121000',addr:'济南市历下区泉城路88号',state:'启用',ctime:'2023-10-10 18:00:00',utime:'2024-05-26 01:00:00',req:'{"name":"济南泉城集团"}',resp:'{"code":2,"msg":"系统异常"}'},
+                                {time:'2024-06-08 16:20:00',result:'失败：网络中断',code:'CUST020',name:'南昌高新企业',type:'企业',contact:'钱二二',phone:'12000120000',addr:'南昌市高新区创新一路1号',state:'停用',ctime:'2023-09-09 19:00:00',utime:'2024-05-25 00:00:00',req:'{"name":"南昌高新企业"}',resp:'{"code":1,"msg":"网络中断"}'},
+                                {time:'2024-06-07 15:10:00',result:'失败：数据校验失败',code:'CUST021',name:'长沙智能制造园',type:'园区',contact:'孙二三',phone:'11900119000',addr:'长沙市岳麓区麓谷大道88号',state:'启用',ctime:'2023-08-08 20:00:00',utime:'2024-05-24 23:00:00',req:'{"name":"长沙智能制造园"}',resp:'{"code":3,"msg":"数据校验失败"}'},
+                                {time:'2024-06-06 14:00:00',result:'失败：未知错误',code:'CUST022',name:'珠海创新科技',type:'企业',contact:'李二四',phone:'11800118000',addr:'珠海市香洲区科技路66号',state:'启用',ctime:'2023-07-07 21:00:00',utime:'2024-05-23 22:00:00',req:'{"name":"珠海创新科技"}',resp:'{"code":9,"msg":"未知错误"}'}
+                            ].map(row => `
+                                <tr>
+                                    <td class='checkbox-cell'><input type='checkbox'></td>
+                                    <td>${row.time}</td>
+                                    <td>${row.result}</td>
+                                    <td>${row.code}</td>
+                                    <td>${row.name}</td>
+                                    <td>${row.type}</td>
+                                    <td>${row.contact}</td>
+                                    <td>${row.phone}</td>
+                                    <td>${row.addr}</td>
+                                    <td>${row.state}</td>
+                                    <td>${row.ctime}</td>
+                                    <td>${row.utime}</td>
+                                    <td><button class="view-msg-btn-fail" data-code="${row.code}" style="color:#2176c7;background:none;border:none;cursor:pointer;">查看报文</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="table-pagination">
+                        <button disabled>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <span>...</span>
+                        <button>10</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+                <div id="drawerMaskMsgFail" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.15);z-index:1000;"></div>
+                <div id="drawerMsgDetailFail" style="display:none;position:fixed;top:0;right:0;width:480px;height:100vh;background:#fff;box-shadow:-2px 0 12px rgba(0,0,0,0.08);z-index:1001;transition:right 0.3s;overflow:auto;">
+                    <div style="padding:24px 28px 12px 28px;font-size:20px;font-weight:600;color:#2176c7;">报文详情</div>
+                    <div style="padding:0 28px 24px 28px;font-size:15px;color:#222;">
+                        <div style="margin-bottom:12px;"><b>请求报文：</b></div>
+                        <pre id="drawerReqMsgFail" style="background:#f7faff;padding:12px 14px;border-radius:6px;font-size:13px;overflow:auto;"></pre>
+                        <div style="margin:18px 0 12px 0;"><b>响应结果报文：</b></div>
+                        <pre id="drawerRespMsgFail" style="background:#f7faff;padding:12px 14px;border-radius:6px;font-size:13px;overflow:auto;"></pre>
+                    </div>
+                    <div style="text-align:right;padding:0 28px 18px 28px;">
+                        <button id="drawerCloseBtnMsgFail" style="background:#2176c7;color:#fff;border:none;border-radius:4px;padding:6px 22px;font-size:15px;cursor:pointer;">关闭</button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => {
+                document.querySelectorAll('.view-msg-btn-fail').forEach(btn => {
+                    btn.onclick = function() {
+                        const code = this.getAttribute('data-code');
+                        const row = [
+                            {code:'CUST006',req:'{"name":"杭州未来科技有限公司"}',resp:'{"code":1,"msg":"接口超时"}'},
+                            {code:'CUST019',req:'{"name":"济南泉城集团"}',resp:'{"code":2,"msg":"系统异常"}'},
+                            {code:'CUST020',req:'{"name":"南昌高新企业"}',resp:'{"code":1,"msg":"网络中断"}'},
+                            {code:'CUST021',req:'{"name":"长沙智能制造园"}',resp:'{"code":3,"msg":"数据校验失败"}'},
+                            {code:'CUST022',req:'{"name":"珠海创新科技"}',resp:'{"code":9,"msg":"未知错误"}'}
+                        ].find(r => r.code === code);
+                        if(row){
+                            document.getElementById('drawerReqMsgFail').innerText = row.req;
+                            document.getElementById('drawerRespMsgFail').innerText = row.resp;
+                            document.getElementById('drawerMaskMsgFail').style.display = 'block';
+                            document.getElementById('drawerMsgDetailFail').style.display = 'block';
+                        }
+                    }
+                });
+                document.getElementById('drawerMaskMsgFail').onclick = closeDrawerMsgFail;
+                document.getElementById('drawerCloseBtnMsgFail').onclick = closeDrawerMsgFail;
+                function closeDrawerMsgFail(){
+                    document.getElementById('drawerMaskMsgFail').style.display = 'none';
+                    document.getElementById('drawerMsgDetailFail').style.display = 'none';
+                }
+            }, 0);
+        }
+
+        function bindPushLogTabEvents() {
+            document.querySelectorAll('.pushlog-tab').forEach(tab => {
+                tab.onclick = function() {
+                    document.querySelectorAll('.pushlog-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName === 'can-sync') {
+                        renderCanSyncTable();
+                    } else if (tabName === 'wait-sync') {
+                        renderWaitSyncTable();
+                    } else if (tabName === 'push-log') {
+                        renderPushLogTable();
+                    } else if (tabName === 'push-fail-log') {
+                        renderPushFailLogTable();
+                    }
+                };
+            });
+        }
+
+        function bindMdmListEvents() {
+            document.querySelectorAll('.pushlog-mdm-list li').forEach(item => {
+                item.onclick = function() {
+                    document.querySelectorAll('.pushlog-mdm-list li').forEach(li => li.classList.remove('active'));
+                    this.classList.add('active');
+                    // 这里可以添加切换主数据类型时的逻辑
+                };
+            });
+        }
+
+        function bindSearchEvents() {
+            const searchInput = document.querySelector('.pushlog-search input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    const listItems = document.querySelectorAll('.pushlog-mdm-list li');
+                    
+                    listItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (searchTerm === '' || text.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        }
+
+        // 动态渲染一级和二级菜单
+        const mdmTypeList = document.getElementById('mdmTypeList');
+        const subMenuMap = {
+            customer: ['推送财务系统', '推送SCM', '推送OA系统'],
+            product: ['推送ERP', '推送MES'],
+            supplier: ['推送采购平台'],
+            employee: ['推送HR系统'],
+            org: ['推送OA系统'],
+            location: []
+        };
+        const typeIconMap = {
+            customer: '👥',
+            product: '📦',
+            supplier: '🚚',
+            employee: '👤',
+            org: '🏢',
+            location: '📍'
+        };
+        const typeNameMap = {
+            customer: '客户主数据',
+            product: '产品主数据',
+            supplier: '供应商主数据',
+            employee: '员工主数据',
+            org: '组织主数据',
+            location: '地点主数据'
+        };
+        function renderMdmMenu(activeType = 'customer') {
+            let html = '';
+            Object.keys(typeNameMap).forEach(type => {
+                html += `<li class="${type === activeType ? 'active' : ''}" data-type="${type}"><span class="mdm-icon">${typeIconMap[type]}</span>${typeNameMap[type]}</li>`;
+                if (type === activeType && subMenuMap[type].length) {
+                    html += `<ul class="pushlog-submenu">${subMenuMap[type].map(s => `<li>${s}</li>`).join('')}</ul>`;
+                }
+            });
+            mdmTypeList.innerHTML = html;
+        }
+        renderMdmMenu();
+        mdmTypeList.addEventListener('click', function(e) {
+            const li = e.target.closest('li[data-type]');
+            if (li) {
+                renderMdmMenu(li.getAttribute('data-type'));
+            }
+        });
+    </script>
+</body>
+</html>

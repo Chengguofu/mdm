@@ -1204,12 +1204,14 @@
               <span class="favorite-icon" data-menu-id="data-service-management">★</span>
             </div>
             <ul class="submenu">
-              <li class="submenu-item" data-item-id="receive-config">数据接收接口配置</li>
-              <li class="submenu-item" data-item-id="receive-log">数据接收接口日志</li>
-              <li class="submenu-item" data-item-id="push-config">数据推送接口配置</li>
-              <li class="submenu-item" data-item-id="push-log">数据推送接口日志</li>
+              <li class="submenu-item" data-content="business-system" data-url="business_system.html">业务系统</li>
+              <li class="submenu-item" data-item-id="receive-config">接收服务配置</li>
+              <li class="submenu-item" data-item-id="receive-log">接收服务日志</li>
+              <li class="submenu-item" data-item-id="push-config">推送服务配置</li>
+              <li class="submenu-item" data-item-id="push-log">推送服务日志</li>
               <li class="submenu-item" data-item-id="filter-config">筛选配置</li>
-              <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
+              <li class="submenu-item" data-content="query-service-config" data-url="data_service_sub.html">查询服务配置</li>
+              <li class="submenu-item" data-content="query-service-log" data-url="data_service_log.html">查询服务日志</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="data-analysis-management">
@@ -1248,6 +1250,8 @@
               <li class="submenu-item" data-item-id="lang">多语言管理</li>
               <li class="submenu-item" data-item-id="data-perm">数据权限</li>
               <li class="submenu-item" data-item-id="sys-setting">系统设置</li>
+              <li class="submenu-item" data-content="config-transfer" data-url="modal_config_transfer.html">配置迁移</li>
+              <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
               <li class="submenu-item"><a href="attachmant.html" target="_blank" style="color:inherit;text-decoration:none;display:block;width:100%;height:100%;">批量附件上传</a></li>
             </ul>
           </li>
@@ -1406,12 +1410,11 @@
                         <label style="display:block; margin-bottom:6px; font-weight:500;">Redirect URI</label>
                         <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., https://yourapp.com/callback">
                     </div>
+                    <div style="grid-column: 1 / span 2;">
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">鉴权方法</label>
+                        <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="请输入鉴权方法，如Basic、Bearer等">
+                    </div>
                  </div>
-                 <div style="margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px;">
-                    <label style="display:block; margin-bottom:6px; font-weight:500;">高级代码配置 (JSON)</label>
-                    <textarea id="ssoAdvancedCode" style="width:100%; box-sizing: border-box; min-height: 120px; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: 'Courier New', Courier, monospace;" placeholder="请输入JSON格式的扩展配置..."></textarea>
-                    <div id="ssoCodeValidator" style="margin-top: 5px; font-size: 13px; height: 16px;"></div>
-                </div>
             </div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:12px;">
@@ -1699,9 +1702,9 @@
         if (this.dataset.itemId === 'cockpit') showCockpitPage();
         else if (this.dataset.itemId === 'notice') showNoticeTable();
         else if (this.dataset.itemId === 'filter-config') showConditionPage();
-        else if (this.dataset.itemId === 'receive-config') showDataCollectionConfigPage();
-        else if (this.dataset.itemId === 'push-config') showDataPushConfigPage();
-        else if (this.dataset.itemId === 'push-log') showPushLogTabs();
+        else if (this.dataset.itemId === 'receive-config') document.getElementById('mainContent').innerHTML = `<iframe src="data_receive_list.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        else if (this.dataset.itemId === 'push-config') document.getElementById('mainContent').innerHTML = `<iframe src="data_send_list.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        else if (this.dataset.itemId === 'push-log') document.getElementById('mainContent').innerHTML = `<iframe src="data_send_log.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
         else if (this.dataset.itemId === 'degree') {
           window.open('degree.html', '_blank');
         }
@@ -1710,6 +1713,14 @@
         }
         else if (this.dataset.itemId === 'sys-dict') {
           document.getElementById('mainContent').innerHTML = `<iframe src="data_dict.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        }
+
+        else if (this.dataset.itemId === 'receive-log') document.getElementById('mainContent').innerHTML = `<iframe src="data_receive_log.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        else if (this.dataset.content === 'query-service-config') {
+          document.getElementById('mainContent').innerHTML = `<iframe src="data_service_sub.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+        }
+        else if (this.dataset.content === 'query-service-log') {
+          document.getElementById('mainContent').innerHTML = `<iframe src="data_service_log.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
         }
         else {
           const content = this.dataset.content;
@@ -1741,6 +1752,12 @@
             document.getElementById('mainContent').innerHTML = `<iframe src="data_compare.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else if (content === 'accounting-subject') {
             window.open('Classification.html', '_blank');
+          } else if (content === 'business-system') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="business_system.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'config-transfer') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="modal_config_transfer.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'smart-service') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="smart_service.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else {
             document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
           }
@@ -1933,14 +1950,13 @@
                                 <label style="display:block; margin-bottom:6px; font-weight:500;">Redirect URI</label>
                                 <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="e.g., https://yourapp.com/callback">
                             </div>
+                            <div style="grid-column: 1 / span 2;">
+                                <label style="display:block; margin-bottom:6px; font-weight:500;">鉴权方法</label>
+                                <input type="text" style="width:100%; box-sizing: border-box; padding:6px 10px; border:1px solid #ccc; border-radius:4px;" placeholder="请输入鉴权方法，如Basic、Bearer等">
+                            </div>
                          </div>
-                         <div style="margin-top: 16px; border-top: 1px solid #f0f0f0; padding-top: 16px;">
-                            <label style="display:block; margin-bottom:6px; font-weight:500;">高级代码配置 (JSON)</label>
-                            <textarea id="ssoAdvancedCode" style="width:100%; box-sizing: border-box; min-height: 120px; padding:8px 10px; border:1px solid #ccc; border-radius:4px; font-family: 'Courier New', Courier, monospace;" placeholder="请输入JSON格式的扩展配置..."></textarea>
-                            <div id="ssoCodeValidator" style="margin-top: 5px; font-size: 13px; height: 16px;"></div>
-                        </div>
+                    </div>
                 </div>
-              </div>
               <div style="display:flex;align-items:flex-start;gap:12px;">
                 <label style="width:100px;">权限范围：</label>
                 <input id="noticePermInput" type="text" style="flex:1;padding:6px 10px;border:1px solid #e3eaf3;border-radius:4px;background:#f8fbff;cursor:pointer;" placeholder="点击选择权限范围" readonly />
@@ -2132,172 +2148,7 @@
       }
     }
 
-    function showPushLogTabs() {
-      document.getElementById('mainContent').innerHTML = `
-        <div class="pushlog-layout" style="display:flex;gap:18px;">
-          <div class="pushlog-left" style="width:260px;min-width:200px;background:#f8fbff;border-radius:8px;padding:12px 0 12px 0;box-shadow:0 2px 8px rgba(33,118,199,0.06);overflow:auto;">
-            <div style="font-weight:600;font-size:16px;color:#2176c7;padding:0 18px 10px 18px;">主数据列表</div>
-            <ul class="pushlog-mdm-list" style="list-style:none;margin:0;padding:0 8px;">
-              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">物料代码管理</li>
-              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">物料体系管理</li>
-              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">单位类主数据</li>
-              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">数据管理</li>
-              <li style="padding:8px 12px;border-radius:6px;cursor:pointer;color:#185a99;font-size:15px;">字典表管理</li>
-            </ul>
-          </div>
-          <div class="pushlog-right" style="flex:1;min-width:0;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(33,118,199,0.06);padding:0 0 18px 0;overflow:auto;">
-            <div class="pushlog-tab-bar" style="display:flex;gap:2px;border-bottom:1.5px solid #e3eaf3;">
-              <div class="pushlog-tab active" data-tab="can-sync" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#2176c7;">可同步数据</div>
-              <div class="pushlog-tab" data-tab="wait-sync" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">待同步数据列表</div>
-              <div class="pushlog-tab" data-tab="push-log" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">推送日志</div>
-              <div class="pushlog-tab" data-tab="push-fail-log" style="padding:12px 28px;cursor:pointer;font-size:16px;font-weight:500;color:#185a99;">推送失败日志</div>
-            </div>
-            <div class="pushlog-tab-content" id="pushlogTabContent">
-              ${renderCanSyncTable()}
-            </div>
-          </div>
-        </div>
-      `;
-      bindPushLogTabEventsV2();
-    }
-    function renderCanSyncTable() {
-      return `
-        <div class="action-bar" style="margin:18px 0 10px 0;">
-          <button>查询</button>
-          <button>手动分发</button>
-          <button>添加到待同步列表</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>主键</th>
-                <th>同步标识</th>
-                <th>据点物料编码</th>
-                <th>选择物料</th>
-                <th>物料编码</th>
-                <th>物料名称</th>
-                <th>营运据点</th>
-                <th>据点生命周期</th>
-                <th>税种</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-    function renderWaitSyncTable() {
-      return `
-        <div class="action-bar" style="margin:18px 0 10px 0;">
-          <button>查询</button>
-          <button>手动分发</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>主键</th>
-                <th>同步标识</th>
-                <th>据点物料编码</th>
-                <th>选择物料</th>
-                <th>物料编码</th>
-                <th>物料名称</th>
-                <th>营运据点</th>
-                <th>据点生命周期</th>
-                <th>税种</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-    function renderPushLogTable() {
-      return `
-        <div class="action-bar" style="margin:18px 0 10px 0;">
-          <button>查询</button>
-          <button>手动分发</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>主键</th>
-                <th>同步标识</th>
-                <th>据点物料编码</th>
-                <th>选择物料</th>
-                <th>物料编码</th>
-                <th>物料名称</th>
-                <th>营运据点</th>
-                <th>据点生命周期</th>
-                <th>税种</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-    function renderPushFailLogTable() {
-      return `
-        <div class="action-bar" style="margin:18px 0 10px 0;">
-          <button>查询</button>
-          <button>手动分发</button>
-          <button>添加到待同步列表</button>
-        </div>
-        <div class="table-wrap">
-          <table class="model-table">
-            <thead>
-              <tr>
-                <th class="checkbox-cell"><input type="checkbox"></th>
-                <th>主键</th>
-                <th>同步标识</th>
-                <th>据点物料编码</th>
-                <th>选择物料</th>
-                <th>物料编码</th>
-                <th>物料名称</th>
-                <th>营运据点</th>
-                <th>据点生命周期</th>
-                <th>税种</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="checkbox-cell"><input type="checkbox"></td><td>22417205378...</td><td>未同步</td><td>100460T003A</td><td>22417205378...</td><td>100460T003A</td><td>460T-27玛丽...</td><td>ZL2</td><td>BK101</td><td>1</td></tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-    function bindPushLogTabEventsV2() {
-      document.querySelectorAll('.pushlog-tab').forEach(tab => {
-        tab.onclick = function() {
-          document.querySelectorAll('.pushlog-tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          const tabName = this.getAttribute('data-tab');
-          const tabContent = document.getElementById('pushlogTabContent');
-          if (tabName === 'can-sync') {
-            tabContent.innerHTML = renderCanSyncTable();
-          } else if (tabName === 'wait-sync') {
-            tabContent.innerHTML = renderWaitSyncTable();
-          } else if (tabName === 'push-log') {
-            tabContent.innerHTML = renderPushLogTable();
-          } else if (tabName === 'push-fail-log') {
-            tabContent.innerHTML = renderPushFailLogTable();
-          }
-        };
-      });
-    }
+
 
     // 全局变量保存快速查询显示状态
     let modelQueryShowQueryBar = false;
@@ -3597,6 +3448,8 @@
       searchModalMask.style.display = 'none';
       if(searchInput) searchInput.value = '';
     }
+
+
     searchCloseBtn.onclick = closeSearchModal;
     searchModalMask.onclick = function(e) {
       if(e.target === this) closeSearchModal();
@@ -3679,6 +3532,7 @@
         <div class="model-tab-content" id="modelTabContent"></div>
       `;
     }
+
 
 
     

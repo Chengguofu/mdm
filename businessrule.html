@@ -607,12 +607,40 @@
         if (detail && detail.assignField) {
           selected = detail.assignField;
         }
-        // 恢复"当模型属性"字段
-        html += `<div class='form-row'><div class='form-label'>当模型属性：</div><div class='form-value'><input id='assignTrigger' placeholder='如: 字段A, 字段B' value='${detail && detail.assignTrigger ? detail.assignTrigger : ''}' style='width:70%;'><span style='margin-left:8px;color:#888;'>发生变化时</span></div></div>`;
+        // "当模型属性"字段改为下拉单选
+        let triggerSelected = '';
+        if (detail && detail.assignTrigger) {
+          triggerSelected = detail.assignTrigger;
+        }
+        html += `<div class='form-row'><div class='form-label'>当模型属性：</div><div class='form-value'>`;
+        html += `<select id='assignTrigger' style='width: 75%; min-height: 32px; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 8px; font-size: 13px; background: #f9fbfd;'>`;
+        html += `<option value=''>请选择模型属性</option>`;
+        html += fieldOptions.map(opt => `<option value='${opt.code}' ${triggerSelected===opt.code?'selected':''}>${opt.name}</option>`).join('');
+        html += `</select><span style='margin-left:8px;color:#888;'>发生变化时</span></div></div>`;
         html += `<div class='form-row'><div class='form-label'>赋值于：</div><div class='form-value'>`;
-        html += `<select id='assignField' style='width: 100%; min-height: 38px; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 8px; font-size: 13px; background: #f9fbfd;'>`;
+        html += `<select id='assignField' style='width: 100%; min-height: 32px; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 8px; font-size: 13px; background: #f9fbfd;'>`;
         html += `<option value=''>请选择字段</option>`;
         html += fieldOptions.map(opt => `<option value='${opt.code}' ${selected===opt.code?'selected':''}>${opt.name}</option>`).join('');
+        html += `</select></div></div>`;
+        // 新增：值等于 下拉
+        let valueEqualSelected = '';
+        if (detail && detail.valueEqual) {
+          valueEqualSelected = detail.valueEqual;
+        }
+        html += `<div class='form-row'><div class='form-label'>值等于：</div><div class='form-value'>`;
+        html += `<select id='valueEqual' style='width: 100%; min-height: 32px; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 8px; font-size: 13px; background: #f9fbfd;'>`;
+        html += `<option value=''>请选择模型属性</option>`;
+        html += fieldOptions.map(opt => `<option value='${opt.code}' ${valueEqualSelected===opt.code?'selected':''}>${opt.name}</option>`).join('');
+        html += `</select></div></div>`;
+        // 新增：引用属性 下拉
+        let refAttrSelected = '';
+        if (detail && detail.refAttr) {
+          refAttrSelected = detail.refAttr;
+        }
+        html += `<div class='form-row'><div class='form-label'>引用属性：</div><div class='form-value'>`;
+        html += `<select id='refAttr' style='width: 100%; min-height: 32px; padding: 6px 10px; border: 1.2px solid #c0d3eb; border-radius: 8px; font-size: 13px; background: #f9fbfd;'>`;
+        html += `<option value=''>请选择模型属性</option>`;
+        html += fieldOptions.map(opt => `<option value='${opt.code}' ${refAttrSelected===opt.code?'selected':''}>${opt.name}</option>`).join('');
         html += `</select></div></div>`;
         // 赋值表达式字段
         html += `<div class='form-row'><div class='form-label'>赋值表达式：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'>
@@ -677,36 +705,34 @@
         const area = document.getElementById('uniqueCardArea');
         if (!area) return;
         area.innerHTML = cards.map((card, idx) => `
-          <div class='unique-card' style='background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(33,118,199,0.10);padding:22px 18px 18px 18px;margin-bottom:18px;border:1.5px solid #e0e6ed;font-size:13px;position:relative;width:96%;max-width:560px;margin-left:auto;margin-right:auto;'>
+          <div class='unique-card' style='background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(33,118,199,0.10);padding:22px 18px 18px 18px;margin-bottom:18px;border:1.5px solid #e0e6ed;font-size:13px;position:relative;width:86.4%;max-width:560px;margin-left:auto;margin-right:auto;'>
             <div style='position:absolute;top:4px;right:10px;display:flex;gap:4px;'>
               <button class="add-card-btn" title="新增一行" style="background:none;border:none;color:#2176c7;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:2px;height:22px;padding:0 2px;"><span style='font-size:14px;'>＋</span><span>新增</span></button>
               <button class='del-card-btn' data-idx='${idx}' title='删除' style='background:none;border:none;color:#e74c3c;font-size:12px;cursor:pointer;height:22px;padding:0 6px;'><span>删除</span></button>
             </div>
             <div style='margin-top:28px;'>
-              <div style='display:flex;gap:12px;margin-bottom:8px;'>
-                <div style='flex:1;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:64px;text-align:left;font-size:13px;'>属性</div>
-                  <input class='form-control' placeholder='属性' style='width:80%;font-size:13px;margin-left:4px;' value='${card.uniqueAttr||''}'>
-                </div>
-                <div style='flex:1;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性名称</div>
-                  <input class='form-control' placeholder='属性名称' style='width:80%;font-size:13px;margin-left:4px;' value='${card.uniqueAttrName||''}'>
-                </div>
+              <div style='margin-bottom:12px;display:flex;align-items:center;'>
+                <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性</div>
+                <input class='form-control' placeholder='属性' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueAttr||''}'>
               </div>
-              ${valType==='唯一性校验'?`<div style='display:flex;gap:12px;'>
-                <div style='flex:1;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:64px;text-align:left;font-size:13px;'>主数据</div>
-                  <input class='form-control' placeholder='主数据' style='width:80%;font-size:13px;margin-left:4px;' value='${card.uniqueMaster||''}'>
+              <div style='margin-bottom:12px;display:flex;align-items:center;'>
+                <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性名称</div>
+                <input class='form-control' placeholder='属性名称' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueAttrName||''}'>
+              </div>
+              ${valType==='唯一性校验'?`
+                <div style='margin-bottom:12px;display:flex;align-items:center;'>
+                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>主数据</div>
+                  <input class='form-control' placeholder='主数据' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMaster||''}'>
                 </div>
-                <div style='flex:1;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:64px;text-align:left;font-size:13px;'>属性</div>
-                  <input class='form-control' placeholder='属性' style='width:80%;font-size:13px;margin-left:4px;' value='${card.uniqueMasterAttr||''}'>
+                <div style='margin-bottom:12px;display:flex;align-items:center;'>
+                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性</div>
+                  <input class='form-control' placeholder='属性' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMasterAttr||''}'>
                 </div>
-                <div style='flex:1;display:flex;align-items:center;'>
+                <div style='margin-bottom:12px;display:flex;align-items:center;'>
                   <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性名称</div>
-                  <input class='form-control' placeholder='属性名称' style='width:80%;font-size:13px;margin-left:4px;' value='${card.uniqueMasterAttrName||''}'>
+                  <input class='form-control' placeholder='属性名称' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMasterAttrName||''}'>
                 </div>
-              </div>`:''}
+              `:''}
             </div>
           </div>
         `).join('');
@@ -845,6 +871,8 @@
         detail.fields = document.getElementById('fieldsInput').value;
       } else if (type === '赋值规则') {
         detail.assignField = document.getElementById('assignField').value;
+        detail.valueEqual = document.getElementById('valueEqual').value;
+        detail.refAttr = document.getElementById('refAttr').value;
         detail.assignExpr = document.getElementById('assignExpr').value;
         detail.assignTrigger = document.getElementById('assignTrigger').value;
       } else if (type === '数据联动' || type === '数据联动规则') {

@@ -1100,6 +1100,7 @@
             </div>
             <ul class="submenu">
               <li class="submenu-item" data-content="model-query" data-url="model_query.html">数据模型管理</li>
+              <li class="submenu-item" data-content="config-transfer" data-url="modal_config_transfer.html">配置迁移</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="model-management">
@@ -1212,6 +1213,7 @@
               <li class="submenu-item" data-item-id="filter-config">筛选配置</li>
               <li class="submenu-item" data-content="query-service-config" data-url="data_service_sub.html">查询服务配置</li>
               <li class="submenu-item" data-content="query-service-log" data-url="data_service_log.html">查询服务日志</li>
+              <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
             </ul>
           </li>
           <li class="menu-item" data-menu-id="data-analysis-management">
@@ -1240,19 +1242,8 @@
             <ul class="submenu">
               <li class="submenu-item" data-item-id="sys-dict">系统字典</li>
               <li class="submenu-item" data-content="data-standard" data-url="data_standard.html">数据元标准</li>
-              <li class="submenu-item" data-item-id="account">账号管理</li>
-              <li class="submenu-item" data-item-id="role">角色管理</li>
-              <li class="submenu-item" data-item-id="menu">系统菜单管理</li>
               <li class="submenu-item" data-item-id="notice">通知公告管理</li>
-              <li class="submenu-item" data-item-id="job">任务调度中心</li>
-              <li class="submenu-item" data-item-id="monitor">系统监控中心</li>
-              <li class="submenu-item" data-item-id="log">系统日志中心</li>
-              <li class="submenu-item" data-item-id="lang">多语言管理</li>
-              <li class="submenu-item" data-item-id="data-perm">数据权限</li>
-              <li class="submenu-item" data-item-id="sys-setting">系统设置</li>
-              <li class="submenu-item" data-content="config-transfer" data-url="modal_config_transfer.html">配置迁移</li>
-              <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
-              <li class="submenu-item"><a href="attachmant.html" target="_blank" style="color:inherit;text-decoration:none;display:block;width:100%;height:100%;">批量附件上传</a></li>
+              <li class="submenu-item" data-content="attachmant" data-url="attachmant.html">批量附件上传</li>
             </ul>
           </li>
         </ul>
@@ -1758,6 +1749,8 @@
             document.getElementById('mainContent').innerHTML = `<iframe src="modal_config_transfer.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else if (content === 'smart-service') {
             document.getElementById('mainContent').innerHTML = `<iframe src="smart_service.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          } else if (content === 'attachmant') {
+            document.getElementById('mainContent').innerHTML = `<iframe src="attachmant.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
           } else {
             document.getElementById('mainContent').innerHTML = document.getElementById('homePage').innerHTML;
           }
@@ -3429,6 +3422,15 @@
     function showDataPushConfigPage() {
       document.getElementById('mainContent').innerHTML = `
         <iframe src="data_send.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>
+      `;
+    }
+
+
+
+    // 系统字典页面
+    function showSystemDictPage() {
+      document.getElementById('mainContent').innerHTML = `
+        <iframe src="data_dict.html" style="width:100%; height:calc(100vh - 110px); border:none; border-radius:12px; box-shadow:0 2px 8px rgba(33,118,199,0.10);"></iframe>
       `;
     }
 

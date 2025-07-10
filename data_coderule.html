@@ -58,14 +58,31 @@
     .code-segments { margin-top: 20px; }
     .segment-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid #e0e6ed; border-radius: 6px; margin-bottom: 12px; }
     .segment-type { width: 120px; flex-shrink: 0; }
-    .segment-type select { width: 100%; padding: 6px 8px; border: 1px solid #c0d3eb; border-radius: 4px; font-size: 13px; }
+    .segment-type select {
+      width: 100%;
+      padding: 0 8px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #c0d3eb;
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+    .segment-config input,
+    .segment-config select {
+      height: 30px;
+      padding: 4px 8px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #c0d3eb;
+      box-sizing: border-box;
+    }
     .segment-config { flex: 1; display: flex; gap: 8px; align-items: center; min-height: 32px; }
-    .segment-config input, .segment-config select { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 12px; }
+    .segment-config input, .segment-config select { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 12px; height: 30px; }
     .segment-config label { display: flex; align-items: center; gap: 4px; font-size: 12px; }
     .segment-separator { display:none; }
     .separator-input { padding: 4px 8px; border: 1px solid #c0d3eb; border-radius: 3px; font-size: 12px; text-align: center; width:90px; margin-left:8px; }
     .segment-actions { width: 60px; flex-shrink: 0; }
-    .btn-small { padding: 4px 10px; font-size: 11px; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
+    .btn-small { padding: 4px 10px; font-size: 13px; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
     .btn-add { background: #4db6ac; color: #fff; }
     .btn-add:hover { background: #399488; }
     .btn-remove { background: #e74c3c; color: #fff; }
@@ -91,6 +108,30 @@
     .serial-group input.serial-step { width: 35px; }
     .serial-group input.serial-start, .serial-group input.serial-end { width: 70px; }
     .serial-group .serial-pad-label { margin:0;font-size:13px;display:flex;align-items:center;gap:2px; }
+    /* 缩小流水码输入区域gap */
+    .serial-group-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 0 !important;
+      flex-wrap: nowrap;
+      margin-bottom: 5px;
+    }
+    /* 流水码专用输入框样式 */
+    .serial-group input[type="number"],
+    .serial-group input[type="text"] {
+      height: 29px;
+      width: calc(100% + 2px) !important;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    /* 重置周期单选平铺 */
+    .serial-reset-date-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
@@ -298,18 +339,11 @@
     function toggleCodeConfig() {
       const codeType = document.getElementById('editType').value;
       const autoConfig = document.getElementById('autoCodeConfig');
-      const manualConfig = document.getElementById('manualCodeConfig');
-      
-      if (codeType === '自动编码') {
-        autoConfig.classList.remove('hidden');
-        manualConfig.classList.add('hidden');
-        // 清空编码段，因为类型改变了
-        document.getElementById('segmentsContainer').innerHTML = '';
-        document.getElementById('codePreview').textContent = '请配置编码规则';
-      } else {
-        autoConfig.classList.add('hidden');
-        manualConfig.classList.remove('hidden');
-      }
+      // 无论自动还是手动编码，都显示编码段配置
+      autoConfig.classList.remove('hidden');
+      // 清空编码段，因为类型改变了
+      document.getElementById('segmentsContainer').innerHTML = '';
+      document.getElementById('codePreview').textContent = '请配置编码规则';
     }
 
     function addSegment(event) {
@@ -330,7 +364,13 @@
           <option value="引用码">引用码</option>
         `;
       } else {
-        typeOptions = `<option value="手工码">手工码</option>`;
+        typeOptions = `
+          <option value="固定码">固定码</option>
+          <option value="日期码">日期码</option>
+          <option value="字段码">字段码</option>
+          <option value="引用码">引用码</option>
+          <option value="手工码">手工码</option>
+        `;
       }
 
       // 结构：主字段+分隔符+删除按钮同行
@@ -396,44 +436,44 @@
             break;
           case '流水码':
             configHtml = `
-              <div style='display:flex;flex-direction:column;gap:4px;max-width:900px;'>
-                <!-- 第一行：主字段区，所有字段上下结构，横向排列 -->
-                <div style='display:flex;align-items:flex-end;gap:4px;flex-wrap:nowrap;'>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">最大长度</label>
-                    <input type="number" class="serial-length" min="1" max="10" value="4" oninput="updateCodePreview()" style="width:58px;">
-                  </div>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">补零</label>
-                    <input type="checkbox" class="serial-pad" checked onchange="updateCodePreview()" style="width:13px;height:13px;">
-                  </div>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">步长</label>
-                    <input type="number" class="serial-step" value="1" min="1" oninput="updateCodePreview()" style="width:35px;">
-                  </div>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">起始值</label>
-                    <input type="number" class="serial-start" value="1" min="0" oninput="updateCodePreview()" style="width:40px;">
-                  </div>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">终止值</label>
-                    <input type="number" class="serial-end" value="9999" min="0" oninput="updateCodePreview()" style="width:58px;">
-                  </div>
-                  <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
-                    <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">分隔符</label>
-                    <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:40px;">
-                  </div>
+              <div class="serial-group-row" style="max-width:900px;">
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">最大长度</label>
+                  <input type="number" class="serial-length" min="1" max="10" value="4" oninput="updateCodePreview()" style="width:58px;">
                 </div>
-                <!-- 第二行：重置类型、重置二级项 -->
-                <div style='display:flex;align-items:center;gap:8px;flex-wrap:nowrap;justify-content:flex-start;'>
-                  <label style='white-space:nowrap;'>重置类型</label>
-                  <select class="serial-reset-type" style="width:90px;" onchange="updateSerialResetConfig(this, ${segmentId})">
-                    <option value="none">不重置</option>
-                    <option value="date">按日期重置</option>
-                    <option value="field">按字段值重置</option>
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:90px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">补零方式</label>
+                  <select class="serial-pad" onchange="updateCodePreview()" style="width:80px;">
+                    <option value="none">不补零</option>
+                    <option value="prefix">前面补零</option>
+                    <option value="suffix">后面补零</option>
                   </select>
-                  <div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>
                 </div>
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">步长</label>
+                  <input type="number" class="serial-step" value="1" min="1" oninput="updateCodePreview()" style="width:35px;">
+                </div>
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">起始值</label>
+                  <input type="number" class="serial-start" value="1" min="0" oninput="updateCodePreview()" style="width:40px;">
+                </div>
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">终止值</label>
+                  <input type="number" class="serial-end" value="9999" min="0" oninput="updateCodePreview()" style="width:58px;">
+                </div>
+                <div class="serial-group" style="display:flex;flex-direction:column;align-items:flex-start;min-width:70px;">
+                  <label style="margin-bottom:2px;font-size:13px;color:#2176c7;">分隔符</label>
+                  <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:40px;">
+                </div>
+              </div>
+              <div style='display:flex;align-items:center;gap:8px;flex-wrap:nowrap;justify-content:flex-start;'>
+                <label style='white-space:nowrap;'>重置类型</label>
+                <select class="serial-reset-type" style="width:90px;" onchange="updateSerialResetConfig(this, ${segmentId})">
+                  <option value="none">不重置</option>
+                  <option value="date">按日期重置</option>
+                  <option value="field">按字段值重置</option>
+                </select>
+                <div id='serial-reset-extra-${segmentId}'></div>
               </div>
             `;
             break;
@@ -444,7 +484,48 @@
         }
       } else {
         // 手动编码模式
-        configHtml = `<input type="number" class="manual-length" placeholder="最大长度" min="1" max="20" style="width:120px;" oninput="updateCodePreview()">`;
+        switch(type) {
+          case '固定码':
+            configHtml = `<input type="text" class="fixed-value" placeholder="固定字符" style="width:120px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">`;
+            break;
+          case '日期码':
+            configHtml = `
+              <select class="date-field" style="width:120px;" onchange="updateCodePreview()">
+                <option value="create_date">创建日期</option>
+                <option value="update_date">更新日期</option>
+              </select>
+              <input type="text" class="date-format" placeholder="日期格式" value="YYYYMMDD" style="width:100px;" oninput="updateCodePreview()">
+              <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">
+            `;
+            break;
+          case '字段码':
+            configHtml = `
+              <select class="field-name" style="width:120px;" onchange="updateCodePreview()">
+                <option value="">模型属性</option>
+                <option value="attr1">属性1</option>
+                <option value="attr2">属性2</option>
+                <option value="attr3">属性3</option>
+              </select>
+              <select class="ref-attr" style="width:120px;margin-left:8px;" onchange="updateCodePreview()">
+                <option value="">引用属性</option>
+                <option value="ref1">引用1</option>
+                <option value="ref2">引用2</option>
+                <option value="ref3">引用3</option>
+              </select>
+              <input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">
+            `;
+            break;
+          case '引用码':
+            configHtml = `<input type="text" class="parent-field" placeholder="父级字段" style="width:120px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">`;
+            break;
+          case '手工码':
+            configHtml = `<input type="number" class="manual-min-length" placeholder="最小长度" min="1" max="50" style="width:80px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="number" class="manual-max-length" placeholder="最大长度" min="1" max="50" style="width:80px;margin-left:8px;" oninput="updateCodePreview()">`;
+            configHtml += `<input type="text" class="separator-input" placeholder="分隔符" maxlength="3" oninput="updateCodePreview()" style="width:64px;margin-left:8px;">`;
+            break;
+        }
       }
 
       configDiv.innerHTML = configHtml;
@@ -473,7 +554,14 @@
           case '流水码':
             const length = segment.querySelector('.serial-length').value || 4;
             const start = segment.querySelector('.serial-start') ? segment.querySelector('.serial-start').value : 1;
-            segmentValue = String(start).padStart(length, '0');
+            const pad = segment.querySelector('.serial-pad').value || 'none';
+            let paddedValue = String(start).padStart(length, '0');
+            if (pad === 'prefix') {
+              paddedValue = paddedValue.padStart(length, '0');
+            } else if (pad === 'suffix') {
+              paddedValue = paddedValue.padEnd(length, '0');
+            }
+            segmentValue = paddedValue;
             break;
           case '引用码':
             segmentValue = segment.querySelector('.parent-field').value || 'REF';
@@ -526,7 +614,7 @@
             config.ref = segment.querySelector('.ref-attr').value;
           } else if (type === '流水码') {
             config.maxLength = parseInt(segment.querySelector('.serial-length').value);
-            config.padZero = segment.querySelector('.serial-pad').checked;
+            config.padZero = segment.querySelector('.serial-pad').value === 'prefix' || segment.querySelector('.serial-pad').value === 'suffix';
             config.step = parseInt(segment.querySelector('.serial-step').value);
             config.start = parseInt(segment.querySelector('.serial-start').value);
             config.end = parseInt(segment.querySelector('.serial-end').value);
@@ -604,7 +692,7 @@
               configDiv.querySelector('.ref-attr').value = segment.config.ref || '';
             } else if (segment.type === '流水码') {
               configDiv.querySelector('.serial-length').value = segment.config.maxLength;
-              configDiv.querySelector('.serial-pad').checked = segment.config.padZero;
+              configDiv.querySelector('.serial-pad').value = segment.config.padZero ? 'prefix' : 'none';
               configDiv.querySelector('.serial-step').value = segment.config.step;
               if(configDiv.querySelector('.serial-start')) configDiv.querySelector('.serial-start').value = segment.config.start || 1;
               if(configDiv.querySelector('.serial-end')) configDiv.querySelector('.serial-end').value = segment.config.end || 9999;
@@ -703,7 +791,20 @@
       const extraDiv = document.getElementById('serial-reset-extra-' + segmentId);
       if(val === 'date') {
         extraDiv.style.display = '';
-        extraDiv.innerHTML = `<label>重置周期</label><select class='serial-reset-date' style='width:90px;'><option value='year'>年</option><option value='quarter'>季度</option><option value='month'>月</option></select>`;
+        extraDiv.innerHTML = `
+          <div style='display:flex;align-items:center;gap:16px;'>
+            <select class='serial-reset-date-field' style='width:110px;'>
+              <option value='create_date'>创建日期</option>
+              <option value='update_date'>更新时间</option>
+            </select>
+            <span class='serial-reset-date-group'>
+              <label style='margin:0;'><input type='radio' name='serial-reset-date-${segmentId}' class='serial-reset-date' value='year' checked>年</label>
+              <label style='margin:0;'><input type='radio' name='serial-reset-date-${segmentId}' class='serial-reset-date' value='quarter'>季度</label>
+              <label style='margin:0;'><input type='radio' name='serial-reset-date-${segmentId}' class='serial-reset-date' value='month'>月</label>
+              <label style='margin:0;'><input type='radio' name='serial-reset-date-${segmentId}' class='serial-reset-date' value='day'>日</label>
+            </span>
+          </div>
+        `;
       } else if(val === 'field') {
         extraDiv.style.display = '';
         extraDiv.innerHTML = `<div style='display:flex;align-items:center;gap:4px;'><label style='margin-right:4px;'>字段</label><select class='serial-reset-field' style='width:90px;'><option value='field1'>字段1</option><option value='field2'>字段2</option></select></div>`;

@@ -11,18 +11,18 @@
     }
     .modal-window {
       background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); 
-      width:972px; /* 原1080px缩小10% */
-      max-width:98vw; 
-      min-height:444px; /* 原467px再缩小5% */
-      height:500px;    /* 原526px再缩小5% */
-      max-height:108vh; /* 原90vh扩大20% */
+      width:1283px; /* 原1166px再扩大10% */
+      max-width:129.4vw; /* 原117.6vw再扩大10% */
+      min-height:586px; /* 原532.8px再扩大10% */
+      height:660px;    /* 原600px再扩大10% */
+      max-height:129.4vh; /* 原117.6vh再扩大10% */
       overflow:hidden; 
       position:relative; 
       animation:popin .25s;
       display: flex;
       flex-direction: column;
       overflow-y: auto !important;
-      max-height: 98vh !important;
+      max-height: 129.4vh !important;
     }
     @keyframes popin { from{transform:scale(0.95);opacity:0;} to{transform:scale(1);opacity:1;} }
     .modal-header {
@@ -368,6 +368,7 @@
       box-sizing: border-box;
       overflow: hidden;
       padding-bottom: 110px !important;
+      margin-top: 36px;
     }
     #tab-base .form-value .form-control,
     #tab-base .form-value input[type="text"],
@@ -568,12 +569,12 @@
       <span class="modal-title">模型详情</span>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
-    <div class="modal-steps" style="display:flex;align-items:center;justify-content:space-between;margin:24px 32px 0 32px;">
+    <div class="modal-steps" style="display:flex;align-items:center;justify-content:space-between;margin:26px 32px 0 32px;">
       <div class="modal-step" data-step="base"><span class="step-index">1</span> 基本配置</div>
       <div class="modal-step" data-step="attr"><span class="step-index">2</span> 属性配置</div>
       <div class="modal-step" data-step="rule"><span class="step-index">3</span> 业务规则</div>
       <div class="modal-step" data-step="code"><span class="step-index">4</span> 编码规则</div>
-      <div class="modal-step" data-step="layout"><span class="step-index">5</span> 发布配置</div>
+      <div class="modal-step" data-step="layout"><span class="step-index">5</span> 布局配置</div>
     </div>
     <div class="modal-content" id="tab-base">
       <div class="section-collapse-title" id="baseInfoCollapseBtn">
@@ -708,16 +709,31 @@
       </div>
     </div>
     <div class="modal-content" id="tab-layout" style="display:none;">
-      <div style="text-align: center; padding: 60px 20px; color: #666;">
-        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">🚀</div>
-        <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">发布配置管理</div>
-        <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
-          详细功能请参考发布配置管理页面<br>
-          您可以在这里配置和管理模型的发布设置
+      <div style="display: flex; justify-content: center; gap: 48px; align-items: stretch; padding: 60px 0;">
+        <!-- 原有布局配置卡片 -->
+        <div style="flex:1; min-width:320px; max-width:420px; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(33,118,199,0.10); display:flex; flex-direction:column; align-items:center; padding:36px 24px;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">🚀</div>
+          <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">布局配置管理</div>
+          <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
+            详细功能请参考布局配置管理页面<br>
+            您可以在这里配置和管理模型的布局设置
+          </div>
+          <a href="javascript:void(0)" onclick="openPageSetup()" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
+            前往布局配置管理
+          </a>
         </div>
-        <a href="javascript:void(0)" onclick="openPageSetup()" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
-          前往发布配置管理
-        </a>
+        <!-- 新增引用分类布局配置卡片 -->
+        <div style="flex:1; min-width:320px; max-width:420px; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(33,118,199,0.10); display:flex; flex-direction:column; align-items:center; padding:36px 24px;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;">🌳</div>
+          <div style="font-size: 18px; margin-bottom: 12px; color: #185a99; font-weight: 600;">引用分类布局配置</div>
+          <div style="font-size: 15px; margin-bottom: 24px; color: #666; line-height: 1.6;">
+            适用于引用分类模型的树形页面布局<br>
+            您可以在这里配置和管理引用分类模型的页面布局
+          </div>
+          <a href="javascript:void(0)" onclick="window.open('page_setup_tree.html','_blank')" style="display: inline-block; background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 12px 24px; text-decoration: none; transition: background 0.18s; box-shadow: 0 2px 8px rgba(33,118,199,0.08);">
+            前往引用分类布局配置
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -997,12 +1013,10 @@ function renderAttrDetailBox() {
           <div class='form-label'>取值方式</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>自动生成</option><option>手动输入</option></select></div></div>
         <div class='form-row'><div class='form-label'>字段类型</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字符串</option><option>数字</option><option>日期</option></select></div>
           <div class='form-label'>长度 (byte)</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
-        <div class='form-row'><div class='form-label'>是否敏感信息</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div>
-          <div class='form-label'>敏感起始位置</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
-        <div class='form-row'><div class='form-label'>敏感终止位置</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
-          <div class='form-label'>是否必填</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div></div>
-        <div class='form-row'><div class='form-label'>小数位长度</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
-          <div class='form-label'>默认值</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>是否必填</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div>
+          <div class='form-label'>小数位长度</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div></div>
+        <div class='form-row'><div class='form-label'>默认值</div><div class='form-value'><input class='form-control' ${isCode?'readonly':''}></div>
+          <div class='form-label'>字典表引用</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>无</option><option>引用A</option></select></div></div>
         <div class='form-row'><div class='form-label'>字典表引用</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>无</option><option>引用A</option></select></div>
           <div class='form-label'>字典表引用字段</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>字段1</option><option>字段2</option></select></div></div>
         <div class='form-row'><div class='form-label'>是否显示字典表代码</div><div class='form-value'><select class='form-control' ${isCode?'disabled':''}><option>是</option><option>否</option></select></div>

@@ -230,6 +230,11 @@
         <option value="YEAR">YEAR(日期)</option>
         <option value="MONTH">MONTH(日期)</option>
         <option value="DAY">DAY(日期)</option>
+        <option value="MIN">MIN(字段)</option>
+        <option value="MAX">MAX(字段)</option>
+        <option value="SUM">SUM(字段)</option>
+        <option value="AVG">AVG(字段)</option>
+        <option value="COUNT">COUNT(字段)</option>
       </select>
       <input id="constInput" placeholder="常量/值" style="width:120px;">
     </div>
@@ -276,7 +281,7 @@
         refAttrWrap.style.display = 'none';
         refAttrSelect.innerHTML = '';
         if (fieldSelect.value) {
-          exprInput.value += fieldSelect.value;
+          exprInput.value += '{' + fieldSelect.value + '}';
           fieldSelect.value = '';
         }
       }
@@ -289,16 +294,50 @@
     };
     funcSelect.onchange = function() {
       let part = '';
-      if (funcSelect.value === 'LEN' || funcSelect.value === 'TRIM' || funcSelect.value === 'UPPER' || funcSelect.value === 'LOWER') {
-        part = funcSelect.value + '()';
-      } else if (funcSelect.value === 'ISNULL') {
-        part = 'ISNULL(,)';
-      } else if (funcSelect.value === 'SUBSTR') {
-        part = 'SUBSTR(,,)';
-      } else if (funcSelect.value === 'REPLACE') {
-        part = 'REPLACE(,,)';
-      } else if (funcSelect.value === 'CONCAT') {
-        part = 'CONCAT(,)';
+      switch(funcSelect.value) {
+        case 'LEN':
+        case 'TRIM':
+        case 'UPPER':
+        case 'LOWER':
+        case 'MIN':
+        case 'MAX':
+        case 'SUM':
+        case 'AVG':
+        case 'COUNT':
+          part = funcSelect.value + '()';
+          break;
+        case 'ISNULL':
+          part = 'ISNULL(,)';
+          break;
+        case 'SUBSTR':
+          part = 'SUBSTR(,,)';
+          break;
+        case 'REPLACE':
+          part = 'REPLACE(,,)';
+          break;
+        case 'CONCAT':
+          part = 'CONCAT(,)';
+          break;
+        case 'IF':
+          part = 'IF(,)';
+          break;
+        case 'DATE_FORMAT':
+          part = 'DATE_FORMAT(,)';
+          break;
+        case 'DATEDIFF':
+          part = 'DATEDIFF(,)';
+          break;
+        case 'DATE_ADD':
+          part = 'DATE_ADD(,)';
+          break;
+        case 'DATE_SUB':
+          part = 'DATE_SUB(,)';
+          break;
+        case 'YEAR':
+        case 'MONTH':
+        case 'DAY':
+          part = funcSelect.value + '()';
+          break;
       }
       if (part) {
         exprInput.value += part;
@@ -314,7 +353,7 @@
     refAttrSelect.onchange = function() {
       if (refAttrSelect.value) {
         // 拼接 city.属性
-        exprInput.value += fieldSelect.value + '.' + refAttrSelect.value;
+        exprInput.value += '{' + fieldSelect.value + '.' + refAttrSelect.value + '}';
         refAttrSelect.value = '';
         refAttrWrap.style.display = 'none';
         fieldSelect.value = '';

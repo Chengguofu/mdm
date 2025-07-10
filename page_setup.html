@@ -424,6 +424,17 @@
         html += smartServices.map(s=>`<option value='${s.id}' ${smartFillService===s.id?'selected':''}>${s.name}</option>`).join('');
         html += `</select>`;
         html += `<button class='btn-modern' style='margin-left:4px;' onclick='openSmartMappingDrawer()'>数据映射</button></div>`;
+        // 新增显示差异提示选项
+        html += `<div class='field-config-row'>
+          <label>显示差异提示</label>
+          <input type='checkbox' id='showDiffTip' onchange='setShowDiffTip(this.checked)' style='width:18px;height:18px;vertical-align:middle;margin-right:6px;'>
+          <span id='diffTipHelpIcon' style='color:#888;font-size:12px;margin-left:4px;cursor:pointer;display:inline-block;vertical-align:middle;'>
+            <svg width='16' height='16' style='vertical-align:middle;margin-right:0px;' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='#eaf3ff' stroke='#2176c7' stroke-width='1.5'/><text x='8' y='12' text-anchor='middle' font-size='11' fill='#2176c7'>?</text></svg>
+          </span>
+          <span id='diffTipHelpPopup' style='display:none;position:absolute;z-index:9999;background:#fff;border:1.5px solid #2176c7;border-radius:6px;padding:10px 16px;font-size:13px;color:#185a99;box-shadow:0 2px 8px rgba(33,118,199,0.10);margin-left:8px;min-width:260px;max-width:340px;'>
+            开启，弹出一个智能服务和当前用户填写的值的差异，用户可根据比较结果选择是否回填<br>关闭，则不显示比较结果，直接更新表单数据
+          </span>
+        </div>`;
       }
       return html;
     }
@@ -1180,27 +1191,27 @@
       }
       const currentField = conf.fields[fieldIndex];
       const colSpan = currentField.colSpan || 1;
-      if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', format: '' };
+      if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', isSensitive: false, sensitiveStart: 0, sensitiveEnd: 0, onlyWrite: false, mustRead: false };
       const props = fieldProps[field.key];
-      let formatInput = '';
-      if(field.type === '日期' || field.type === 'date') {
-        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 yyyy-MM-dd' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
-      } else {
-        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 #,##0.00' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
-      }
       const rowStart = Math.floor(fieldIndex / conf.cols) * conf.cols;
       const maxColSpan = conf.cols - (fieldIndex - rowStart);
       html += `
         <div class='field-config-row'><label>字段标题</label><input type='text' class='input-modern' value='${field.label}' disabled style='background:#f4f8fb;'></div>
         <div class='field-config-row'><label>显示标题</label><input type='checkbox' class='checkbox-modern' ${props.showLabel?'checked':''} onchange="setDetailFieldProp('${field.key}','showLabel',this.checked)"></div>
         <div class='field-config-row'><label>字段宽度</label><input type='number' class='input-modern' min='40' max='400' value='${props.width||120}' onchange="setDetailFieldProp('${field.key}','width',this.value)"></div>
+        <div class='field-config-row'><label>只填</label><input type='checkbox' class='checkbox-modern' ${props.onlyWrite?'checked':''} onchange="setDetailFieldProp('${field.key}','onlyWrite',this.checked)"></div>
+        <div class='field-config-row'><label>必读</label><input type='checkbox' class='checkbox-modern' ${props.mustRead?'checked':''} onchange="setDetailFieldProp('${field.key}','mustRead',this.checked)"></div>
         <div class='field-config-row'><label>合并栏数</label><select class='modern-select' onchange="updateFieldColSpan(${fieldIndex}, this.value)">
           ${Array.from({length: maxColSpan}, (_, i) => i + 1).map(num => 
             `<option value='${num}' ${colSpan === num ? 'selected' : ''}>${num}列</option>`
           ).join('')}
         </select></div>
         <div class='field-config-row'><label>提示文字</label><input type='text' class='input-modern' value='${props.placeholder||''}' placeholder='请输入提示文字' onchange="setDetailFieldProp('${field.key}','placeholder',this.value)"></div>
-        ${formatInput}
+        <div class='field-config-row'><label>是否敏感信息</label><input type='checkbox' class='checkbox-modern' ${props.isSensitive?'checked':''} onchange="toggleSensitiveConfig('${field.key}', this.checked)"></div>
+        ${props.isSensitive ? `
+        <div class='field-config-row'><label>敏感起始位置</label><input type='number' class='input-modern' min='0' value='${props.sensitiveStart||0}' onchange="setDetailFieldProp('${field.key}','sensitiveStart',this.value)"></div>
+        <div class='field-config-row'><label>敏感终止位置</label><input type='number' class='input-modern' min='0' value='${props.sensitiveEnd||0}' onchange="setDetailFieldProp('${field.key}','sensitiveEnd',this.value)"></div>
+        ` : ''}
       `;
       html += '</div>';
       // 智能服务分组
@@ -1209,13 +1220,47 @@
       </div>`;
       html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>${renderSmartServicePropsHtml()}</div>`;
       propsDiv.innerHTML = html;
+      // 智能填写差异提示帮助气泡交互
+      setTimeout(function(){
+        var icon = document.getElementById('diffTipHelpIcon');
+        var popup = document.getElementById('diffTipHelpPopup');
+        if(icon && popup) {
+          icon.onclick = function(e) {
+            e.stopPropagation();
+            if(popup.style.display==='none'||popup.style.display==='') {
+              popup.style.display='inline-block';
+              // 点击页面其他地方关闭
+              document.addEventListener('click', hideDiffTipHelp, { once: true });
+            } else {
+              popup.style.display='none';
+            }
+          };
+          function hideDiffTipHelp() { popup.style.display='none'; }
+          // 防止点击气泡本身关闭
+          popup.onclick = function(e){ e.stopPropagation(); };
+        }
+      }, 0);
     }
     function setDetailFieldProp(key, prop, value) {
-      if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', format: '' };
+      if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', isSensitive: false, sensitiveStart: 0, sensitiveEnd: 0, onlyWrite: false, mustRead: false };
       if (prop === 'showLabel') fieldProps[key][prop] = value;
       else if (prop === 'width') fieldProps[key][prop] = +value;
+      else if (prop === 'isSensitive') fieldProps[key][prop] = value;
+      else if (prop === 'sensitiveStart') fieldProps[key][prop] = +value;
+      else if (prop === 'sensitiveEnd') fieldProps[key][prop] = +value;
+      else if (prop === 'onlyWrite') fieldProps[key][prop] = value;
+      else if (prop === 'mustRead') fieldProps[key][prop] = value;
       else fieldProps[key][prop] = value;
       renderDetailCanvasFieldProps();
+    }
+    
+    function toggleSensitiveConfig(key, isSensitive) {
+      setDetailFieldProp(key, 'isSensitive', isSensitive);
+      // 如果取消敏感信息，清空相关值
+      if (!isSensitive) {
+        setDetailFieldProp(key, 'sensitiveStart', 0);
+        setDetailFieldProp(key, 'sensitiveEnd', 0);
+      }
     }
     
     function updateFieldColSpan(fieldIndex, colSpan) {
@@ -1271,6 +1316,9 @@
     renderDetailCanvasTabs();
     renderSmartServiceProps(); // 初始化时也刷新
     renderDetailCanvasFieldProps();
+    // 新增全局变量和方法
+    let showDiffTip = false;
+    function setShowDiffTip(val) { showDiffTip = val; }
   </script>
 </body>
 <!-- 智能数据映射抽屉结构 -->

@@ -155,6 +155,14 @@
         <svg viewBox="0 0 1024 1024" fill="currentColor"><path d="M944.5 880.3L739.8 675.6c58.5-70.7 93.8-161.1 93.8-259.6C833.6 186.2 647.4 0 416.8 0S0 186.2 0 416.8s186.2 416.8 416.8 416.8c98.5 0 188.9-35.3 259.6-93.8l204.7 204.7c10.6 10.6 27.8 10.6 38.4 0l25.1-25.1c10.6-10.6 10.6-27.8 0-38.4zM416.8 736c-176.3 0-319.2-142.9-319.2-319.2S240.5 97.6 416.8 97.6 736 240.5 736 416.8 593.1 736 416.8 736z"></path></svg>
       </button>
     </div>
+    <!-- 新增编码字段 -->
+    <div style="margin-top:32px;display:flex;align-items:center;justify-content:center;gap:12px;">
+      <label style="font-size:16px;font-weight:500;color:#2176c7;margin-right:8px;">编码：</label>
+      <input id="codePrefix" type="text" value="20000130" readonly style="width:110px;height:38px;border:1.5px solid #d9d9d9;border-radius:8px;background:#f5f7fa;color:#888;font-size:15px;padding:0 10px;outline:none;" />
+      <span style="font-size:18px;color:#888;">-</span>
+      <input id="codeSuffix" type="text" placeholder="请输入后缀" style="width:120px;height:38px;border:1.5px solid #d9d9d9;border-radius:8px;background:#fff;font-size:15px;padding:0 10px;outline:none;" />
+    </div>
+    <div style="margin-top:10px;font-size:13px;color:#888;">完整编码：<span id="fullCode" style="color:#2176c7;font-weight:600;">20000130-</span></div>
   </div>
 
   <!-- Modal -->
@@ -317,6 +325,16 @@
     document.addEventListener('mouseup', () => {
         isDragging = false;
     });
+
+    // 编码字段联动逻辑
+    const codePrefix = document.getElementById('codePrefix');
+    const codeSuffix = document.getElementById('codeSuffix');
+    const fullCode = document.getElementById('fullCode');
+    function updateFullCode() {
+      fullCode.textContent = codePrefix.value + '-' + (codeSuffix.value || '');
+    }
+    codeSuffix.addEventListener('input', updateFullCode);
+    // 可根据需要将codePrefix.value动态赋值
 
   </script>
 </body>

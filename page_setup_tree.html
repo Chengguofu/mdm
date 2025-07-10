@@ -148,6 +148,38 @@
       width:18px;height:18px;accent-color:#2176c7;vertical-align:middle;
     }
     #previewModal, #previewDrawer { z-index: 9999 !important; }
+    /* 折叠/展开样式 */
+    .section-collapse-title,
+    .section-collapse-title * {
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: #2176c7 !important;
+    }
+    .section-collapse-title {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 8px;
+      margin-top: 10px;
+    }
+    .section-collapse-title svg {
+      margin-right: 8px;
+      transition: transform 0.2s;
+    }
+    .section-collapse-title.collapsed svg {
+      transform: rotate(-90deg);
+    }
+    .section-content {
+      transition: max-height 0.2s, opacity 0.2s;
+      overflow: hidden;
+    }
+    .section-content.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+      padding: 0 !important;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -898,30 +930,79 @@
     // 渲染属性配置
     function renderDetailCanvasFieldProps() {
       const propsDiv = document.getElementById('canvasFieldProps');
-      if(!detailSelectedCanvasField) { propsDiv.innerHTML = '<div style="color:#aaa;">请选择画布中的字段</div>'; return; }
-      const field = [...detailBasicFields, ...detailFinanceFields, ...detailHRFields].find(f=>f.key===detailSelectedCanvasField);
-      if (!field) { propsDiv.innerHTML = '<div style="color:#aaa;">字段不存在</div>'; return; }
-      if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', format: '' };
-      const props = fieldProps[field.key];
-      let formatInput = '';
-      if(field.type === '日期' || field.type === 'date') {
-        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 yyyy-MM-dd' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
-      } else {
-        formatInput = `<div class='field-config-row'><label>显示格式</label><input type='text' class='input-modern' value='${props.format||''}' placeholder='如 #,##0.00' onchange="setDetailFieldProp('${field.key}','format',this.value)"></div>`;
+      // 展开收缩状态（全局变量）
+      if (window.__attrCollapseState === undefined) {
+        window.__attrCollapseState = { base: true, smart: true };
       }
-      propsDiv.innerHTML = `
+      const collapseState = window.__attrCollapseState;
+      
+      if(!detailSelectedCanvasField) { 
+        propsDiv.innerHTML = '<div style="color:#aaa;">请选择画布中的字段</div>'; 
+        return; 
+      }
+      
+      const field = [...detailBasicFields, ...detailFinanceFields, ...detailHRFields].find(f=>f.key===detailSelectedCanvasField);
+      if (!field) { 
+        propsDiv.innerHTML = '<div style="color:#aaa;">字段不存在</div>'; 
+        return; 
+      }
+      
+      if (!fieldProps[field.key]) fieldProps[field.key] = { showLabel: true, width: 120, placeholder: '', isSensitive: false, sensitiveStart: 0, sensitiveEnd: 0 };
+      const props = fieldProps[field.key];
+      
+      // 基本配置分组
+      let html = `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("base")'>
+        <span style='display:inline-block;transform:rotate(${collapseState.base?"90deg":"0deg"});transition:.2s;'>▶</span> 基本配置
+      </div>`;
+      html += `<div id='attrBaseGroup' style='margin-bottom:18px;${collapseState.base?"":"display:none;"}'>`;
+      html += `
         <div class='field-config-row'><label>字段标题</label><input type='text' class='input-modern' value='${field.label}' disabled style='background:#f4f8fb;'></div>
         <div class='field-config-row'><label>显示标题</label><input type='checkbox' class='checkbox-modern' ${props.showLabel?'checked':''} onchange="setDetailFieldProp('${field.key}','showLabel',this.checked)"></div>
         <div class='field-config-row'><label>字段宽度</label><input type='number' class='input-modern' min='40' max='400' value='${props.width||120}' onchange="setDetailFieldProp('${field.key}','width',this.value)"></div>
         <div class='field-config-row'><label>提示文字</label><input type='text' class='input-modern' value='${props.placeholder||''}' placeholder='请输入提示文字' onchange="setDetailFieldProp('${field.key}','placeholder',this.value)"></div>
-        ${formatInput}
+        <div class='field-config-row'><label>是否敏感信息</label><input type='checkbox' class='checkbox-modern' ${props.isSensitive?'checked':''} onchange="toggleSensitiveConfig('${field.key}', this.checked)"></div>
+        ${props.isSensitive ? `
+        <div class='field-config-row'><label>敏感起始位置</label><input type='number' class='input-modern' min='0' value='${props.sensitiveStart||0}' onchange="setDetailFieldProp('${field.key}','sensitiveStart',this.value)"></div>
+        <div class='field-config-row'><label>敏感终止位置</label><input type='number' class='input-modern' min='0' value='${props.sensitiveEnd||0}' onchange="setDetailFieldProp('${field.key}','sensitiveEnd',this.value)"></div>
+        ` : ''}
       `;
+      html += '</div>';
+      
+      // 智能服务分组
+      html += `<div style='font-weight:600;color:#2176c7;margin-bottom:6px;cursor:pointer;user-select:none;' onclick='toggleAttrCollapseGroup("smart")'>
+        <span style='display:inline-block;transform:rotate(${collapseState.smart?"90deg":"0deg"});transition:.2s;'>▶</span> 智能服务
+      </div>`;
+      html += `<div id='attrSmartGroup' style='${collapseState.smart?"":"display:none;"}'>`;
+      html += `<div style="color:#aaa;">智能服务配置功能</div>`;
+      html += `</div>`;
+      
+      propsDiv.innerHTML = html;
     }
     function setDetailFieldProp(key, prop, value) {
-      if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', format: '' };
+      if (!fieldProps[key]) fieldProps[key] = { showLabel: true, width: 120, placeholder: '', isSensitive: false, sensitiveStart: 0, sensitiveEnd: 0 };
       if (prop === 'showLabel') fieldProps[key][prop] = value;
       else if (prop === 'width') fieldProps[key][prop] = +value;
+      else if (prop === 'isSensitive') fieldProps[key][prop] = value;
+      else if (prop === 'sensitiveStart') fieldProps[key][prop] = +value;
+      else if (prop === 'sensitiveEnd') fieldProps[key][prop] = +value;
       else fieldProps[key][prop] = value;
+      renderDetailCanvasFieldProps();
+    }
+    
+    function toggleSensitiveConfig(key, isSensitive) {
+      setDetailFieldProp(key, 'isSensitive', isSensitive);
+      // 如果取消敏感信息，清空相关值
+      if (!isSensitive) {
+        setDetailFieldProp(key, 'sensitiveStart', 0);
+        setDetailFieldProp(key, 'sensitiveEnd', 0);
+      }
+    }
+    
+    function toggleAttrCollapseGroup(group) {
+      if (window.__attrCollapseState === undefined) {
+        window.__attrCollapseState = { base: true, smart: true };
+      }
+      window.__attrCollapseState[group] = !window.__attrCollapseState[group];
       renderDetailCanvasFieldProps();
     }
     // 新增全局变量保存布局方式

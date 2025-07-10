@@ -45,12 +45,6 @@
       <div style="display:flex;gap:18px 24px;align-items:center;flex-wrap:wrap;">
         <label>代码：</label><input type="text" id="queryCode" placeholder="请输入代码" />
         <label>名称：</label><input type="text" id="queryName" placeholder="请输入名称" />
-        <label>是否敏感数据：</label>
-        <select id="querySensitive">
-          <option value="">全部</option>
-          <option value="是">是</option>
-          <option value="否">否</option>
-        </select>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;width:100%;">
         <button id="queryBtn">查询</button>
@@ -71,7 +65,6 @@
             <th>类型</th>
             <th>长度</th>
             <th>精度</th>
-            <th>是否敏感数据</th>
             <th style="text-align:center;">操作</th>
           </tr>
         </thead>
@@ -156,7 +149,6 @@
           <td>${item.type||''}</td>
           <td>${item.length||''}</td>
           <td>${item.precision||''}</td>
-          <td>${item.sensitive}</td>
           <td class="center">
             <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0 8px;">编辑</button>
             <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:15px;padding:0 8px;">删除</button>
@@ -169,9 +161,8 @@
     document.getElementById('queryBtn').onclick = function() {
       const code = document.getElementById('queryCode').value.trim();
       const name = document.getElementById('queryName').value.trim();
-      const sensitive = document.getElementById('querySensitive').value;
       let filtered = data.filter(item => {
-        return (!code || item.code.includes(code)) && (!name || item.name.includes(name)) && (!sensitive || item.sensitive === sensitive);
+        return (!code || item.code.includes(code)) && (!name || item.name.includes(name));
       });
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = filtered.map((item, idx) => `
@@ -182,7 +173,6 @@
           <td>${item.type||''}</td>
           <td>${item.length||''}</td>
           <td>${item.precision||''}</td>
-          <td>${item.sensitive}</td>
           <td class="center">
             <button type="button" class="row-btn-edit" onclick="editRow(${idx})" style="background:none;border:none;color:#2176c7;cursor:pointer;font-size:15px;padding:0 8px;">编辑</button>
             <button type="button" class="row-btn-del" onclick="deleteRow(${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:15px;padding:0 8px;">删除</button>
@@ -193,7 +183,6 @@
     document.getElementById('resetBtn').onclick = function() {
       document.getElementById('queryCode').value = '';
       document.getElementById('queryName').value = '';
-      document.getElementById('querySensitive').value = '';
       renderTable();
     };
     // 新增

@@ -227,13 +227,42 @@
                 conditionEl.className = 'condition-row';
 
                 // 只保留字段、关系、值、删除
-                const currentFields = ['客户编码', '客户名称', '供应商编码', '供应商名称', '物料编码', '物料名称', '使用单位名称', '使用单位编码'];
+                const currentFields = ['客户编码', '客户名称', '供应商编码', '供应商名称', '物料编码', '物料名称', '使用单位名称', '使用单位编码', '城市', '省份', '字典项'];
                 const relationOptions = ['等于', '不等于', '大于', '小于', '大于等于', '小于等于', '包含', '不包含'];
+
+                // 判断是否为引用字段
+                const refFieldMap = {
+                  '城市': [
+                    {name:'市编码', val:'code'},
+                    {name:'市名称', val:'name'},
+                    {name:'省编码', val:'provinceCode'},
+                    {name:'省名称', val:'provinceName'},
+                    {name:'国家编码', val:'countryCode'},
+                    {name:'国家名称', val:'countryName'}
+                  ],
+                  '省份': [
+                    {name:'省编码', val:'code'},
+                    {name:'省名称', val:'name'}
+                  ],
+                  '字典项': [
+                    {name:'字典编码', val:'code'},
+                    {name:'字典名称', val:'name'}
+                  ]
+                };
+
+                let refAttrSelectHtml = '';
+                if (refFieldMap[data.field]) {
+                  refAttrSelectHtml = `<select class="form-select ref-attr-select" style="min-width:90px;">
+                    <option value="">选择属性</option>
+                    ${refFieldMap[data.field].map(opt=>`<option value="${opt.val}" ${data.refAttr===opt.val?'selected':''}>${opt.name}</option>`).join('')}
+                  </select>`;
+                }
 
                 conditionEl.innerHTML = `
                     <select class="form-select field-select">
                         ${currentFields.map(f => `<option value="${f}" ${data.field === f ? 'selected' : ''}>${f}</option>`).join('')}
                     </select>
+                    ${refAttrSelectHtml}
                     <select class="form-select relation-select">
                         ${relationOptions.map(r => `<option value="${r}" ${data.relation === r ? 'selected' : ''}>${r}</option>`).join('')}
                     </select>
@@ -286,22 +315,44 @@
       }
             });
 
+            // 监听字段选择变化，动态插入引用属性下拉
             conditionBuilderRoot.addEventListener('change', function(e) {
-                if (e.target.classList.contains('model-select')) {
-                    const conditionRow = e.target.closest('.condition-row');
-                    if (!conditionRow) return;
-
-                    const modelType = e.target.value;
-                    const fieldSelect = conditionRow.querySelector('.field-select');
-                    const currentFieldValue = fieldSelect.value;
-
-                    const newFieldOptions = modelType === 'sub' ? subModelFields : mainModelFields;
-
-                    fieldSelect.innerHTML = newFieldOptions.map(f => `<option value="${f}">${f}</option>`).join('');
-
-                    if (newFieldOptions.includes(currentFieldValue)) {
-                        fieldSelect.value = currentFieldValue;
-      }
+                if (e.target.classList.contains('field-select')) {
+                  const conditionRow = e.target.closest('.condition-row');
+                  if (!conditionRow) return;
+                  const field = e.target.value;
+                  const refFieldMap = {
+                    '城市': [
+                      {name:'市编码', val:'code'},
+                      {name:'市名称', val:'name'},
+                      {name:'省编码', val:'provinceCode'},
+                      {name:'省名称', val:'provinceName'},
+                      {name:'国家编码', val:'countryCode'},
+                      {name:'国家名称', val:'countryName'}
+                    ],
+                    '省份': [
+                      {name:'省编码', val:'code'},
+                      {name:'省名称', val:'name'}
+                    ],
+                    '字典项': [
+                      {name:'字典编码', val:'code'},
+                      {name:'字典名称', val:'name'}
+                    ]
+                  };
+                  let refAttrSelect = conditionRow.querySelector('.ref-attr-select');
+                  if (refFieldMap[field]) {
+                    if (!refAttrSelect) {
+                      refAttrSelect = document.createElement('select');
+                      refAttrSelect.className = 'form-select ref-attr-select';
+                      refAttrSelect.style.minWidth = '90px';
+                      refAttrSelect.innerHTML = '<option value="">选择属性</option>' + refFieldMap[field].map(opt=>`<option value="${opt.val}">${opt.name}</option>`).join('');
+                      e.target.insertAdjacentElement('afterend', refAttrSelect);
+                    } else {
+                      refAttrSelect.innerHTML = '<option value="">选择属性</option>' + refFieldMap[field].map(opt=>`<option value="${opt.val}">${opt.name}</option>`).join('');
+                    }
+                  } else if (refAttrSelect) {
+                    refAttrSelect.remove();
+                  }
                 }
             });
 

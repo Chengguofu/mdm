@@ -220,84 +220,152 @@
         <div style="display:flex;gap:18px;align-items:flex-start;min-height:420px;">
           <!-- 第一栏：树型结构 -->
           <div style="flex:1;min-width:180px;max-width:240px;background:#f8fafc;border:1px solid #e0e6ed;border-radius:8px;padding:12px 8px;">
-            <div style="font-weight:600;color:#2176c7;margin-bottom:10px;">物料分类树</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-weight:600;color:#2176c7;">物料分类树</div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" class="btn-modern" onclick="expandAllTreeNodes()" style="font-size:11px;padding:3px 6px;background:#e3eaf3;color:#2176c7;border:1px solid #c0d3eb;">
+                  全部展开
+                </button>
+                <button type="button" class="btn-modern" onclick="collapseAllTreeNodes()" style="font-size:11px;padding:3px 6px;background:#e3eaf3;color:#2176c7;border:1px solid #c0d3eb;">
+                  全部折叠
+                </button>
+              </div>
+            </div>
             <div id="materialTree" style="max-height:380px;overflow-y:auto;">
-              <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                <span style="color:#2176c7;margin-right:4px;">▶</span>
-                <span>原材料</span>
+              <!-- 根节点 -->
+              <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#f4f8fb;font-weight:600;" onclick="toggleTreeNode(this)">
+                <div style="display:flex;align-items:center;">
+                  <span style="color:#2176c7;margin-right:4px;">▼</span>
+                  <span>全部</span>
+                </div>
+                <span class="layout-indicator" data-node="root" style="font-size:12px;color:#4caf50;margin-left:8px;">⚙️</span>
               </div>
-              <div class="tree-children" style="margin-left:16px;display:none;">
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                  <span style="color:#2176c7;margin-right:4px;">▶</span>
-                  <span>金属材料</span>
+              <div class="tree-children" style="margin-left:16px;display:block;">
+                <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                  <div style="display:flex;align-items:center;">
+                    <span style="color:#2176c7;margin-right:4px;">▶</span>
+                    <span>原材料</span>
+                  </div>
+                  <!-- 无图标 -->
                 </div>
                 <div class="tree-children" style="margin-left:16px;display:none;">
-                  <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                    <span style="color:#2176c7;margin-right:4px;">▶</span>
-                    <span>钢材</span>
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="color:#2176c7;margin-right:4px;">▶</span>
+                      <span>金属材料</span>
+                    </div>
+                    <!-- 无图标 -->
                   </div>
                   <div class="tree-children" style="margin-left:16px;display:none;">
-                    <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                      <span style="margin-right:4px;">●</span>
-                      <span>碳钢</span>
+                    <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                      <div style="display:flex;align-items:center;">
+                        <span style="color:#2176c7;margin-right:4px;">▶</span>
+                        <span>钢材</span>
+                      </div>
+                      <!-- 无图标 -->
                     </div>
-                    <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                      <span style="margin-right:4px;">●</span>
-                      <span>不锈钢</span>
+                    <div class="tree-children" style="margin-left:16px;display:none;">
+                      <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                        <div style="display:flex;align-items:center;">
+                          <span style="margin-right:4px;">●</span>
+                          <span>碳钢</span>
+                        </div>
+                        <span class="layout-indicator" data-node="carbon_steel" style="font-size:12px;color:#4caf50;margin-left:8px;">⚙️</span>
+                      </div>
+                      <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                        <div style="display:flex;align-items:center;">
+                          <span style="margin-right:4px;">●</span>
+                          <span>不锈钢</span>
+                        </div>
+                        <!-- 无图标 -->
+                      </div>
+                    </div>
+                    <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                      <div style="display:flex;align-items:center;">
+                        <span style="color:#2176c7;margin-right:4px;">▶</span>
+                        <span>铝材</span>
+                      </div>
+                      <!-- 无图标 -->
+                    </div>
+                    <div class="tree-children" style="margin-left:16px;display:none;">
+                      <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                        <div style="display:flex;align-items:center;">
+                          <span style="margin-right:4px;">●</span>
+                          <span>铝合金</span>
+                        </div>
+                        <!-- 无图标 -->
+                      </div>
                     </div>
                   </div>
-                  <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                    <span style="color:#2176c7;margin-right:4px;">▶</span>
-                    <span>铝材</span>
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="color:#2176c7;margin-right:4px;">▶</span>
+                      <span>非金属材料</span>
+                    </div>
+                    <!-- 无图标 -->
                   </div>
                   <div class="tree-children" style="margin-left:16px;display:none;">
-                    <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                      <span style="margin-right:4px;">●</span>
-                      <span>铝合金</span>
+                    <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                      <div style="display:flex;align-items:center;">
+                        <span style="margin-right:4px;">●</span>
+                        <span>塑料</span>
+                      </div>
+                      <!-- 无图标 -->
+                    </div>
+                    <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                      <div style="display:flex;align-items:center;">
+                        <span style="margin-right:4px;">●</span>
+                        <span>橡胶</span>
+                      </div>
+                      <!-- 无图标 -->
                     </div>
                   </div>
                 </div>
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                  <span style="color:#2176c7;margin-right:4px;">▶</span>
-                  <span>非金属材料</span>
+                <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                  <div style="display:flex;align-items:center;">
+                    <span style="color:#2176c7;margin-right:4px;">▶</span>
+                    <span>半成品</span>
+                  </div>
+                  <!-- 无图标 -->
                 </div>
                 <div class="tree-children" style="margin-left:16px;display:none;">
-                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                    <span style="margin-right:4px;">●</span>
-                    <span>塑料</span>
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="margin-right:4px;">●</span>
+                      <span>铸件</span>
+                    </div>
+                    <span class="layout-indicator" data-node="casting" style="font-size:12px;color:#4caf50;margin-left:8px;">⚙️</span>
                   </div>
-                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                    <span style="margin-right:4px;">●</span>
-                    <span>橡胶</span>
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="margin-right:4px;">●</span>
+                      <span>锻件</span>
+                    </div>
+                    <!-- 无图标 -->
                   </div>
                 </div>
-              </div>
-              <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                <span style="color:#2176c7;margin-right:4px;">▶</span>
-                <span>半成品</span>
-              </div>
-              <div class="tree-children" style="margin-left:16px;display:none;">
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                  <span style="margin-right:4px;">●</span>
-                  <span>铸件</span>
+                <div class="tree-node" style="padding:4px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleTreeNode(this)">
+                  <div style="display:flex;align-items:center;">
+                    <span style="color:#2176c7;margin-right:4px;">▶</span>
+                    <span>成品</span>
+                  </div>
+                  <!-- 无图标 -->
                 </div>
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                  <span style="margin-right:4px;">●</span>
-                  <span>锻件</span>
-                </div>
-              </div>
-              <div class="tree-node" style="padding:4px 0;cursor:pointer;" onclick="toggleTreeNode(this)">
-                <span style="color:#2176c7;margin-right:4px;">▶</span>
-                <span>成品</span>
-              </div>
-              <div class="tree-children" style="margin-left:16px;display:none;">
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                  <span style="margin-right:4px;">●</span>
-                  <span>机械零件</span>
-                </div>
-                <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;" onclick="selectTreeNode(this)">
-                  <span style="margin-right:4px;">●</span>
-                  <span>电子元件</span>
+                <div class="tree-children" style="margin-left:16px;display:none;">
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="margin-right:4px;">●</span>
+                      <span>机械零件</span>
+                    </div>
+                    <!-- 无图标 -->
+                  </div>
+                  <div class="tree-node" style="padding:4px 0;cursor:pointer;color:#2176c7;display:flex;justify-content:space-between;align-items:center;" onclick="selectTreeNode(this)">
+                    <div style="display:flex;align-items:center;">
+                      <span style="margin-right:4px;">●</span>
+                      <span>电子元件</span>
+                    </div>
+                    <!-- 无图标 -->
+                  </div>
                 </div>
               </div>
             </div>
@@ -310,9 +378,16 @@
           <div style="flex:2;min-width:320px;max-width:600px;background:#fff;border:1px solid #e0e6ed;border-radius:8px;padding:12px 18px;">
             <!-- 新增公共布局配置区域 -->
             <div id="detailLayoutConfig" style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #e0e6ed;">
-              <span style="font-weight:500;color:#185a99;margin-right:18px;">主子表布局：</span>
-              <label style="margin-right:18px;"><input type="radio" name="detailLayoutType" value="tab" checked onchange="setDetailLayoutType('tab')"> 分页签平铺</label>
-              <label><input type="radio" name="detailLayoutType" value="mainSubTab" onchange="setDetailLayoutType('mainSubTab')"> 上下页签</label>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <span style="font-weight:500;color:#185a99;margin-right:18px;">主子表布局：</span>
+                  <label style="margin-right:18px;"><input type="radio" name="detailLayoutType" value="tab" checked onchange="setDetailLayoutType('tab')"> 分页签平铺</label>
+                  <label><input type="radio" name="detailLayoutType" value="mainSubTab" onchange="setDetailLayoutType('mainSubTab')"> 上下页签</label>
+                </div>
+                <button type="button" class="btn-modern" onclick="openCopyLayoutModal()" style="background:#e3eaf3;color:#2176c7;border:1px solid #c0d3eb;padding:6px 12px;border-radius:4px;">
+                  <span style="margin-right:4px;">📋</span>复制布局
+                </button>
+              </div>
             </div>
             <div id="detailCanvasTabs"></div>
           </div>
@@ -350,6 +425,26 @@
       </div>
       <div id="sortFieldList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
       <button type="button" class="btn-main" onclick="addSelectedSortFields()">添加</button>
+    </div>
+  </div>
+  
+  <!-- 复制布局弹窗 -->
+  <div id="copyLayoutModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;min-width:480px;max-width:90vw;max-height:80vh;overflow:auto;border-radius:8px;box-shadow:0 4px 24px rgba(33,118,199,0.18);padding:28px 32px 24px 32px;position:relative;">
+      <div style="font-size:16px;color:#2176c7;font-weight:600;margin-bottom:16px;">复制布局到其他节点
+        <span onclick="closeCopyLayoutModal()" style="position:absolute;right:24px;top:18px;font-size:22px;cursor:pointer;color:#888;">×</span>
+      </div>
+      <div style="margin-bottom:16px;color:#666;font-size:14px;">
+        当前布局：<span id="currentLayoutName" style="color:#2176c7;font-weight:500;"></span>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-weight:500;color:#185a99;margin-bottom:8px;">选择目标节点（可多选）：</div>
+        <div id="copyLayoutTree" style="max-height:300px;overflow-y:auto;border:1px solid #c0d3eb;border-radius:6px;padding:12px;background:#f8fafc;"></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button type="button" class="btn-line" onclick="closeCopyLayoutModal()">取消</button>
+        <button type="button" class="btn-main" onclick="copyLayoutToSelectedNodes()">确认复制</button>
+      </div>
     </div>
   </div>
   <script>
@@ -1011,6 +1106,210 @@
       // 可根据需要刷新画布或子表区域
       // renderDetailCanvasTabs();
     }
+    
+    // 复制布局相关功能
+    function openCopyLayoutModal() {
+      const modal = document.getElementById('copyLayoutModal');
+      const currentLayoutName = document.getElementById('currentLayoutName');
+      const treeContainer = document.getElementById('copyLayoutTree');
+      
+      // 显示当前布局名称
+      const currentView = detailViews.find(v => v.key === detailSelectedView);
+      currentLayoutName.textContent = currentView ? currentView.label : '未知布局';
+      
+      // 渲染树形选择器
+      renderCopyLayoutTree(treeContainer);
+      
+      modal.style.display = 'flex';
+    }
+    
+    function closeCopyLayoutModal() {
+      document.getElementById('copyLayoutModal').style.display = 'none';
+    }
+    
+    function renderCopyLayoutTree(container) {
+      // 构建完整的树形结构数据
+      const treeData = [
+        {
+          id: 'raw',
+          name: '原材料',
+          children: [
+            {
+              id: 'metal',
+              name: '金属材料',
+              children: [
+                {
+                  id: 'steel',
+                  name: '钢材',
+                  children: [
+                    { id: 'carbon_steel', name: '碳钢' },
+                    { id: 'stainless_steel', name: '不锈钢' }
+                  ]
+                },
+                {
+                  id: 'aluminum',
+                  name: '铝材',
+                  children: [
+                    { id: 'aluminum_alloy', name: '铝合金' }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 'non_metal',
+              name: '非金属材料',
+              children: [
+                { id: 'plastic', name: '塑料' },
+                { id: 'rubber', name: '橡胶' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'semi_finished',
+          name: '半成品',
+          children: [
+            { id: 'casting', name: '铸件' },
+            { id: 'forging', name: '锻件' }
+          ]
+        },
+        {
+          id: 'finished',
+          name: '成品',
+          children: [
+            { id: 'mechanical_parts', name: '机械零件' },
+            { id: 'electronic_components', name: '电子元件' }
+          ]
+        }
+      ];
+      
+      let html = '';
+      
+      function renderNode(node, level = 0) {
+        const indent = level * 20;
+        const hasChildren = node.children && node.children.length > 0;
+        
+        html += `<div style="margin-left:${indent}px;">`;
+        
+        if (hasChildren) {
+          html += `<div class="copy-tree-node" data-id="${node.id}" style="display:flex;align-items:center;padding:4px 0;cursor:pointer;">`;
+          html += `<span class="copy-tree-toggle" style="color:#2176c7;margin-right:6px;font-size:12px;transition:transform 0.2s;">▶</span>`;
+          html += `<input type="checkbox" class="copy-tree-checkbox" data-id="${node.id}" style="margin-right:6px;">`;
+          html += `<span>${node.name}</span>`;
+          html += `</div>`;
+          
+          html += `<div class="copy-tree-children" data-parent="${node.id}" style="display:none;">`;
+          node.children.forEach(child => renderNode(child, level + 1));
+          html += `</div>`;
+        } else {
+          html += `<div class="copy-tree-node" data-id="${node.id}" style="display:flex;align-items:center;padding:4px 0;">`;
+          html += `<span style="margin-right:6px;color:#999;">●</span>`;
+          html += `<input type="checkbox" class="copy-tree-checkbox" data-id="${node.id}" style="margin-right:6px;">`;
+          html += `<span>${node.name}</span>`;
+          html += `</div>`;
+        }
+        
+        html += `</div>`;
+      }
+      
+      treeData.forEach(node => renderNode(node));
+      container.innerHTML = html;
+      
+      // 绑定事件
+      bindCopyTreeEvents();
+    }
+    
+    function bindCopyTreeEvents() {
+      // 展开/收起节点
+      document.querySelectorAll('.copy-tree-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const node = this.parentElement;
+          const nodeId = node.getAttribute('data-id');
+          const children = document.querySelector(`.copy-tree-children[data-parent="${nodeId}"]`);
+          
+          if (children) {
+            if (children.style.display === 'none') {
+              children.style.display = 'block';
+              this.textContent = '▼';
+              this.style.transform = 'rotate(0deg)';
+            } else {
+              children.style.display = 'none';
+              this.textContent = '▶';
+              this.style.transform = 'rotate(-90deg)';
+            }
+          }
+        });
+      });
+      
+      // 父节点选中时，子节点也选中
+      document.querySelectorAll('.copy-tree-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const nodeId = this.getAttribute('data-id');
+          const isChecked = this.checked;
+          
+          // 选中子节点
+          const children = document.querySelectorAll(`.copy-tree-children[data-parent="${nodeId}"] .copy-tree-checkbox`);
+          children.forEach(child => {
+            child.checked = isChecked;
+          });
+          
+          // 检查父节点状态
+          updateParentCheckboxState(nodeId);
+        });
+      });
+    }
+    
+    function updateParentCheckboxState(nodeId) {
+      const parent = document.querySelector(`.copy-tree-children[data-parent="${nodeId}"]`);
+      if (parent) {
+        const parentId = parent.getAttribute('data-parent');
+        const parentCheckbox = document.querySelector(`.copy-tree-checkbox[data-id="${parentId}"]`);
+        const siblingCheckboxes = parent.querySelectorAll('.copy-tree-checkbox');
+        const checkedSiblings = parent.querySelectorAll('.copy-tree-checkbox:checked');
+        
+        if (checkedSiblings.length === 0) {
+          parentCheckbox.checked = false;
+          parentCheckbox.indeterminate = false;
+        } else if (checkedSiblings.length === siblingCheckboxes.length) {
+          parentCheckbox.checked = true;
+          parentCheckbox.indeterminate = false;
+        } else {
+          parentCheckbox.checked = false;
+          parentCheckbox.indeterminate = true;
+        }
+      }
+    }
+    
+    function copyLayoutToSelectedNodes() {
+      const selectedCheckboxes = document.querySelectorAll('.copy-tree-checkbox:checked');
+      const selectedNodes = Array.from(selectedCheckboxes).map(cb => ({
+        id: cb.getAttribute('data-id'),
+        name: cb.parentElement.querySelector('span:last-child').textContent
+      }));
+      
+      if (selectedNodes.length === 0) {
+        alert('请选择至少一个目标节点');
+        return;
+      }
+      
+      // 获取当前布局配置
+      const currentConfig = JSON.parse(JSON.stringify(detailCanvasConfig[detailSelectedView]));
+      const currentLayoutType = detailLayoutType;
+      
+      // 模拟复制到选中的节点
+      const nodeNames = selectedNodes.map(n => n.name).join('、');
+      alert(`布局已复制到以下节点：\n${nodeNames}\n\n（实际复制逻辑请对接后端API）`);
+      
+      console.log('复制布局配置:', {
+        sourceView: detailSelectedView,
+        targetNodes: selectedNodes,
+        layoutConfig: currentConfig,
+        layoutType: currentLayoutType
+      });
+      
+      closeCopyLayoutModal();
+    }
     // 新增渲染字段方法
     function renderPreviewFields(conf) {
       if(!conf || !conf.fields) return '<div style="color:#aaa;">暂无字段</div>';
@@ -1067,6 +1366,45 @@
       // 可以在这里添加选中节点后的逻辑
       console.log('选中节点:', node.textContent.trim());
     }
+    
+    // 全部展开树节点
+    function expandAllTreeNodes() {
+      const treeChildren = document.querySelectorAll('#materialTree .tree-children');
+      const treeIcons = document.querySelectorAll('#materialTree .tree-node span');
+      
+      treeChildren.forEach(children => {
+        children.style.display = 'block';
+      });
+      
+      treeIcons.forEach(icon => {
+        if (icon.textContent === '▶') {
+          icon.textContent = '▼';
+        }
+      });
+    }
+    
+    // 全部折叠树节点
+    function collapseAllTreeNodes() {
+      const treeChildren = document.querySelectorAll('#materialTree .tree-children');
+      const treeIcons = document.querySelectorAll('#materialTree .tree-node span');
+      
+      treeChildren.forEach(children => {
+        children.style.display = 'none';
+      });
+      
+      treeIcons.forEach(icon => {
+        if (icon.textContent === '▼') {
+          icon.textContent = '▶';
+        }
+      });
+    }
+    
+    // 更新布局配置指示器
+    function updateLayoutIndicators() {}
+    // 页面初始化时更新指示器
+    document.addEventListener('DOMContentLoaded', function() {
+      updateLayoutIndicators();
+    });
   </script>
 </body>
 </html> 

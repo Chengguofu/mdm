@@ -1211,7 +1211,7 @@
               <li class="submenu-item" data-item-id="push-config">推送服务配置</li>
               <li class="submenu-item" data-item-id="push-log">推送服务日志</li>
               <li class="submenu-item" data-item-id="filter-config">筛选配置</li>
-              <li class="submenu-item" data-content="query-service-config" data-url="data_service_sub.html">查询服务配置</li>
+                                      <li class="submenu-item" data-content="query-service-config" data-url="data_service_list.html">查询服务配置</li>
               <li class="submenu-item" data-content="query-service-log" data-url="data_service_log.html">查询服务日志</li>
               <li class="submenu-item" data-content="smart-service" data-url="smart_service.html">智能服务管理</li>
             </ul>
@@ -1708,7 +1708,7 @@
 
         else if (this.dataset.itemId === 'receive-log') document.getElementById('mainContent').innerHTML = `<iframe src="data_receive_log.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
         else if (this.dataset.content === 'query-service-config') {
-          document.getElementById('mainContent').innerHTML = `<iframe src="data_service_sub.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
+          document.getElementById('mainContent').innerHTML = `<iframe src="data_service_list.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;
         }
         else if (this.dataset.content === 'query-service-log') {
           document.getElementById('mainContent').innerHTML = `<iframe src="data_service_log.html" style="width:100%; height:calc(100vh - 120px); border:none;"></iframe>`;

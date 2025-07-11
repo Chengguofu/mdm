@@ -331,6 +331,116 @@
       display: inline-flex;
       align-items: center;
     }
+    .multi-select-wrap {
+      position: relative;
+    }
+    .multi-select-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 25px;
+      border: 1.5px solid #d0d7de;
+      border-radius: 7px;
+      padding: 1px 4px 1px 4px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .multi-select-hidden-input {
+      border: none;
+      outline: none;
+      flex: 1 1 28px;
+      min-width: 28px;
+      height: 19px;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      display: inline-block;
+    }
+    .multi-select-option {
+      padding: 6px 12px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .multi-select-option:hover {
+      background: #f4f7fa;
+    }
+    .multi-select-option.selected {
+      color: #2176c7;
+    }
+    .multi-tag {
+      display: inline-block;
+      padding: 1px 4px;
+      margin: 1px;
+      border-radius: 3px;
+      background: #e0e6ed;
+    }
+    .multi-tag-close {
+      margin-left: 2px;
+      cursor: pointer;
+    }
+    .multi-select-dropdown {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      border: 1.5px solid #d0d7de;
+      border-radius: 7px;
+      box-shadow: 0 2px 12px rgba(33,118,199,0.10);
+      z-index: 10;
+      max-height: 180px;
+      overflow: auto;
+    }
+    .multi-select-input, .form-control {
+      min-height: 36px !important;
+      height: 36px !important;
+      box-sizing: border-box;
+      border: 1.5px solid #d0d7de;
+      border-radius: 7px;
+      font-size: 15px;
+      padding: 2px 10px 2px 10px;
+      background: #fff;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .multi-select-input {
+      flex-wrap: wrap;
+      cursor: pointer;
+      padding: 2px 10px 2px 10px;
+    }
+    .multi-select-hidden-input {
+      border: none;
+      outline: none;
+      flex: 1 1 28px;
+      min-width: 28px;
+      height: 28px;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      display: inline-block;
+      font-size: 15px;
+    }
+    select.form-control {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background: #fff;
+      padding-right: 30px;
+      cursor: pointer;
+    }
+    .multi-tag {
+      display: inline-block;
+      padding: 1px 8px;
+      margin: 1px;
+      border-radius: 3px;
+      background: #e0e6ed;
+      font-size: 15px;
+      height: 28px;
+      line-height: 26px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -372,7 +482,8 @@
             <div class="form-label">规则类型<span class="required">*</span>：</div>
             <div class="form-value">
               <select id="editType" required>
-                <option value="校验规则">校验规则</option>
+                <option value="唯一性校验">唯一性校验</option>
+                <option value="约束条件校验">约束条件校验</option>
                 <option value="必填规则">必填规则</option>
                 <option value="只读规则">只读规则</option>
                 <option value="赋值规则">赋值规则</option>
@@ -526,15 +637,61 @@
     function renderRuleDetail(type, detail) {
       const area = document.getElementById('ruleDetailArea');
       let html = '';
-      if (type === '校验规则') {
-        html += `<div class='form-row'><div class='form-label'>校验类型：</div><div class='form-value'><select id='validateType'><option value='唯一性校验'>唯一性校验</option><option value='一般性校验'>一般性校验</option></select></div></div>`;
-        html += `<div id='validateDetailArea'></div>`;
-        // 唯一性校验卡片区域
-        html += `<div id='uniqueCardArea' style='margin-bottom:18px;'></div>`;
-        // 适用条件和状态区域
-        html += `<div id='uniqueCondStatusArea'></div>`;
-        // 每次渲染校验规则时初始化uniqueCards
-        window.uniqueCards = [{ uniqueAttr: '', uniqueAttrName: '', uniqueMaster: '', uniqueMasterAttr: '', uniqueMasterAttrName: '' }];
+      if (type === '唯一性校验' || type === '约束条件校验') {
+        // 原校验规则+校验类型逻辑
+        html += `<div class='form-row'><div class='form-label'>规则级别：</div><div class='form-value'><select id='validateLevel'><option value='错误型校验规则'>错误型校验规则</option><option value='警告型校验规则'>警告型校验规则</option></select></div></div>`;
+        html += `<div class='form-row'><div class='form-label'>校验提示信息：</div><div class='form-value'><input id='validateMsg' placeholder='提示内容'></div></div>`;
+        
+        if (type === '唯一性校验') {
+          // 先初始化唯一性校验数据
+          if (!window.uniqueCards || !window.uniqueCards[0]) {
+            window.uniqueCards = [{ uniqueAttr: '', uniqueAttrArr: [], uniqueMaster: '', uniqueMasterAttr: '', uniqueMasterAttrArr: [] }];
+          }
+          // 唯一性校验表单区域直接平铺
+          html += `
+            <div class='form-row'>
+              <div class='form-label'>属性</div>
+              <div class='form-value'>
+                <div class='multi-select-wrap' style='width:100%;position:relative;'>
+                  <div class='multi-select-input' tabindex='0' style='width:100%;' data-idx='0'>
+                    ${(window.uniqueCards[0].uniqueAttrArr||[]).map(attr=>`<span class='multi-tag'>${attr}<span class='multi-tag-close' data-value='${attr}' style='margin-left:2px;cursor:pointer;'>&times;</span></span>`).join('')}
+                    <input class='multi-select-hidden-input' style='border:none;outline:none;flex:1 1 40px;min-width:40px;height:28px;background:transparent;padding:0;margin:0;display:inline-block;' readonly placeholder='请选择属性，可多选'>
+                  </div>
+                  <div class='multi-select-dropdown' style='display:none;position:absolute;top:110%;left:0;width:100%;background:#fff;border:1.5px solid #d0d7de;border-radius:7px;box-shadow:0 2px 12px rgba(33,118,199,0.10);z-index:10;max-height:180px;overflow:auto;'></div>
+                </div>
+              </div>
+            </div>
+            <div class='form-row'>
+              <div class='form-label'>主数据</div>
+              <div class='form-value'>
+                <select class='form-control' style='width:100%;' id='uniqueMasterSelect'>
+                  <option value=''>请选择主数据</option>
+                  <option value='master1'>主数据1</option>
+                  <option value='master2'>主数据2</option>
+                  <option value='master3'>主数据3</option>
+                </select>
+              </div>
+            </div>
+            <div class='form-row'>
+              <div class='form-label'>主数据属性</div>
+              <div class='form-value'>
+                <div class='multi-select-wrap' style='width:100%;position:relative;'>
+                  <div class='multi-select-input master-attr-input' tabindex='0' style='width:100%;' data-idx='0'>
+                    ${(window.uniqueCards[0].uniqueMasterAttrArr||[]).map(attr=>`<span class='multi-tag'>${attr}<span class='multi-tag-close' data-value='${attr}' style='margin-left:2px;cursor:pointer;'>&times;</span></span>`).join('')}
+                    <input class='multi-select-hidden-input' style='border:none;outline:none;flex:1 1 40px;min-width:40px;height:28px;background:transparent;padding:0;margin:0;display:inline-block;' readonly placeholder='请选择主数据属性，可多选'>
+                  </div>
+                  <div class='multi-select-dropdown master-attr-dropdown' style='display:none;position:absolute;top:110%;left:0;width:100%;background:#fff;border:1.5px solid #d0d7de;border-radius:7px;box-shadow:0 2px 12px rgba(33,118,199,0.10);z-index:10;max-height:180px;overflow:auto;'></div>
+                </div>
+              </div>
+            </div>
+          `;
+          // 适用条件和状态区域
+          html += `<div id='uniqueCondStatusArea'></div>`;
+        } else if (type === '约束条件校验') {
+          // 约束条件校验的输入字段
+          html += `<div class='form-row'><div class='form-label'>约束规则：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='constraintRuleInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑约束规则'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='约束规则编辑' id='constraintRuleBtn'>🔍</span></div></div>`;
+          html += `<div class='form-row'><div class='form-label'>适用条件：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='constraintCondInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='适用条件编辑' id='constraintCondBtn'>🔍</span></div></div>`;
+        }
       } else if (type === '必填规则' || type === '显隐规则') {
         // 显隐规则增加操作字段
         if (type === '显隐规则') {
@@ -672,100 +829,138 @@
         html += `<option value=''>请选择联动字段</option>`;
         html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageField===opt.code)?'selected':''}>${opt.name}</option>`).join('');
         html += `</select></div></div>`;
-        html += `<div class='form-row'><div class='form-label'>联动条件：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'>
-          <input id='linkageExpr' placeholder='city.province = province' value='${detail && detail.linkageExpr ? detail.linkageExpr : ''}' style='width:100%;padding-right:36px;'>
-          <span id='exprEditBtn' style='position:absolute;right:8px;cursor:pointer;font-size:18px;color:#2176c7;' title='表达式编辑'>🔍</span>
-        </div></div>`;
+        // 新增：联动条件（引用属性下拉）
+        html += `<div class='form-row'><div class='form-label'>联动条件：</div><div class='form-value'><select id='linkageRefAttr' style='width:70%;'>`;
+        html += `<option value=''>请选择引用属性</option>`;
+        html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageRefAttr===opt.code)?'selected':''}>${opt.name}</option>`).join('');
+        html += `</select></div></div>`;
+        // 联动表达式输入
+        html += `<div class='form-row'><div class='form-label'>联动表达式：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'>`;
+        html += `<input id='linkageExpr' placeholder='city.province = province' value='${detail && detail.linkageExpr ? detail.linkageExpr : ''}' style='width:100%;padding-right:36px;'>`;
+        html += `<span id='exprEditBtn' style='position:absolute;right:8px;cursor:pointer;font-size:18px;color:#2176c7;' title='表达式编辑'>🔍</span>`;
+        html += `</div></div>`;
       }
       area.innerHTML = html;
-      // 校验规则细分
-      if (type === '校验规则') {
-        const validateType = document.getElementById('validateType');
-        function renderValidateDetail(valType) {
-          let vhtml = '';
-          if (valType === '唯一性校验' || valType === '一般性校验') {
-            renderUniqueCardArea(window.uniqueCards, valType);
-            renderUniqueCondStatusArea();
-          } else {
-            // 非唯一性/一般性校验时清空卡片和适用条件/状态区域
-            const area = document.getElementById('uniqueCardArea');
-            if (area) area.innerHTML = '';
-            const condArea = document.getElementById('uniqueCondStatusArea');
-            if (condArea) condArea.innerHTML = '';
-          }
-          vhtml += `<div class='form-row'><div class='form-label'>规则级别：</div><div class='form-value'><select id='validateLevel'><option value='错误型校验规则'>错误型校验规则</option><option value='警告型校验规则'>警告型校验规则</option></select></div></div>`;
-          vhtml += `<div class='form-row'><div class='form-label'>校验提示信息：</div><div class='form-value'><input id='validateMsg' placeholder='提示内容'></div></div>`;
-          document.getElementById('validateDetailArea').innerHTML = vhtml;
-        }
-        validateType.onchange = function() { renderValidateDetail(this.value); };
-        renderValidateDetail(validateType.value);
-      }
       // 唯一性校验卡片区域渲染
-      function renderUniqueCardArea(cards = [{ uniqueAttr: '', uniqueAttrName: '', uniqueMaster: '', uniqueMasterAttr: '', uniqueMasterAttrName: '' }], valType = '唯一性校验') {
-        const area = document.getElementById('uniqueCardArea');
-        if (!area) return;
-        area.innerHTML = cards.map((card, idx) => `
-          <div class='unique-card' style='background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(33,118,199,0.10);padding:22px 18px 18px 18px;margin-bottom:18px;border:1.5px solid #e0e6ed;font-size:13px;position:relative;width:86.4%;max-width:560px;margin-left:auto;margin-right:auto;'>
-            <div style='position:absolute;top:4px;right:10px;display:flex;gap:4px;'>
-              <button class="add-card-btn" title="新增一行" style="background:none;border:none;color:#2176c7;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:2px;height:22px;padding:0 2px;"><span style='font-size:14px;'>＋</span><span>新增</span></button>
-              <button class='del-card-btn' data-idx='${idx}' title='删除' style='background:none;border:none;color:#e74c3c;font-size:12px;cursor:pointer;height:22px;padding:0 6px;'><span>删除</span></button>
-            </div>
-            <div style='margin-top:28px;'>
-              <div style='margin-bottom:12px;display:flex;align-items:center;'>
-                <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性</div>
-                <input class='form-control' placeholder='属性' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueAttr||''}'>
-              </div>
-              <div style='margin-bottom:12px;display:flex;align-items:center;'>
-                <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性名称</div>
-                <input class='form-control' placeholder='属性名称' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueAttrName||''}'>
-              </div>
-              ${valType==='唯一性校验'?`
-                <div style='margin-bottom:12px;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>主数据</div>
-                  <input class='form-control' placeholder='主数据' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMaster||''}'>
-                </div>
-                <div style='margin-bottom:12px;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性</div>
-                  <input class='form-control' placeholder='属性' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMasterAttr||''}'>
-                </div>
-                <div style='margin-bottom:12px;display:flex;align-items:center;'>
-                  <div class='form-label' style='margin-bottom:0;width:80px;text-align:left;font-size:13px;'>属性名称</div>
-                  <input class='form-control' placeholder='属性名称' style='width:calc(80% - 76.8px);font-size:13px;margin-left:16px;' value='${card.uniqueMasterAttrName||''}'>
-                </div>
-              `:''}
-            </div>
-          </div>
-        `).join('');
-        // 新增按钮事件
-        area.querySelectorAll('.add-card-btn').forEach(btn => {
-          btn.onclick = function() {
-            window.uniqueCards.push({ uniqueAttr: '', uniqueAttrName: '', uniqueMaster: '', uniqueMasterAttr: '', uniqueMasterAttrName: '' });
-            renderUniqueCardArea(window.uniqueCards, valType);
-          };
-        });
-        // 删除按钮事件
-        area.querySelectorAll('.del-card-btn').forEach(btn => {
-          btn.onclick = function() {
-            const idx = +btn.getAttribute('data-idx');
-            window.uniqueCards.splice(idx, 1);
-            renderUniqueCardArea(window.uniqueCards, valType);
-          };
-        });
-      }
-      // 唯一性校验适用条件和状态区域渲染
-      function renderUniqueCondStatusArea() {
-        const area = document.getElementById('uniqueCondStatusArea');
-        if (!area) return;
-        area.innerHTML = `<div class='form-row' style='margin-top:8px;'>
-          <div class='form-label'>适用条件：</div>
-          <div class='form-value' style='position:relative;display:flex;align-items:center;'>
-            <input id='uniqueCondInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑'>
-            <span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='适用条件编辑' id='uniqueCondBtn'>🔍</span>
-          </div>
-        </div>`;
-        document.getElementById('uniqueCondBtn').onclick = function() {
-          window.open('condition_new.html', '_blank', 'width=800,height=600');
+      if (type === '唯一性校验') {
+        // 直接初始化多选和下拉交互
+        const area = document.getElementById('ruleDetailArea');
+        // 多选下拉属性列表
+        const ATTR_OPTIONS = ['a1','b2','c3','d4','e5','f6','g7','h8','i9','j10'];
+        // 属性多选
+        const inputWrap = area.querySelector('.multi-select-input[data-idx="0"]');
+        const dropdown = area.querySelector('.multi-select-dropdown');
+        function renderDropdown() {
+          const selected = window.uniqueCards[0].uniqueAttrArr||[];
+          dropdown.innerHTML = ATTR_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
+        }
+        inputWrap.onclick = function(e) {
+          e.stopPropagation();
+          renderDropdown();
+          dropdown.style.display = 'block';
         };
+        dropdown.onclick = function(e) {
+          const v = e.target.getAttribute('data-value');
+          if (!v) return;
+          let arr = window.uniqueCards[0].uniqueAttrArr||[];
+          if (arr.includes(v)) {
+            arr = arr.filter(x=>x!==v);
+          } else {
+            arr = arr.concat(v);
+          }
+          window.uniqueCards[0].uniqueAttrArr = arr;
+          window.uniqueCards[0].uniqueAttr = arr.join(',');
+          renderRuleDetail('唯一性校验');
+        };
+        inputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
+          closeBtn.onclick = function(ev) {
+            ev.stopPropagation();
+            const v = closeBtn.getAttribute('data-value');
+            let arr = window.uniqueCards[0].uniqueAttrArr||[];
+            arr = arr.filter(x=>x!==v);
+            window.uniqueCards[0].uniqueAttrArr = arr;
+            window.uniqueCards[0].uniqueAttr = arr.join(',');
+            renderRuleDetail('唯一性校验');
+          };
+        });
+        inputWrap.onblur = function() {
+          setTimeout(()=>{dropdown.style.display='none';},120);
+        };
+        // 主数据属性多选
+        const masterInputWrap = area.querySelector('.master-attr-input[data-idx="0"]');
+        const masterDropdown = area.querySelector('.master-attr-dropdown');
+        const MASTER_ATTR_OPTIONS = ['ma1','ma2','ma3','ma4'];
+        function renderMasterDropdown() {
+          const selected = window.uniqueCards[0].uniqueMasterAttrArr||[];
+          masterDropdown.innerHTML = MASTER_ATTR_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
+        }
+        masterInputWrap.onclick = function(e) {
+          e.stopPropagation();
+          renderMasterDropdown();
+          masterDropdown.style.display = 'block';
+        };
+        masterDropdown.onclick = function(e) {
+          const v = e.target.getAttribute('data-value');
+          if (!v) return;
+          let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
+          if (arr.includes(v)) {
+            arr = arr.filter(x=>x!==v);
+          } else {
+            arr = arr.concat(v);
+          }
+          window.uniqueCards[0].uniqueMasterAttrArr = arr;
+          window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
+          renderRuleDetail('唯一性校验');
+        };
+        masterInputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
+          closeBtn.onclick = function(ev) {
+            ev.stopPropagation();
+            const v = closeBtn.getAttribute('data-value');
+            let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
+            arr = arr.filter(x=>x!==v);
+            window.uniqueCards[0].uniqueMasterAttrArr = arr;
+            window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
+            renderRuleDetail('唯一性校验');
+          };
+        });
+        masterInputWrap.onblur = function() {
+          setTimeout(()=>{masterDropdown.style.display='none';},120);
+        };
+        // 点击页面其他地方关闭所有下拉
+        document.addEventListener('click', function(){
+          area.querySelectorAll('.multi-select-dropdown').forEach(d=>d.style.display='none');
+        });
+        renderUniqueCondStatusArea();
+        return;
+      }
+      // 约束条件校验适用条件按钮事件
+      if (type === '约束条件校验') {
+        const constraintRuleBtn = document.getElementById('constraintRuleBtn');
+        if (constraintRuleBtn) {
+          constraintRuleBtn.onclick = function() {
+            const currentValue = document.getElementById('constraintRuleInput').value || '';
+            const exprWindow = window.open('expression.html', '_blank', 'width=700,height=600');
+            
+            // 监听表达式编辑器返回的结果
+            const messageHandler = function(e) {
+              if (e.data && e.data.type === 'getExprInit') {
+                // 表达式编辑器请求初始值
+                exprWindow.postMessage({ type: 'exprInit', value: currentValue }, '*');
+              } else if (e.data && e.data.type === 'exprResult') {
+                // 接收到表达式结果
+                document.getElementById('constraintRuleInput').value = e.data.value || '';
+                window.removeEventListener('message', messageHandler);
+              }
+            };
+            window.addEventListener('message', messageHandler);
+          };
+        }
+        const constraintCondBtn = document.getElementById('constraintCondBtn');
+        if (constraintCondBtn) {
+          constraintCondBtn.onclick = function() {
+            window.open('condition_new.html', '_blank', 'width=800,height=600');
+          };
+        }
       }
       // 赋值规则表达式编辑按钮事件
       if (type === '赋值规则') {
@@ -843,13 +1038,16 @@
     // 采集规则详细信息
     function collectRuleDetail(type) {
       let detail = {};
-      if (type === '校验规则') {
-        const validateType = document.getElementById('validateType').value;
-        detail.validateType = validateType;
-        if (validateType === '唯一性校验') {
+      if (type === '唯一性校验' || type === '约束条件校验') {
+        // 原校验规则+校验类型逻辑
+        if (type === '唯一性校验') {
           // 唯一性校验不需要额外字段
-        } else if (validateType === '一般性校验') {
-          // 一般性校验不显示约束条件和提示语，所以不采集这些字段
+        } else if (type === '约束条件校验') {
+          // 约束条件校验不显示约束条件和提示语，所以不采集这些字段
+          const constraintRuleEl = document.getElementById('constraintRuleInput');
+          if (constraintRuleEl) detail.constraintRule = constraintRuleEl.value;
+          const constraintCondEl = document.getElementById('constraintCondInput');
+          if (constraintCondEl) detail.constraintCond = constraintCondEl.value;
         } else {
           // 其他校验类型才采集约束条件和提示语
           const constraintCondEl = document.getElementById('constraintCond');
@@ -878,6 +1076,7 @@
       } else if (type === '数据联动' || type === '数据联动规则') {
         detail.linkageTrigger = document.getElementById('linkageTrigger').value;
         detail.linkageField = document.getElementById('linkageField').value;
+        detail.linkageRefAttr = document.getElementById('linkageRefAttr').value;
         detail.linkageExpr = document.getElementById('linkageExpr').value;
       }
       return detail;
@@ -1072,7 +1271,7 @@
       
       // 获取当前规则的校验类型
       const currentRule = rules[window.currentFieldIdx];
-      const isGeneralValidation = currentRule && currentRule.detail && currentRule.detail.validateType === '一般性校验';
+      const isGeneralValidation = currentRule && currentRule.detail && currentRule.detail.validateType === '约束条件校验';
       
       // 字段名称与编码映射
       const fieldOptions = [
@@ -1222,6 +1421,22 @@
       oldShowFieldDrawer(idx);
       renderFieldDrawerInit();
     }
+    // 唯一性校验适用条件和状态区域渲染
+    function renderUniqueCondStatusArea() {
+      const area = document.getElementById('uniqueCondStatusArea');
+      if (!area) return;
+      area.innerHTML = `<div class='form-row' style='margin-top:8px;'>
+        <div class='form-label'>适用条件：</div>
+        <div class='form-value' style='position:relative;display:flex;align-items:center;'>
+          <input id='uniqueCondInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑'>
+          <span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='适用条件编辑' id='uniqueCondBtn'>🔍</span>
+        </div>
+      </div>`;
+      document.getElementById('uniqueCondBtn').onclick = function() {
+        window.open('condition_new.html', '_blank', 'width=800,height=600');
+      };
+    }
   </script>
 </body>
+</html> 
 </html> 

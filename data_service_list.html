@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>主数据服务列表</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            padding: 2rem;
+            font-size: 15px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            font-size: 15px;
+        }
+        .action-btns .btn {
+            margin-right: 6px;
+        }
+        .action-btns .btn:last-child {
+            margin-right: 0;
+        }
+        h3 {
+            font-size: 23px;
+        }
+        
+        /* 抽屉样式 */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -600px;
+            width: 600px;
+            height: 100%;
+            background-color: #fff;
+            z-index: 1050;
+            transition: right 0.3s ease;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .drawer.show {
+            right: 0;
+        }
+        
+        .drawer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        
+        .drawer-body {
+            padding: 1.5rem;
+        }
+        
+        .drawer-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .drawer-close:hover {
+            color: #000;
+        }
+        
+        .config-table-in-drawer td {
+            padding: 0.8rem 1rem;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+        
+        .config-table-in-drawer td:first-child {
+            width: 25%;
+            font-weight: 500;
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+        /* 工具栏按钮样式 */
+        .btn-main { background: #2176c7; color: #fff; border: none; border-radius: 4px; padding: 0 18px; height: 36px; font-size: 15px; display: flex; align-items: center; font-weight: 500; transition: background 0.18s; cursor: pointer; }
+        .btn-main:hover { background: #185a99; }
+        .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-line:hover { background: #f5f7fa; border-color: #185a99; color: #185a99; }
+        .btn-danger { background: #fff; color: #d33; border: 1.5px solid #d33; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-danger:hover { background: #d33; color: #fff; }
+        .btn-success { background: #fff; color: #28a745; border: 1.5px solid #28a745; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-success:hover { background: #28a745; color: #fff; }
+        .btn-warning { background: #fff; color: #ffc107; border: 1.5px solid #ffc107; border-radius: 4px; padding: 0 14px; height: 36px; font-size: 15px; display: flex; align-items: center; transition: background 0.18s, border 0.18s; cursor: pointer; }
+        .btn-warning:hover { background: #ffc107; color: #fff; }
+        .checkbox-cell { width: 50px; text-align: center; }
+        .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .status-enabled { color: #28a745; font-weight: 500; }
+        .status-disabled { color: #6c757d; font-weight: 500; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <h3 class="mb-4">主数据服务列表</h3>
+    <!-- 查询区单独区域 -->
+    <form class="row g-3 align-items-center mb-3" style="background:#fff;border-radius:8px;padding:18px 18px 0 18px;box-shadow:0 2px 8px rgba(33,118,199,0.04);max-width:1100px;">
+        <div class="col-auto">
+            <label class="form-label mb-0 me-2">主数据模型</label>
+            <select class="form-select form-select-sm" style="width:140px;">
+                <option value="">全部</option>
+                <option>客户主数据</option>
+                <option>供应商主数据</option>
+                <option>产品主数据</option>
+                <option>员工主数据</option>
+                <option>组织主数据</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0 me-2">业务系统</label>
+            <select class="form-select form-select-sm" style="width:120px;">
+                <option value="">全部</option>
+                <option>OA系统</option>
+                <option>ERP系统</option>
+                <option>CRM系统</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0 me-2">接口服务名称</label>
+            <input type="text" class="form-control form-control-sm" style="width:160px;" placeholder="请输入服务名称">
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0 me-2">接口类型</label>
+            <select class="form-select form-select-sm" style="width:90px;">
+                <option value="">全部</option>
+                <option>JSON</option>
+                <option>XML</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm me-2"><i class="bi bi-search"></i> 查询</button>
+            <button type="reset" class="btn btn-outline-secondary btn-sm">重置</button>
+        </div>
+    </form>
+    <!-- 工具栏 -->
+    <div class="d-flex align-items-center gap-2 mb-2" style="max-width:1100px;">
+        <button class="btn btn-main btn-sm" onclick="openServiceDrawer()"><i class="bi bi-plus-lg me-1"></i>新建服务</button>
+        <button class="btn btn-success btn-sm" onclick="enableSelected()">启用</button>
+        <button class="btn btn-warning btn-sm" onclick="disableSelected()">禁用</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSelected()">删除</button>
+    </div>
+    <table class="table table-bordered table-hover align-middle mt-2">
+        <thead>
+            <tr>
+                <th class="checkbox-cell"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                <th style="width: 60px;">序号</th>
+                <th>主数据模型</th>
+                <th>业务系统</th>
+                <th>接口服务编码</th>
+                <th>接口服务名称</th>
+                <th>接口类型</th>
+                <th>状态</th>
+                <th style="width: 180px;">操作</th>
+            </tr>
+        </thead>
+        <tbody id="serviceTableBody">
+            <!-- JS渲染 -->
+        </tbody>
+    </table>
+</div>
+
+<!-- 新建服务抽屉 -->
+<style>
+.drawer-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.18); z-index: 2000; display: none;
+}
+.drawer {
+  position: fixed; top: 0; right: -900px; width: 900px; max-width:98vw; height: 100vh;
+  background: #fff; z-index: 2010; box-shadow: -2px 0 16px rgba(33,118,199,0.13);
+  transition: right 0.3s; display: flex; flex-direction: column;
+}
+.drawer.show { right: 0; }
+.drawer-header {
+  padding: 18px 24px; font-size: 18px; font-weight: 600; border-bottom: 1px solid #e3eaf3;
+  display: flex; justify-content: space-between; align-items: center; background: #f8f9fa;
+}
+.drawer-close {
+  background: none; border: none; font-size: 28px; color: #888; cursor: pointer;
+}
+.drawer-body { flex: 1; overflow: hidden; }
+</style>
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeServiceDrawer()"></div>
+<div class="drawer" id="serviceDrawer">
+  <div class="drawer-header">
+    <span>新建服务</span>
+    <button class="drawer-close" onclick="closeServiceDrawer()">&times;</button>
+  </div>
+  <div class="drawer-body" style="padding:0;">
+    <iframe id="serviceDrawerIframe" src="" style="width:100%;height:calc(100vh - 60px);border:none;border-radius:0 0 8px 8px;"></iframe>
+  </div>
+</div>
+<script>
+function openServiceDrawer() {
+  document.getElementById('drawerOverlay').style.display = 'block';
+  document.getElementById('serviceDrawer').classList.add('show');
+  document.getElementById('serviceDrawerIframe').src = 'data_service_sub.html';
+  document.body.style.overflow = 'hidden';
+}
+function closeServiceDrawer() {
+  document.getElementById('drawerOverlay').style.display = 'none';
+  document.getElementById('serviceDrawer').classList.remove('show');
+  document.body.style.overflow = '';
+}
+// ESC键关闭抽屉
+  document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+          closeServiceDrawer();
+      }
+  });
+// 示例数据
+let serviceData = [
+    {id:1, model:'客户主数据', system:'OA系统', code:'API_00123', name:'客户主数据接收接口', type:'JSON', status:'启用'},
+    {id:2, model:'供应商主数据', system:'ERP系统', code:'API_00124', name:'供应商主数据同步接口', type:'XML', status:'禁用'},
+    {id:3, model:'产品主数据', system:'CRM系统', code:'API_00125', name:'产品主数据查询接口', type:'JSON', status:'启用'}
+];
+function renderServiceTable() {
+    const tbody = document.getElementById('serviceTableBody');
+    tbody.innerHTML = serviceData.map((row, idx) => `
+        <tr>
+            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" value="${row.id}" onchange="updateSelectAll()"></td>
+            <td>${idx+1}</td>
+            <td>${row.model}</td>
+            <td>${row.system}</td>
+            <td>${row.code}</td>
+            <td>${row.name}</td>
+            <td>${row.type}</td>
+            <td class="${row.status==='启用'?'status-enabled':'status-disabled'}">${row.status}</td>
+            <td class="action-btns" style="white-space:nowrap;">
+                <button class="btn btn-link btn-sm text-primary p-0 me-2">查看</button>
+                <button class="btn btn-link btn-sm text-secondary p-0 me-2">编辑</button>
+                <button class="btn btn-link btn-sm text-danger p-0">删除</button>
+            </td>
+        </tr>
+    `).join('');
+}
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(checkbox => { checkbox.checked = selectAll.checked; });
+}
+function updateSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+    const totalCount = checkboxes.length;
+    if (checkedCount === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+    } else if (checkedCount === totalCount) {
+        selectAll.checked = true;
+        selectAll.indeterminate = false;
+    } else {
+        selectAll.checked = false;
+        selectAll.indeterminate = true;
+    }
+}
+function getSelectedIds() {
+    const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+function enableSelected() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) { alert('请选择要启用的服务'); return; }
+    serviceData.forEach(row => { if (ids.includes(row.id)) row.status = '启用'; });
+    renderServiceTable();
+}
+function disableSelected() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) { alert('请选择要禁用的服务'); return; }
+    serviceData.forEach(row => { if (ids.includes(row.id)) row.status = '禁用'; });
+    renderServiceTable();
+}
+function deleteSelected() {
+    const ids = getSelectedIds();
+    if (ids.length === 0) { alert('请选择要删除的服务'); return; }
+    if (!confirm('确定要删除选中的服务吗？')) return;
+    serviceData = serviceData.filter(row => !ids.includes(row.id));
+    renderServiceTable();
+}
+renderServiceTable();
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 打开新建服务抽屉
+    function openNewServiceDrawer() {
+        document.getElementById('drawerOverlay').style.display = 'block';
+        document.getElementById('newServiceDrawer').classList.add('show');
+        document.body.style.overflow = 'hidden'; // 防止背景滚动
+    }
+    
+    // 关闭新建服务抽屉
+    function closeNewServiceDrawer() {
+        document.getElementById('drawerOverlay').style.display = 'none';
+        document.getElementById('newServiceDrawer').classList.remove('show');
+        document.body.style.overflow = ''; // 恢复背景滚动
+    }
+    
+    // 表单提交处理
+    document.getElementById('newServiceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 这里可以添加表单验证和提交逻辑
+        alert('服务创建成功！');
+        closeNewServiceDrawer();
+        
+        // 重置表单
+        this.reset();
+    });
+    
+    // ESC键关闭抽屉
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeNewServiceDrawer();
+        }
+    });
+</script>
+</body>
+</html> 

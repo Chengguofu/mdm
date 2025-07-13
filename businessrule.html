@@ -441,6 +441,25 @@
       line-height: 26px;
       vertical-align: middle;
     }
+    
+    /* 联合校验区域样式 */
+    #jointValidationArea {
+      transition: all 0.3s ease;
+      border-left: 3px solid #2176c7;
+      padding-left: 16px;
+      margin-left: 8px;
+      background: linear-gradient(90deg, rgba(33,118,199,0.03) 0%, rgba(33,118,199,0.01) 100%);
+      border-radius: 0 8px 8px 0;
+    }
+    
+    /* 联合校验开关标签样式 */
+    .switch-label {
+      margin-left: 8px;
+      font-size: 13px;
+      color: #2176c7;
+      vertical-align: middle;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -455,8 +474,9 @@
           <tr>
             <th>规则名称</th>
             <th>规则类型</th>
-            <th>校验类型</th>
+            <!--<th>校验类型</th>-->
             <th>状态</th>
+            <th>创建人</th>
             <th>创建时间</th>
             <th style="text-align:center;">操作</th>
           </tr>
@@ -476,12 +496,12 @@
         <div class="drawer-body" style="overflow-y:auto;max-height:calc(100vh - 120px);">
           <div class="form-row">
             <div class="form-label">规则名称<span class="required">*</span>：</div>
-            <div class="form-value"><input type="text" id="editName" required></div>
+            <div class="form-value"><input type="text" id="editName" required style="width:308px"></div>
           </div>
           <div class="form-row">
             <div class="form-label">规则类型<span class="required">*</span>：</div>
             <div class="form-value">
-              <select id="editType" required>
+              <select id="editType" required style="width:70%">
                 <option value="唯一性校验">唯一性校验</option>
                 <option value="约束条件校验">约束条件校验</option>
                 <option value="必填规则">必填规则</option>
@@ -496,7 +516,7 @@
           <div class="form-row">
             <div class="form-label">状态：</div>
             <div class="form-value">
-              <label class="switch"><input type="checkbox" id="editStatusSwitch"><span class="slider"></span></label><span id="editStatusLabel" class="switch-label">启用</span>
+              <label class="switch"><input type="checkbox" id="editStatusSwitch"><span class="slider"></span></label>
             </div>
           </div>
         </div>
@@ -554,8 +574,9 @@
         <tr>
           <td>${item.name}</td>
           <td>${item.type}</td>
-          <td>${item.type === '校验规则' ? (item.detail && item.detail.validateType ? item.detail.validateType : '-') : '-'}</td>
+          <!--<td>${item.type === '校验规则' ? (item.detail && item.detail.validateType ? item.detail.validateType : '-') : '-'}</td>-->
           <td><label class="switch"><input type="checkbox" ${item.status==='启用'?'checked':''} onchange="toggleRowStatus(${idx})"><span class="slider"></span></label><span class="switch-label">${item.status}</span></td>
+          <td>${item.creator || '管理员'}</td>
           <td>${item.createTime}</td>
           <td class="center">
             <!-- <button type="button" onclick="showCondDrawer(${idx})" class="op-btn">条件设置</button><button type="button" onclick="showFieldDrawer(${idx})" class="op-btn">校验字段</button> -->
@@ -568,12 +589,18 @@
     renderTable();
     document.getElementById('addBtn').onclick = function() {
       editIdx = -1;
-      document.getElementById('drawerTitle').textContent = '新增业务规则';
-      document.getElementById('editName').value = '';
-      document.getElementById('editType').value = '校验规则';
-      document.getElementById('editStatusSwitch').checked = true;
-      document.getElementById('editStatusLabel').textContent = '启用';
-      document.getElementById('ruleDetailArea').innerHTML = '';
+      var drawerTitle = document.getElementById('drawerTitle');
+      if (drawerTitle) drawerTitle.textContent = '新增业务规则';
+      var editName = document.getElementById('editName');
+      if (editName) editName.value = '';
+      var editType = document.getElementById('editType');
+      if (editType) editType.value = '校验规则';
+      var editStatusSwitch = document.getElementById('editStatusSwitch');
+      if (editStatusSwitch) editStatusSwitch.checked = true;
+      var editStatusLabel = document.getElementById('editStatusLabel');
+      if (editStatusLabel) editStatusLabel.textContent = '启用';
+      var ruleDetailArea = document.getElementById('ruleDetailArea');
+      if (ruleDetailArea) ruleDetailArea.innerHTML = '';
       renderRuleDetail('校验规则', null);
       showDrawer();
     };
@@ -601,11 +628,16 @@
     window.editRule = function(idx) {
       editIdx = idx;
       const item = rules[idx];
-      document.getElementById('drawerTitle').textContent = '编辑业务规则';
-      document.getElementById('editName').value = item.name;
-      document.getElementById('editType').value = item.type;
-      document.getElementById('editStatusSwitch').checked = item.status === '启用';
-      document.getElementById('editStatusLabel').textContent = item.status;
+      var drawerTitle = document.getElementById('drawerTitle');
+      if (drawerTitle) drawerTitle.textContent = '编辑业务规则';
+      var editName = document.getElementById('editName');
+      if (editName) editName.value = item.name;
+      var editType = document.getElementById('editType');
+      if (editType) editType.value = item.type;
+      var editStatusSwitch = document.getElementById('editStatusSwitch');
+      if (editStatusSwitch) editStatusSwitch.checked = item.status === '启用';
+      var editStatusLabel = document.getElementById('editStatusLabel');
+      if (editStatusLabel) editStatusLabel.textContent = item.status;
       renderRuleDetail(item.type, item.detail);
       showDrawer();
     };
@@ -626,9 +658,9 @@
       if (!name) { alert('规则名称为必填项！'); return; }
       if (!detail) return;
       if (editIdx === -1) {
-        rules.push({ name, type, status, createTime, detail });
+        rules.push({ name, type, status, creator: '管理员', createTime, detail });
       } else {
-        rules[editIdx] = { name, type, status, createTime, detail };
+        rules[editIdx] = { name, type, status, creator: '管理员', createTime, detail };
       }
       renderTable();
       hideDrawer();
@@ -645,9 +677,33 @@
         if (type === '唯一性校验') {
           // 先初始化唯一性校验数据
           if (!window.uniqueCards || !window.uniqueCards[0]) {
-            window.uniqueCards = [{ uniqueAttr: '', uniqueAttrArr: [], uniqueMaster: '', uniqueMasterAttr: '', uniqueMasterAttrArr: [] }];
+            window.uniqueCards = [{ 
+              uniqueAttr: '', 
+              uniqueAttrArr: [], 
+              uniqueMaster: '', 
+              uniqueMasterAttr: '', 
+              uniqueMasterAttrArr: [],
+              enableJointValidation: false, // 新增：是否启用联合校验
+              caseSensitive: false, // 新增：区分大小写
+              ignoreAllSpace: true, // 新增：忽略所有空格，默认true
+              ignoreFullHalf: false // 新增：不区分全角半角
+            }];
           }
-          // 唯一性校验表单区域直接平铺
+          
+          // 如果是编辑模式，恢复保存的数据
+          if (detail) {
+            window.uniqueCards[0].uniqueAttr = detail.uniqueAttr || '';
+            window.uniqueCards[0].uniqueAttrArr = detail.uniqueAttrArr || [];
+            window.uniqueCards[0].enableJointValidation = detail.enableJointValidation || false;
+            window.uniqueCards[0].uniqueMaster = detail.uniqueMaster || '';
+            window.uniqueCards[0].uniqueMasterAttr = detail.uniqueMasterAttr || '';
+            window.uniqueCards[0].uniqueMasterAttrArr = detail.uniqueMasterAttrArr || [];
+            window.uniqueCards[0].caseSensitive = detail.caseSensitive || false;
+            window.uniqueCards[0].ignoreAllSpace = detail.ignoreAllSpace !== false;
+            window.uniqueCards[0].ignoreFullHalf = detail.ignoreFullHalf || false;
+          }
+          
+          // 唯一性校验表单区域
           html += `
             <div class='form-row'>
               <div class='form-label'>属性</div>
@@ -661,26 +717,51 @@
                 </div>
               </div>
             </div>
-            <div class='form-row'>
-              <div class='form-label'>主数据</div>
-              <div class='form-value'>
-                <select class='form-control' style='width:100%;' id='uniqueMasterSelect'>
-                  <option value=''>请选择主数据</option>
-                  <option value='master1'>主数据1</option>
-                  <option value='master2'>主数据2</option>
-                  <option value='master3'>主数据3</option>
-                </select>
+            <div id='uniqueOptionsRow' style='margin-top:0;margin-bottom:18px;display:flex;justify-content:flex-start;'>
+              <div style='display:flex;align-items:center;gap:28px;margin-left:120px;'>
+                <label style='display:flex;align-items:center;font-weight:400;color:#185a99;'><input type='checkbox' id='caseSensitive' ${(window.uniqueCards[0].caseSensitive)?'checked':''} style='margin-right:6px;'><span style='font-size:13px;'>区分大小写</span></label>
+                <label style='display:flex;align-items:center;font-weight:400;color:#185a99;'><input type='checkbox' id='ignoreAllSpace' ${(window.uniqueCards[0].ignoreAllSpace!==false)?'checked':''} style='margin-right:6px;'><span style='font-size:13px;'>忽略所有空格</span></label>
+                <label style='display:flex;align-items:center;font-weight:400;color:#185a99;'><input type='checkbox' id='ignoreFullHalf' ${(window.uniqueCards[0].ignoreFullHalf)?'checked':''} style='margin-right:6px;'><span style='font-size:13px;'>区分全角半角</span></label>
               </div>
             </div>
             <div class='form-row'>
-              <div class='form-label'>主数据属性</div>
-              <div class='form-value'>
-                <div class='multi-select-wrap' style='width:100%;position:relative;'>
-                  <div class='multi-select-input master-attr-input' tabindex='0' style='width:100%;' data-idx='0'>
-                    ${(window.uniqueCards[0].uniqueMasterAttrArr||[]).map(attr=>`<span class='multi-tag'>${attr}<span class='multi-tag-close' data-value='${attr}' style='margin-left:2px;cursor:pointer;'>&times;</span></span>`).join('')}
-                    <input class='multi-select-hidden-input' style='border:none;outline:none;flex:1 1 40px;min-width:40px;height:28px;background:transparent;padding:0;margin:0;display:inline-block;' readonly placeholder='请选择主数据属性，可多选'>
-                  </div>
-                  <div class='multi-select-dropdown master-attr-dropdown' style='display:none;position:absolute;top:110%;left:0;width:100%;background:#fff;border:1.5px solid #d0d7de;border-radius:7px;box-shadow:0 2px 12px rgba(33,118,199,0.10);z-index:10;max-height:180px;overflow:auto;'></div>
+              <div class='form-label'>联合校验：</div>
+              <div class='form-value' style='display:flex;align-items:center;gap:8px;'>
+                <label class="switch">
+                  <input type="checkbox" id="jointValidationSwitch" ${(window.uniqueCards[0].enableJointValidation || false) ? 'checked' : ''}>
+                  <span class="slider"></span>
+                </label>
+                <span class="joint-help-icon" style="font-size:16px;color:#2176c7;border-radius:50%;border:1px solid #b6c6e3;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;line-height:18px;cursor:pointer;margin-left:6px;position:relative;z-index:101;">?
+                  <span class="joint-help-pop" style="display:none;position:absolute;left:24px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid #b6c6e3;border-radius:6px;padding:8px 14px;box-shadow:0 2px 8px rgba(33,118,199,0.13);font-size:13px;min-width:220px;z-index:999;white-space:normal;">校验当前输入值与另一个主数据模型中的对应属性值，确保数据在两个模型中同时保持唯一</span>
+                </span>
+              </div>
+            </div>
+            <div id="jointValidationArea" style="display: ${(window.uniqueCards[0].enableJointValidation || false) ? 'block' : 'none'};">
+              <div class='form-row'>
+                <div class='form-label'>主数据</div>
+                <div class='form-value'>
+                  <select class='form-control' style='width:100%;' id='uniqueMasterSelect'>
+                    <option value=''>请选择主数据</option>
+                    <option value='master1' ${(window.uniqueCards[0].uniqueMaster === 'master1') ? 'selected' : ''}>主数据1</option>
+                    <option value='master2' ${(window.uniqueCards[0].uniqueMaster === 'master2') ? 'selected' : ''}>主数据2</option>
+                    <option value='master3' ${(window.uniqueCards[0].uniqueMaster === 'master3') ? 'selected' : ''}>主数据3</option>
+                  </select>
+                </div>
+              </div>
+              <div class='form-row'>
+                <div class='form-label'>主数据属性</div>
+                <div class='form-value'>
+                  <select id='uniqueMasterAttrSelect' style='width:100%;'>
+                    <option value=''>请选择主数据属性</option>
+                    <option value='客户名称' ${(window.uniqueCards[0].uniqueMasterAttr==="客户名称")?'selected':''}>客户名称</option>
+                    <option value='客户编码' ${(window.uniqueCards[0].uniqueMasterAttr==="客户编码")?'selected':''}>客户编码</option>
+                    <option value='供应商名称' ${(window.uniqueCards[0].uniqueMasterAttr==="供应商名称")?'selected':''}>供应商名称</option>
+                    <option value='供应商编码' ${(window.uniqueCards[0].uniqueMasterAttr==="供应商编码")?'selected':''}>供应商编码</option>
+                    <option value='物料名称' ${(window.uniqueCards[0].uniqueMasterAttr==="物料名称")?'selected':''}>物料名称</option>
+                    <option value='物料编码' ${(window.uniqueCards[0].uniqueMasterAttr==="物料编码")?'selected':''}>物料编码</option>
+                    <option value='使用单位名称' ${(window.uniqueCards[0].uniqueMasterAttr==="使用单位名称")?'selected':''}>使用单位名称</option>
+                    <option value='使用单位编码' ${(window.uniqueCards[0].uniqueMasterAttr==="使用单位编码")?'selected':''}>使用单位编码</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -688,8 +769,13 @@
           // 适用条件和状态区域
           html += `<div id='uniqueCondStatusArea'></div>`;
         } else if (type === '约束条件校验') {
-          // 约束条件校验的输入字段
-          html += `<div class='form-row'><div class='form-label'>约束规则：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='constraintRuleInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑约束规则'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='约束规则编辑' id='constraintRuleBtn'>🔍</span></div></div>`;
+          // 新增：校验类型下拉
+          let validateType = (detail && detail.validateType) || '正则表达式校验';
+          html += `<div class='form-row'><div class='form-label'>校验类型：</div><div class='form-value'><select id='validateTypeSelect' style='width:70%'><option value='正则表达式校验' ${validateType==='正则表达式校验'?'selected':''}>正则表达式校验</option><option value='约束表达式' ${validateType==='约束表达式'?'selected':''}>约束表达式</option></select></div></div>`;
+          // 正则表达式输入框
+          html += `<div class='form-row' id='regexRow' style='display:${validateType==='正则表达式校验'?'flex':'none'};'><div class='form-label'>正则表达式：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='regexInput' class='form-control' style='width:100%;' placeholder='请输入或选择正则表达式'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='选择正则表达式' id='regexSelectBtn'>🔍</span></div></div>`;
+          // 约束表达式输入框
+          html += `<div class='form-row' id='constraintRuleRow' style='display:${validateType==='约束表达式'?'flex':'none'};'><div class='form-label'>约束规则：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='constraintRuleInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑约束规则'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='约束规则编辑' id='constraintRuleBtn'>🔍</span></div></div>`;
           html += `<div class='form-row'><div class='form-label'>适用条件：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='constraintCondInput' class='form-control' style='width:100%;padding-right:32px;' readonly placeholder='点击右侧按钮编辑'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='适用条件编辑' id='constraintCondBtn'>🔍</span></div></div>`;
         }
       } else if (type === '必填规则' || type === '显隐规则') {
@@ -824,16 +910,19 @@
         ];
         // 先渲染"当模型属性"
         html += `<div class='form-row'><div class='form-label'>当模型属性：</div><div class='form-value'><input id='linkageTrigger' placeholder='如：省' value='${detail && detail.linkageTrigger ? detail.linkageTrigger : ''}' style='width:70%;'><span style='margin-left:8px;color:#888;'>发生变化时</span></div></div>`;
-        // 联动字段下拉单选
-        html += `<div class='form-row'><div class='form-label'>联动字段：</div><div class='form-value'><select id='linkageField' style='width:70%;'>`;
-        html += `<option value=''>请选择联动字段</option>`;
-        html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageField===opt.code)?'selected':''}>${opt.name}</option>`).join('');
-        html += `</select></div></div>`;
-        // 新增：联动条件（引用属性下拉）
-        html += `<div class='form-row'><div class='form-label'>联动条件：</div><div class='form-value'><select id='linkageRefAttr' style='width:70%;'>`;
-        html += `<option value=''>请选择引用属性</option>`;
-        html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageRefAttr===opt.code)?'selected':''}>${opt.name}</option>`).join('');
-        html += `</select></div></div>`;
+        // 仅在规则类型为"数据联动规则"时显示联动字段和联动条件
+        if (type === '数据联动规则') {
+          // 联动字段下拉单选
+          html += `<div class='form-row'><div class='form-label'>联动字段：</div><div class='form-value'><select id='linkageField' style='width:70%;'>`;
+          html += `<option value=''>请选择联动字段</option>`;
+          html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageField===opt.code)?'selected':''}>${opt.name}</option>`).join('');
+          html += `</select></div></div>`;
+          // 新增：联动条件（引用属性下拉）
+          html += `<div class='form-row'><div class='form-label'>联动条件：</div><div class='form-value'><select id='linkageRefAttr' style='width:70%;'>`;
+          html += `<option value=''>请选择引用属性</option>`;
+          html += fieldOptions.map(opt => `<option value='${opt.code}' ${(detail && detail.linkageRefAttr===opt.code)?'selected':''}>${opt.name}</option>`).join('');
+          html += `</select></div></div>`;
+        }
         // 联动表达式输入
         html += `<div class='form-row'><div class='form-label'>联动表达式：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'>`;
         html += `<input id='linkageExpr' placeholder='city.province = province' value='${detail && detail.linkageExpr ? detail.linkageExpr : ''}' style='width:100%;padding-right:36px;'>`;
@@ -841,98 +930,168 @@
         html += `</div></div>`;
       }
       area.innerHTML = html;
-      // 唯一性校验卡片区域渲染
-      if (type === '唯一性校验') {
-        // 直接初始化多选和下拉交互
-        const area = document.getElementById('ruleDetailArea');
-        // 多选下拉属性列表
-        const ATTR_OPTIONS = ['a1','b2','c3','d4','e5','f6','g7','h8','i9','j10'];
-        // 属性多选
-        const inputWrap = area.querySelector('.multi-select-input[data-idx="0"]');
-        const dropdown = area.querySelector('.multi-select-dropdown');
-        function renderDropdown() {
-          const selected = window.uniqueCards[0].uniqueAttrArr||[];
-          dropdown.innerHTML = ATTR_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
-        }
-        inputWrap.onclick = function(e) {
-          e.stopPropagation();
-          renderDropdown();
-          dropdown.style.display = 'block';
-        };
-        dropdown.onclick = function(e) {
-          const v = e.target.getAttribute('data-value');
-          if (!v) return;
-          let arr = window.uniqueCards[0].uniqueAttrArr||[];
-          if (arr.includes(v)) {
-            arr = arr.filter(x=>x!==v);
-          } else {
-            arr = arr.concat(v);
+              // 唯一性校验卡片区域渲染
+        if (type === '唯一性校验') {
+          // 直接初始化多选和下拉交互
+          const area = document.getElementById('ruleDetailArea');
+          // 多选下拉属性列表
+          const ATTR_OPTIONS = [
+            '客户名称',
+            '客户编码',
+            '供应商名称',
+            '供应商编码',
+            '物料名称',
+            '物料编码',
+            '使用单位名称',
+            '使用单位编码'
+          ];
+          
+          // 联合校验开关事件处理
+          const jointValidationSwitch = document.getElementById('jointValidationSwitch');
+          const jointValidationArea = document.getElementById('jointValidationArea');
+          if (jointValidationSwitch) {
+            jointValidationSwitch.onchange = function() {
+              const isEnabled = this.checked;
+              window.uniqueCards[0].enableJointValidation = isEnabled;
+              if (jointValidationArea) {
+                jointValidationArea.style.display = isEnabled ? 'block' : 'none';
+              }
+              // 如果关闭联合校验，清空主数据相关字段
+              if (!isEnabled) {
+                window.uniqueCards[0].uniqueMaster = '';
+                window.uniqueCards[0].uniqueMasterAttrArr = [];
+                window.uniqueCards[0].uniqueMasterAttr = '';
+                // 重新渲染以更新显示
+                renderRuleDetail('唯一性校验');
+              }
+            };
           }
-          window.uniqueCards[0].uniqueAttrArr = arr;
-          window.uniqueCards[0].uniqueAttr = arr.join(',');
-          renderRuleDetail('唯一性校验');
-        };
-        inputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
-          closeBtn.onclick = function(ev) {
-            ev.stopPropagation();
-            const v = closeBtn.getAttribute('data-value');
+          
+          // 主数据选择事件处理
+          const uniqueMasterSelect = document.getElementById('uniqueMasterSelect');
+          if (uniqueMasterSelect) {
+            uniqueMasterSelect.onchange = function() {
+              window.uniqueCards[0].uniqueMaster = this.value;
+            };
+          }
+          
+          // 属性多选
+          const inputWrap = area.querySelector('.multi-select-input[data-idx="0"]');
+          const dropdown = area.querySelector('.multi-select-dropdown');
+          function renderDropdown() {
+            const selected = window.uniqueCards[0].uniqueAttrArr||[];
+            dropdown.innerHTML = ATTR_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
+          }
+          inputWrap.onclick = function(e) {
+            e.stopPropagation();
+            renderDropdown();
+            dropdown.style.display = 'block';
+          };
+          dropdown.onclick = function(e) {
+            const v = e.target.getAttribute('data-value');
+            if (!v) return;
             let arr = window.uniqueCards[0].uniqueAttrArr||[];
-            arr = arr.filter(x=>x!==v);
+            if (arr.includes(v)) {
+              arr = arr.filter(x=>x!==v);
+            } else {
+              arr = arr.concat(v);
+            }
             window.uniqueCards[0].uniqueAttrArr = arr;
             window.uniqueCards[0].uniqueAttr = arr.join(',');
             renderRuleDetail('唯一性校验');
           };
-        });
-        inputWrap.onblur = function() {
-          setTimeout(()=>{dropdown.style.display='none';},120);
-        };
-        // 主数据属性多选
-        const masterInputWrap = area.querySelector('.master-attr-input[data-idx="0"]');
-        const masterDropdown = area.querySelector('.master-attr-dropdown');
-        const MASTER_ATTR_OPTIONS = ['ma1','ma2','ma3','ma4'];
-        function renderMasterDropdown() {
-          const selected = window.uniqueCards[0].uniqueMasterAttrArr||[];
-          masterDropdown.innerHTML = MASTER_ATTR_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
-        }
-        masterInputWrap.onclick = function(e) {
-          e.stopPropagation();
-          renderMasterDropdown();
-          masterDropdown.style.display = 'block';
-        };
-        masterDropdown.onclick = function(e) {
-          const v = e.target.getAttribute('data-value');
-          if (!v) return;
-          let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
-          if (arr.includes(v)) {
-            arr = arr.filter(x=>x!==v);
-          } else {
-            arr = arr.concat(v);
-          }
-          window.uniqueCards[0].uniqueMasterAttrArr = arr;
-          window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
-          renderRuleDetail('唯一性校验');
-        };
-        masterInputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
-          closeBtn.onclick = function(ev) {
-            ev.stopPropagation();
-            const v = closeBtn.getAttribute('data-value');
-            let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
-            arr = arr.filter(x=>x!==v);
-            window.uniqueCards[0].uniqueMasterAttrArr = arr;
-            window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
-            renderRuleDetail('唯一性校验');
+          inputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
+            closeBtn.onclick = function(ev) {
+              ev.stopPropagation();
+              const v = closeBtn.getAttribute('data-value');
+              let arr = window.uniqueCards[0].uniqueAttrArr||[];
+              arr = arr.filter(x=>x!==v);
+              window.uniqueCards[0].uniqueAttrArr = arr;
+              window.uniqueCards[0].uniqueAttr = arr.join(',');
+              renderRuleDetail('唯一性校验');
+            };
+          });
+          inputWrap.onblur = function() {
+            setTimeout(()=>{dropdown.style.display='none';},120);
           };
-        });
-        masterInputWrap.onblur = function() {
-          setTimeout(()=>{masterDropdown.style.display='none';},120);
-        };
-        // 点击页面其他地方关闭所有下拉
-        document.addEventListener('click', function(){
-          area.querySelectorAll('.multi-select-dropdown').forEach(d=>d.style.display='none');
-        });
-        renderUniqueCondStatusArea();
-        return;
-      }
+          
+          // 主数据属性多选（只在联合校验启用时初始化）
+          if (window.uniqueCards[0].enableJointValidation) {
+            const masterInputWrap = area.querySelector('.master-attr-input[data-idx="0"]');
+            const masterDropdown = area.querySelector('.master-attr-dropdown');
+            const MASTER_ATTR_OPTIONS = [
+              '客户名称',
+              '客户编码',
+              '供应商名称',
+              '供应商编码',
+              '物料名称',
+              '物料编码',
+              '使用单位名称',
+              '使用单位编码'
+            ];
+            // 可输入筛选
+            let filterValue = '';
+            function renderMasterDropdown() {
+              const selected = window.uniqueCards[0].uniqueMasterAttrArr||[];
+              const filtered = filterValue ? MASTER_ATTR_OPTIONS.filter(opt=>opt.includes(filterValue)) : MASTER_ATTR_OPTIONS;
+              masterDropdown.innerHTML = filtered.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${selected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${selected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
+            }
+            masterInputWrap.onclick = function(e) {
+              e.stopPropagation();
+              filterValue = '';
+              renderMasterDropdown();
+              masterDropdown.style.display = 'block';
+              masterInputWrap.querySelector('.multi-select-hidden-input').focus();
+            };
+            masterDropdown.onclick = function(e) {
+              const v = e.target.getAttribute('data-value');
+              if (!v) return;
+              let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
+              if (arr.includes(v)) {
+                arr = arr.filter(x=>x!==v);
+              } else {
+                arr = arr.concat(v);
+              }
+              window.uniqueCards[0].uniqueMasterAttrArr = arr;
+              window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
+              renderRuleDetail('唯一性校验');
+            };
+            masterInputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
+              closeBtn.onclick = function(ev) {
+                ev.stopPropagation();
+                const v = closeBtn.getAttribute('data-value');
+                let arr = window.uniqueCards[0].uniqueMasterAttrArr||[];
+                arr = arr.filter(x=>x!==v);
+                window.uniqueCards[0].uniqueMasterAttrArr = arr;
+                window.uniqueCards[0].uniqueMasterAttr = arr.join(',');
+                renderRuleDetail('唯一性校验');
+              };
+            });
+            // 输入筛选
+            const inputEl = masterInputWrap.querySelector('.multi-select-hidden-input');
+            inputEl.readOnly = false;
+            inputEl.value = '';
+            inputEl.oninput = function(e) {
+              filterValue = inputEl.value.trim();
+              renderMasterDropdown();
+              masterDropdown.style.display = 'block';
+            };
+            inputEl.onfocus = function() {
+              renderMasterDropdown();
+              masterDropdown.style.display = 'block';
+            };
+            inputEl.onblur = function() {
+              setTimeout(()=>{masterDropdown.style.display='none';},120);
+            };
+          }
+          
+          // 点击页面其他地方关闭所有下拉
+          document.addEventListener('click', function(){
+            area.querySelectorAll('.multi-select-dropdown').forEach(d=>d.style.display='none');
+          });
+          renderUniqueCondStatusArea();
+          return;
+        }
       // 约束条件校验适用条件按钮事件
       if (type === '约束条件校验') {
         const constraintRuleBtn = document.getElementById('constraintRuleBtn');
@@ -1034,6 +1193,32 @@
           };
         }, 0);
       }
+      // 约束条件校验校验类型切换逻辑
+      if (type === '约束条件校验') {
+        setTimeout(()=>{
+          const validateTypeSelect = document.getElementById('validateTypeSelect');
+          const regexRow = document.getElementById('regexRow');
+          const constraintRuleRow = document.getElementById('constraintRuleRow');
+          if(validateTypeSelect && regexRow && constraintRuleRow) {
+            validateTypeSelect.onchange = function() {
+              if(this.value==='正则表达式校验') {
+                regexRow.style.display = 'flex';
+                constraintRuleRow.style.display = 'none';
+              } else {
+                regexRow.style.display = 'none';
+                constraintRuleRow.style.display = 'flex';
+              }
+            };
+          }
+          // 正则选择按钮事件（可扩展弹窗选择）
+          const regexSelectBtn = document.getElementById('regexSelectBtn');
+          if(regexSelectBtn) {
+            regexSelectBtn.onclick = function() {
+              alert('此处可弹出正则表达式选择器');
+            };
+          }
+        },0);
+      }
     }
     // 采集规则详细信息
     function collectRuleDetail(type) {
@@ -1041,7 +1226,23 @@
       if (type === '唯一性校验' || type === '约束条件校验') {
         // 原校验规则+校验类型逻辑
         if (type === '唯一性校验') {
-          // 唯一性校验不需要额外字段
+          // 唯一性校验字段采集
+          if (window.uniqueCards && window.uniqueCards[0]) {
+            detail.uniqueAttr = window.uniqueCards[0].uniqueAttr || '';
+            detail.uniqueAttrArr = window.uniqueCards[0].uniqueAttrArr || [];
+            detail.enableJointValidation = window.uniqueCards[0].enableJointValidation || false;
+            // 新增：采集三个选项
+            detail.caseSensitive = window.uniqueCards[0].caseSensitive || false;
+            detail.ignoreAllSpace = window.uniqueCards[0].ignoreAllSpace !== false;
+            detail.ignoreFullHalf = window.uniqueCards[0].ignoreFullHalf || false;
+            
+            // 只有在启用联合校验时才采集主数据相关字段
+            if (window.uniqueCards[0].enableJointValidation) {
+              detail.uniqueMaster = window.uniqueCards[0].uniqueMaster || '';
+              detail.uniqueMasterAttr = window.uniqueCards[0].uniqueMasterAttr || '';
+              detail.uniqueMasterAttrArr = window.uniqueCards[0].uniqueMasterAttrArr || [];
+            }
+          }
         } else if (type === '约束条件校验') {
           // 约束条件校验不显示约束条件和提示语，所以不采集这些字段
           const constraintRuleEl = document.getElementById('constraintRuleInput');
@@ -1436,6 +1637,45 @@
         window.open('condition_new.html', '_blank', 'width=800,height=600');
       };
     }
+    // 新增：三个选项事件处理
+    const caseSensitive = document.getElementById('caseSensitive');
+    const ignoreAllSpace = document.getElementById('ignoreAllSpace');
+    const ignoreFullHalf = document.getElementById('ignoreFullHalf');
+    if (caseSensitive) {
+      caseSensitive.onchange = function() {
+        window.uniqueCards[0].caseSensitive = this.checked;
+      };
+    }
+    if (ignoreAllSpace) {
+      ignoreAllSpace.onchange = function() {
+        window.uniqueCards[0].ignoreAllSpace = this.checked;
+      };
+    }
+    if (ignoreFullHalf) {
+      ignoreFullHalf.onchange = function() {
+        window.uniqueCards[0].ignoreFullHalf = this.checked;
+      };
+    }
+    // 在renderRuleDetail函数结尾处，绑定select事件和帮助气泡事件
+    setTimeout(()=>{
+      // 主数据属性下拉单选采集
+      const uniqueMasterAttrSelect = document.getElementById('uniqueMasterAttrSelect');
+      if(uniqueMasterAttrSelect){
+        uniqueMasterAttrSelect.onchange = function(){
+          window.uniqueCards[0].uniqueMasterAttr = this.value;
+          window.uniqueCards[0].uniqueMasterAttrArr = this.value ? [this.value] : [];
+        };
+      }
+      // 联合校验帮助气泡
+      const helpIcon = document.querySelector('.joint-help-icon');
+      const helpPop = document.querySelector('.joint-help-pop');
+      if (helpIcon && helpPop) {
+        helpIcon.onmouseenter = () => { helpPop.style.display = 'block'; };
+        helpIcon.onmouseleave = () => { helpPop.style.display = 'none'; };
+        helpPop.onmouseenter = () => { helpPop.style.display = 'block'; };
+        helpPop.onmouseleave = () => { helpPop.style.display = 'none'; };
+      }
+    },0);
   </script>
 </body>
 </html> 

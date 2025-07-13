@@ -69,7 +69,6 @@
       width: 100%;
     }
     .attr-field-list {
-      width: 182px;
       background: #f6f8fa;
       border-radius: 6px 0 0 6px;
       padding: 0;
@@ -81,6 +80,8 @@
       height: 100%;
       overflow-y: auto;
       flex-shrink: 0;
+      width: 182px;
+      box-sizing: border-box;
     }
     .attr-field-list > div > span {
       font-size: 12px !important;
@@ -460,9 +461,8 @@
     .attr-detail-title, .section-collapse-title, .section-collapse-title * {
       font-size: 12px !important;
     }
-    .modal-steps { user-select:none; }
-    .modal-step {
-      display:flex;align-items:center;gap:8px;position:relative;cursor:pointer;font-size:15px;color:#b0b8c1;font-weight:500;transition:.18s;flex:1;justify-content:center;
+    .modal-steps, .modal-steps *, .modal-step, .modal-step .step-index {
+      font-size: 17px !important;
     }
     .modal-step .step-index {
       display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#e5e6eb;color:#888;font-size:15px;font-weight:600;margin-right:6px;transition:.18s;
@@ -560,6 +560,57 @@
       background: #185a99 !important;
       box-shadow: 0 4px 12px rgba(33,118,199,0.15) !important;
     }
+    
+    /* 多视图页签样式 */
+    .attr-view-tab {
+      display: inline-block;
+      padding: 10px 24px;
+      font-size: 15px;
+      color: #185a99;
+      cursor: pointer;
+      background: none;
+      border: none;
+      outline: none;
+      border-bottom: 2.5px solid transparent;
+      transition: .2s;
+      font-weight: 500;
+      margin-right: 2px;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+      text-align: center;
+    }
+    .attr-view-tab:hover {
+      color: #2176c7;
+      background: #f6f8fa;
+    }
+    .attr-view-tab.active {
+      color: #2176c7;
+      font-weight: 600;
+      border-bottom: 2.5px solid #2176c7;
+      background: #f6f8fa;
+      z-index: 2;
+    }
+    #attrViewTabs {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      border-bottom: 2px solid #e5e6eb;
+      background: #fff;
+      min-height: 44px;
+      user-select: none;
+      position: relative;
+      z-index: 20;
+      margin-bottom: 0;
+      padding-left: 0;
+      box-sizing: border-box;
+    }
+    #tab-base, #tab-base * {
+      font-size: 16px !important;
+    }
   </style>
 </head>
 <body>
@@ -642,10 +693,11 @@
       <button type="button" class="btn-line-modern" id="modalSaveBtn">保存</button>
       <button type="button" class="btn-modern" id="modalNextBtn">下一步</button>
     </div>
-    <div class="modal-content" id="tab-attr" style="display:none;">
+    <div class="modal-content" id="tab-attr" style="display:none; padding-top:0;">
       <div class="attr-flexbox">
-        <div class="attr-field-list" id="attrFieldList">
-          <!-- 字段项由JS渲染 -->
+        <div class="attr-field-list" id="attrFieldListWrapper">
+          <div id="attrViewTabs" style="width:100%;"></div>
+          <div id="attrFieldList"></div>
         </div>
         <div class="attr-field-detail" id="attr-detail-box">
           <!-- 详情内容由JS渲染 -->
@@ -971,22 +1023,42 @@ const FIELD_LIBRARY = [
   { value: 'desc38', name: '职称等级' },
   // 可扩展更多字段
 ];
-// 当前属性字段，含状态和属性详情
-let attrFields = [
-  { value: 'desc31', name: '国籍', status: 'normal', enabled: true, detail: { code: 'code1', name: '国籍', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
-  { value: 'desc32', name: '身份证号码', status: 'normal', enabled: true, detail: { code: 'code2', name: '身份证号码', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
-  { value: 'desc33', name: '出生日期', status: 'normal', enabled: true, detail: { code: 'code3', name: '出生日期', type: '日期', length: '', required: '否', getType: '自动生成' } },
-  { value: 'desc34', name: '所属组织机构', status: 'normal', enabled: true, detail: { code: 'code4', name: '所属组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
-  { value: 'desc35', name: '现工作单位组织机构', status: 'normal', enabled: true, detail: { code: 'code5', name: '现工作单位组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
-  { value: 'desc36', name: '参加工作时间', status: 'normal', enabled: true, detail: { code: 'code6', name: '参加工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
-  { value: 'desc37', name: '到首钢工作时间', status: 'normal', enabled: true, detail: { code: 'code7', name: '到首钢工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
-  { value: 'desc38', name: '职称等级', status: 'normal', enabled: true, detail: { code: 'code8', name: '职称等级', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
-];
+
+// 多视图字段管理
+let currentView = 'base'; // 当前选中的视图
+let attrFieldsByView = {
+  // 基本属性字段
+  base: [
+    { value: 'desc31', name: '国籍', status: 'normal', enabled: true, detail: { code: 'code1', name: '国籍', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
+    { value: 'desc32', name: '身份证号码', status: 'normal', enabled: true, detail: { code: 'code2', name: '身份证号码', type: '字符串', length: '32', required: '是', getType: '自动生成' } },
+    { value: 'desc33', name: '出生日期', status: 'normal', enabled: true, detail: { code: 'code3', name: '出生日期', type: '日期', length: '', required: '否', getType: '自动生成' } },
+    { value: 'desc34', name: '所属组织机构', status: 'normal', enabled: true, detail: { code: 'code4', name: '所属组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+    { value: 'desc35', name: '现工作单位组织机构', status: 'normal', enabled: true, detail: { code: 'code5', name: '现工作单位组织机构', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+    { value: 'desc36', name: '参加工作时间', status: 'normal', enabled: true, detail: { code: 'code6', name: '参加工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
+    { value: 'desc37', name: '到首钢工作时间', status: 'normal', enabled: true, detail: { code: 'code7', name: '到首钢工作时间', type: '日期', length: '', required: '否', getType: '自动生成' } },
+    { value: 'desc38', name: '职称等级', status: 'normal', enabled: true, detail: { code: 'code8', name: '职称等级', type: '字符串', length: '32', required: '否', getType: '自动生成' } },
+  ]
+};
+
+// 获取当前视图的字段列表
+function getCurrentAttrFields() {
+  return attrFieldsByView[currentView] || [];
+}
+
+// 设置当前视图的字段列表
+function setCurrentAttrFields(fields) {
+  attrFieldsByView[currentView] = fields;
+}
+
+// 当前属性字段（兼容原有代码）
+let attrFields = getCurrentAttrFields();
+
 // 选中字段索引
 let selectedAttrIdx = 0;
 function renderAttrDetailBox() {
   const box = document.getElementById('attr-detail-box');
-  const f = attrFields[selectedAttrIdx];
+  const currentFields = getCurrentAttrFields();
+  const f = currentFields[selectedAttrIdx];
   if (!f) { box.innerHTML = '<div style="color:#888;padding:32px;">无属性</div>'; return; }
   if (!f.enabled) {
     box.innerHTML = `<div style='color:#d33;font-size:16px;padding:48px 0 0 0;text-align:center;'>该字段已被禁用，请点击左侧启用</div>`;
@@ -1064,6 +1136,7 @@ function renderAttrDetailBox() {
 }
 function renderAttrFieldList() {
   const list = document.getElementById('attrFieldList');
+  const currentFields = getCurrentAttrFields();
   // 批量删除按钮
   let deleteBtn = `<button class="btn-modern" id="batchDeleteBtn" style="display:flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;margin-left:6px;min-width:unset;height:20px;line-height:1;background:#e53935;"><svg width='13' height='13' viewBox='0 0 1024 1024'><path d='M256 256l512 512M768 256L256 768' stroke='#fff' stroke-width='48' stroke-linecap='round'/></svg></button>`;
   list.innerHTML = `
@@ -1078,7 +1151,7 @@ function renderAttrFieldList() {
       </div>
     </div>
   ` +
-    attrFields.map((f, idx) => {
+    currentFields.map((f, idx) => {
       let main = idx === 0 ? '编码' : (idx === 1 ? '名称' : f.name);
       let sub = idx === 0 ? `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>code</div>` : (idx === 1 ? `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>name</div>` : `<div style='font-size:12px;color:#888;margin-top:2px;margin-left:2px;'>desc${idx+1}</div>`);
       let icon = '';
@@ -1115,7 +1188,9 @@ function renderAttrFieldList() {
     icon.onclick = function(e) {
       e.stopPropagation();
       const idx = parseInt(this.getAttribute('data-idx'));
-      attrFields[idx].enabled = !attrFields[idx].enabled;
+      const currentFields = getCurrentAttrFields();
+      currentFields[idx].enabled = !currentFields[idx].enabled;
+      setCurrentAttrFields(currentFields);
       renderAttrFieldList();
       renderAttrDetailBox();
     }
@@ -1125,7 +1200,9 @@ function renderAttrFieldList() {
     cb.onclick = function(e) {
       e.stopPropagation();
       const idx = parseInt(this.getAttribute('data-idx'));
-      attrFields[idx].selected = this.checked;
+      const currentFields = getCurrentAttrFields();
+      currentFields[idx].selected = this.checked;
+      setCurrentAttrFields(currentFields);
     }
   });
   // 绑定批量删除
@@ -1134,9 +1211,11 @@ function renderAttrFieldList() {
     batchDeleteBtn.onclick = function(e) {
       e.stopPropagation();
       // 只删除勾选的，且idx>1
-      attrFields = attrFields.filter((f, idx) => idx<=1 || !f.selected);
+      const currentFields = getCurrentAttrFields();
+      const newFields = currentFields.filter((f, idx) => idx<=1 || !f.selected);
+      setCurrentAttrFields(newFields);
       // 重置选中
-      if(selectedAttrIdx >= attrFields.length) selectedAttrIdx = attrFields.length-1;
+      if(selectedAttrIdx >= newFields.length) selectedAttrIdx = newFields.length-1;
       renderAttrFieldList();
       renderAttrDetailBox();
     }
@@ -1145,7 +1224,9 @@ function renderAttrFieldList() {
   renderAttrDetailBox();
 }
 window.toggleFieldStatus = function(value) {
-  attrFields = attrFields.map(f => f.value===value ? { ...f, status: f.status==='normal'?'deleted':'normal' } : f);
+  const currentFields = getCurrentAttrFields();
+  const newFields = currentFields.map(f => f.value===value ? { ...f, status: f.status==='normal'?'deleted':'normal' } : f);
+  setCurrentAttrFields(newFields);
   renderAttrFieldList();
 }
 // 字段库弹窗逻辑
@@ -1162,15 +1243,19 @@ document.body.addEventListener('click', function(e) {
   if(e.target && e.target.id==='fieldLibAddBtn') {
     // 添加所选字段
     const checked = Array.from(document.querySelectorAll('.field-lib-checkbox:checked')).map(cb=>cb.value);
+    const currentFields = getCurrentAttrFields();
     checked.forEach(val => {
-      if(!attrFields.some(f=>f.value===val)) {
+      if(!currentFields.some(f=>f.value===val)) {
         const field = FIELD_LIBRARY.find(f=>f.value===val);
-        if(field) attrFields.push({ ...field, status: 'normal' });
+        if(field) currentFields.push({ ...field, status: 'normal' });
       } else {
         // 如果已存在但被删除，恢复为正常
-        attrFields = attrFields.map(f=>f.value===val ? { ...f, status: 'normal' } : f);
+        const newFields = currentFields.map(f=>f.value===val ? { ...f, status: 'normal' } : f);
+        setCurrentAttrFields(newFields);
+        return;
       }
     });
+    setCurrentAttrFields(currentFields);
     renderAttrFieldList();
     fieldLibModal.style.display = 'none';
   }
@@ -1222,9 +1307,10 @@ document.body.addEventListener('click', function(e) {
 });
 function renderFieldLibTable() {
   const tbody = document.getElementById('fieldLibTableBody');
+  const currentFields = getCurrentAttrFields();
   tbody.innerHTML = FIELD_LIBRARY.map(f => `
     <tr>
-      <td><input type="checkbox" class="field-lib-checkbox" value="${f.value}" ${attrFields.some(a=>a.value===f.value&&a.status==='normal')?'checked disabled':''}></td>
+      <td><input type="checkbox" class="field-lib-checkbox" value="${f.value}" ${currentFields.some(a=>a.value===f.value&&a.status==='normal')?'checked disabled':''}></td>
       <td>${f.value}</td>
       <td>${f.name}</td>
     </tr>
@@ -1301,18 +1387,46 @@ function renderViewList() {
     document.getElementById('addViewRowBtn').onclick = function() {
       window.viewList.push({name:viewOptions[0],desc:''});
       renderViewList();
+      
+      // 为新视图初始化字段数据
+      const newViewIndex = window.viewList.length - 1;
+      const newViewKey = `view${newViewIndex}`;
+      attrFieldsByView[newViewKey] = [];
     };
     // 删除
-    window.deleteViewRow = function(idx) { window.viewList.splice(idx,1); renderViewList(); };
+    window.deleteViewRow = function(idx) { 
+      window.viewList.splice(idx,1); 
+      renderViewList(); 
+      
+      // 清理对应的视图字段数据
+      const viewKey = `view${idx}`;
+      if (attrFieldsByView[viewKey]) {
+        delete attrFieldsByView[viewKey];
+      }
+      
+      // 如果当前选中的是被删除的视图，切换到基本属性
+      if (currentView === viewKey) {
+        currentView = 'base';
+      }
+      
+      // 重新渲染页签
+      renderAttrViewTabs();
+    };
     // 输入同步
     viewListBox.querySelectorAll('.view-name').forEach(select=>{
       select.onchange = function(){ window.viewList[this.dataset.idx].name = this.value; };
     });
+    
+    // 更新多视图页签
+    renderAttrViewTabs();
   } else {
     viewInfoBtn.style.display = 'none';
     viewInfoSection.style.display = 'none';
     viewListBox.style.display = 'none';
     viewListBox.innerHTML = '';
+    
+    // 更新多视图页签
+    renderAttrViewTabs();
   }
 }
 document.addEventListener('DOMContentLoaded', function() {
@@ -2012,6 +2126,84 @@ function openPageSetup() {
     window.open('page_setup.html', '_blank');
   }
 }
+
+// 多视图页签管理
+function renderAttrViewTabs() {
+  const modelCategory = document.getElementById('modelCategorySelect').value;
+  const attrViewTabs = document.getElementById('attrViewTabs');
+  
+  if (modelCategory === '多视图模型' || modelCategory === '引用分类多视图') {
+    attrViewTabs.style.display = 'flex';
+    
+    // 获取视图列表
+    const viewList = window.viewList || [];
+    
+    // 渲染页签
+    let tabsHtml = '<div class="attr-view-tab active" data-view="base">基本属性</div>';
+    
+    viewList.forEach((view, index) => {
+      const viewKey = `view${index}`;
+      const isActive = currentView === viewKey ? 'active' : '';
+      
+      tabsHtml += `<div class="attr-view-tab ${isActive}" data-view="${viewKey}">${view.name}</div>`;
+      
+      // 初始化视图字段（如果不存在）
+      if (!attrFieldsByView[viewKey]) {
+        attrFieldsByView[viewKey] = [];
+      }
+    });
+    
+    attrViewTabs.innerHTML = tabsHtml;
+    
+    // 绑定页签点击事件
+    attrViewTabs.querySelectorAll('.attr-view-tab').forEach(tab => {
+      tab.onclick = function() {
+        const viewKey = this.getAttribute('data-view');
+        switchAttrView(viewKey);
+      };
+    });
+  } else {
+    attrViewTabs.style.display = 'none';
+    currentView = 'base';
+  }
+}
+
+// 切换视图
+function switchAttrView(viewKey) {
+  // 更新当前视图
+  currentView = viewKey;
+  
+  // 更新页签状态
+  document.querySelectorAll('.attr-view-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  const activeTab = document.querySelector(`[data-view="${viewKey}"]`);
+  if (activeTab) {
+    activeTab.classList.add('active');
+  }
+  
+  // 重置选中索引
+  selectedAttrIdx = 0;
+  
+  // 重新渲染字段列表和详情
+  renderAttrFieldList();
+  renderAttrDetailBox();
+}
+
+// 监听模型分类变化，更新页签
+document.addEventListener('DOMContentLoaded', function() {
+  // 监听模型分类变化
+  document.getElementById('modelCategorySelect').addEventListener('change', function() {
+    renderAttrViewTabs();
+  });
+  
+  // 初始化页签
+  renderAttrViewTabs();
+  
+  // 初始化字段列表
+  renderAttrFieldList();
+});
 </script>
 </body>
 </html> 

@@ -479,11 +479,28 @@
     .modal-step.done .step-index {
       background:#4db6ac;color:#fff;
     }
-    .modal-step:not(:last-child):after {
-      content:'';display:block;position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:36px;height:3px;background:#e5e6eb;z-index:0;
+    .modal-step:not(:last-child)::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: calc(100% + 36px); /* 向右移动36px */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 2px;
+      background: #2176c7;
+      border-radius: 2px;
+      z-index: 1;
+      opacity: 0.85;
     }
-    .modal-step.done:not(:last-child):after {
-      background:#4db6ac;
+    .modal-step.done:not(:last-child)::after {
+      background: #4db6ac;
+      opacity: 1;
+    }
+    .modal-step .step-index {
+      position: relative;
+      z-index: 2;             /* 圆圈在最上层 */
+      background: #fff;       /* 白色底，遮住横线 */
     }
     
     /* 编码规则相关样式 */
@@ -610,6 +627,48 @@
     }
     #tab-base, #tab-base * {
       font-size: 16px !important;
+    }
+    .modal-step {
+      /* ...原有样式... */
+      position: relative;
+    }
+    .modal-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    .modal-step {
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: none;
+      margin: 0 0;
+      z-index: 2;
+    }
+    .modal-step .step-index {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      margin-right: 8px;
+    }
+    .modal-step:not(:last-child)::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: calc(100% + 36px); /* 向右移动36px */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 2px;
+      background: #2176c7;
+      border-radius: 2px;
+      z-index: 1;
+      opacity: 0.85;
+    }
+    .modal-step.done:not(:last-child)::after {
+      background: #4db6ac;
+      opacity: 1;
     }
   </style>
 </head>

@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主数据管理驾驶舱</title>
+    <style>
+        :root {
+            --primary-color: #3fa7ff;
+            --secondary-color: #1e2746;
+            --card-bg: #232c47;
+            --card-border: #3fa7ff;
+            --card-shadow: 0 0 24px 0 #3fa7ff44;
+            --text-color: #eaf6ff;
+            --text-color-secondary: #7ecbff;
+            --header-bg: linear-gradient(90deg, #1e2746 0%, #3fa7ff 100%);
+            --tab-bg: #1e2746;
+            --tab-active: #3fa7ff;
+        }
+        body {
+            background: #10182a url('') repeat;
+            color: var(--text-color);
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .dashboard-container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 32px 24px 24px 24px;
+        }
+        .dashboard-header {
+            background: transparent;
+            color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 24px 0 #3fa7ff33;
+            padding: 32px 0 24px 0;
+            margin-bottom: 32px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .dashboard-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 0 8px #3fa7ff99;
+        }
+        .dashboard-header p {
+            font-size: 18px;
+            color: var(--text-color-secondary);
+            opacity: 0.85;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr 1fr;
+            gap: 20px;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #23305a;
+            font-size: 13px;
+        }
+        
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: var(--text-color-secondary);
+        }
+        
+        .metric-value {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .dashboard-card {
+            background: transparent;
+            border-radius: 14px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            padding: 18px 16px 16px 16px;
+            min-width: 0;
+            height: 330px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quality-card {
+            background: transparent;
+            border-radius: 14px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            padding: 18px 16px 16px 16px;
+            min-width: 0;
+            height: 1500px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px #3fa7ff55;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-color-secondary);
+            margin-bottom: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .stat-item {
+            background: transparent;
+            border-radius: 8px;
+            padding: 11px 6px;
+            text-align: center;
+            box-shadow: 0 0 8px #3fa7ff22;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #3fa7ff33;
+        }
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3fa7ff, #7ecbff);
+        }
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 4px;
+            height: 4px;
+            background: #3fa7ff;
+            border-radius: 50%;
+            box-shadow: 0 0 4px #3fa7ff;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 3px;
+            text-shadow: 0 0 6px #3fa7ff55;
+            position: relative;
+            z-index: 1;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-color-secondary);
+            position: relative;
+            z-index: 1;
+        }
+        .chart-container {
+            background: transparent;
+            border-radius: 8px;
+            min-height: 100px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7ecbff;
+            font-size: 14px;
+            box-shadow: 0 0 8px #3fa7ff22;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .quality-table-container {
+            overflow-x: auto;
+            margin-bottom: 10px;
+            overflow-y: visible;
+            flex: 1;
+            min-height: 120px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: var(--text-color);
+            table-layout: fixed;
+        }
+        .data-table th, .data-table td {
+            padding: 4px 6px;
+            border-bottom: 1px solid #23305a;
+            line-height: 1.3;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .data-table th {
+            background: transparent;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .data-table tr:hover {
+            background: rgba(62, 167, 255, 0.1);
+        }
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #23305a;
+            color: var(--primary-color);
+            border: 1px solid #3fa7ff;
+        }
+        
+        .status-success {
+            background: #1e4d2a;
+            color: #4ade80;
+            border-color: #4ade80;
+        }
+        
+        .status-warning {
+            background: #4d3a1e;
+            color: #fbbf24;
+            border-color: #fbbf24;
+        }
+        
+        .status-error {
+            background: #4d1e1e;
+            color: #f87171;
+            border-color: #f87171;
+        }
+        .tabs {
+            display: flex;
+            background: transparent;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 6px 0;
+            cursor: pointer;
+            color: var(--text-color-secondary);
+            background: none;
+            border: none;
+            font-size: 13px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .tab.active {
+            color: #fff;
+            background: var(--tab-active);
+            font-weight: 600;
+            text-shadow: 0 0 6px #3fa7ff99;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .period-content { display: none; }
+        .period-content.active { display: block; }
+        
+        .trend-content { display: none; }
+        .trend-content.active { display: block; }
+        @media (max-width: 1400px) {
+            .dashboard-grid {
+                grid-template-columns: 0.8fr 1.2fr;
+            }
+        }
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>主数据管理驾驶舱</h1>
+            <p>实时监控主数据质量、审批流程、服务状态和管理情况</p>
+        </div>
+        <div class="dashboard-grid">
+            <!-- 数据质量看板 -->
+            <div class="quality-card">
+                <div class="card-header">数据质量看板</div>
+                <div class="card-subtitle">监控数据质量指标和质检情况</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">40.4M</div>
+                        <div class="stat-label">主数据总行数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">39.9M</div>
+                        <div class="stat-label">业务系统总行数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1.24%</div>
+                        <div class="stat-label">差异率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">94.2%</div>
+                        <div class="stat-label">质量评分</div>
+                    </div>
+                </div>
+
+                <!-- 数据对比 -->
+                <div style="margin-bottom: 16px; flex: 0 0 auto;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                        数据对比
+                    </div>
+                    <!-- 三个统计卡片 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #ff8a65;">
+                            <div style="font-size: 16px; font-weight: 700; color: #ff8a65; margin-bottom: 2px;">189</div>
+                            <div style="font-size: 10px; color: var(--text-color-secondary);">数据差异</div>
+                        </div>
+                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #f7b500;">
+                            <div style="font-size: 16px; font-weight: 700; color: #f7b500; margin-bottom: 2px;">245</div>
+                            <div style="font-size: 10px; color: var(--text-color-secondary);">业务系统缺失数据</div>
+                        </div>
+                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #a259e6;">
+                            <div style="font-size: 16px; font-weight: 700; color: #a259e6; margin-bottom: 2px;">67</div>
+                            <div style="font-size: 10px; color: var(--text-color-secondary);">业务系统冗余数据</div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>主数据类型</th>
+                                    <th>主数据数量</th>
+                                    <th>业务系统主数据</th>
+                                    <th>业务系统数量</th>
+                                    <th>差异条数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>客户</td>
+                                    <td>12,500</td>
+                                    <td>客户A</td>
+                                    <td>12,345</td>
+                                    <td style="color: #ff6b6b; font-weight: 600;">155</td>
+                                </tr>
+                                <tr>
+                                    <td>产品</td>
+                                    <td>8,900</td>
+                                    <td>产品B</td>
+                                    <td>8,756</td>
+                                    <td style="color: #ff6b6b; font-weight: 600;">144</td>
+                                </tr>
+                                <tr>
+                                    <td>供应商</td>
+                                    <td>3,200</td>
+                                    <td>供应商C</td>
+                                    <td>3,133</td>
+                                    <td style="color: #ff6b6b; font-weight: 600;">67</td>
+                                </tr>
+                                <tr>
+                                    <td>物料</td>
+                                    <td>15,800</td>
+                                    <td>物料D</td>
+                                    <td>15,678</td>
+                                    <td style="color: #ff6b6b; font-weight: 600;">122</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 质量检查 -->
+                <div style="flex: 1; display: flex; flex-direction: column; min-height: 200px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                        质量检查
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; flex: 0 0 auto;">
+                        <!-- 数据完整性卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 13px; font-weight: 600; color: #fff;">数据完整性</span>
+                            </div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">96.8<span style="font-size: 14px; font-weight: 600; margin-left: 2px;">%</span></div>
+                            <div style="display: flex; align-items: center; font-size: 11px; margin-bottom: 6px; color: #e53935;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 3px;"><path d="M4 7l6 6 4-4 6 6" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 7v10H10" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                -0.5%
+                            </div>
+                            <div style="width: 100%; height: 6px; background: transparent; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 96.8%; height: 100%; background: var(--primary-color); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据准确性卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 13px; font-weight: 600; color: #fff;">数据准确性</span>
+                            </div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">91.5<span style="font-size: 14px; font-weight: 600; margin-left: 2px;">%</span></div>
+                            <div style="display: flex; align-items: center; font-size: 11px; margin-bottom: 6px; color: #1ecb7b;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 3px;"><path d="M4 17l6-6 4 4 6-6" stroke="#1ecb7b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 17V7H10" stroke="#1ecb7b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                +1.8%
+                            </div>
+                            <div style="width: 100%; height: 6px; background: transparent; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 91.5%; height: 100%; background: var(--primary-color); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据一致性卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 13px; font-weight: 600; color: #fff;">数据一致性</span>
+                            </div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">88.3<span style="font-size: 14px; font-weight: 600; margin-left: 2px;">%</span></div>
+                            <div style="display: flex; align-items: center; font-size: 11px; margin-bottom: 6px; color: #e53935;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 3px;"><path d="M4 7l6 6 4-4 6 6" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 7v10H10" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                -2.3%
+                            </div>
+                            <div style="width: 100%; height: 6px; background: transparent; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 88.3%; height: 100%; background: #f7b500; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据唯一性卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">数据唯一性</span>
+                            </div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">93.7<span style="font-size: 14px; font-weight: 600; margin-left: 2px;">%</span></div>
+                            <div style="display: flex; align-items: center; font-size: 11px; margin-bottom: 6px; color: #1ecb7b;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 3px;"><path d="M4 17l6-6 4 4 6-6" stroke="#1ecb7b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 17V7H10" stroke="#1ecb7b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                +1.2%
+                            </div>
+                            <div style="width: 100%; height: 6px; background: transparent; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 93.7%; height: 100%; background: var(--primary-color); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quality-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>主数据类型</th>
+                                    <th>总记录数</th>
+                                    <th>错误数据数</th>
+                                    <th>错误率</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>客户主数据</td>
+                                    <td>45,678</td>
+                                    <td>2,156</td>
+                                    <td>4.72%</td>
+                                </tr>
+                                <tr>
+                                    <td>产品主数据</td>
+                                    <td>12,345</td>
+                                    <td>234</td>
+                                    <td>1.90%</td>
+                                </tr>
+                                <tr>
+                                    <td>供应商主数据</td>
+                                    <td>8,923</td>
+                                    <td>567</td>
+                                    <td>6.35%</td>
+                                </tr>
+                                <tr>
+                                    <td>组织架构</td>
+                                    <td>1,234</td>
+                                    <td>89</td>
+                                    <td>7.21%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 主数据质量评分区域 -->
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 12px; border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                        主数据质量评分
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- 客户主数据卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <span style="font-size: 14px;">🗄️</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">客户主数据</span>
+                                <span style="background: #1e4d2a; color: #4ade80; font-size: 10px; border-radius: 4px; padding: 1px 4px; font-weight: 500; margin-left: auto;">健康</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-color-secondary); margin-bottom: 3px;">
+                                质量分数 <span style="font-size: 14px; font-weight: 700; color: var(--primary-color); margin-left: 3px;">95.2%</span>
+                            </div>
+                            <div style="height: 5px; background: transparent; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                                <div style="width: 95.2%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px;">
+                                <span>总记录数 <span style="color: #fff; font-weight: 600;">125,000</span></span>
+                                <span>错误数量 <span style="color: #ff6b6b; font-weight: 600;">156</span></span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">最后检查：2024-01-20 02:00:00</div>
+                        </div>
+                        
+                        <!-- 产品信息卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <span style="font-size: 14px;">⚡</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">产品信息</span>
+                                <span style="background: #1e4d2a; color: #4ade80; font-size: 10px; border-radius: 4px; padding: 1px 4px; font-weight: 500; margin-left: auto;">健康</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-color-secondary); margin-bottom: 3px;">
+                                质量分数 <span style="font-size: 14px; font-weight: 700; color: var(--primary-color); margin-left: 3px;">92.8%</span>
+                            </div>
+                            <div style="height: 5px; background: transparent; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                                <div style="width: 92.8%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px;">
+                                <span>总记录数 <span style="color: #fff; font-weight: 600;">45,000</span></span>
+                                <span>错误数量 <span style="color: #ff6b6b; font-weight: 600;">89</span></span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">最后检查：2024-01-20 01:30:00</div>
+                        </div>
+                        
+                        <!-- 供应商卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <span style="font-size: 14px;">🛡️</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">供应商</span>
+                                <span style="background: #4d3a1e; color: #fbbf24; font-size: 10px; border-radius: 4px; padding: 1px 4px; font-weight: 500; margin-left: auto;">警告</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-color-secondary); margin-bottom: 3px;">
+                                质量分数 <span style="font-size: 14px; font-weight: 700; color: var(--primary-color); margin-left: 3px;">87.5%</span>
+                            </div>
+                            <div style="height: 5px; background: transparent; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                                <div style="width: 87.5%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px;">
+                                <span>总记录数 <span style="color: #fff; font-weight: 600;">8,500</span></span>
+                                <span>错误数量 <span style="color: #ff6b6b; font-weight: 600;">45</span></span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">最后检查：2024-01-19 23:45:00</div>
+                        </div>
+                        
+                        <!-- 物料信息卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <span style="font-size: 14px;">🗄️</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">物料信息</span>
+                                <span style="background: #4d1e1e; color: #f87171; font-size: 10px; border-radius: 4px; padding: 1px 4px; font-weight: 500; margin-left: auto;">严重</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-color-secondary); margin-bottom: 3px;">
+                                质量分数 <span style="font-size: 14px; font-weight: 700; color: var(--primary-color); margin-left: 3px;">78.2%</span>
+                            </div>
+                            <div style="height: 5px; background: transparent; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                                <div style="width: 78.2%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px;">
+                                <span>总记录数 <span style="color: #fff; font-weight: 600;">89,000</span></span>
+                                <span>错误数量 <span style="color: #ff6b6b; font-weight: 600;">234</span></span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">最后检查：2024-01-20 00:15:00</div>
+                        </div>
+                        
+                        <!-- 组织架构卡片 -->
+                        <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <span style="font-size: 14px;">🏢</span>
+                                <span style="font-size: 12px; font-weight: 600; color: #fff;">组织架构</span>
+                                <span style="background: #1e4d2a; color: #4ade80; font-size: 10px; border-radius: 4px; padding: 1px 4px; font-weight: 500; margin-left: auto;">健康</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-color-secondary); margin-bottom: 3px;">
+                                质量分数 <span style="font-size: 14px; font-weight: 700; color: var(--primary-color); margin-left: 3px;">96.1%</span>
+                            </div>
+                            <div style="height: 5px; background: transparent; border-radius: 3px; overflow: hidden; margin-bottom: 6px;">
+                                <div style="width: 96.1%; height: 100%; background: var(--primary-color); border-radius: 3px;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px;">
+                                <span>总记录数 <span style="color: #fff; font-weight: 600;">2,500</span></span>
+                                <span>错误数量 <span style="color: #ff6b6b; font-weight: 600;">12</span></span>
+                            </div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">最后检查：2024-01-20 03:15:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 第二栏：数据管理看板 + 数据审批看板 -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- 数据管理看板 -->
+                <div class="dashboard-card" style="height: 674px;">
+                    <div class="card-header">数据管理看板</div>
+                    <div class="card-subtitle">监控主数据新增、变更等统计信息</div>
+                    <!-- 第一排：主数据模型个数、主数据总数据量 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <div class="stat-item" style="flex: 1; padding: 11px 6px;">
+                            <div class="stat-value" style="font-size: 18px;">156</div>
+                            <div class="stat-label" style="font-size: 11px;">主数据模型个数</div>
+                        </div>
+                        <div class="stat-item" style="flex: 1; padding: 11px 6px;">
+                            <div class="stat-value" style="font-size: 18px;">68.2M</div>
+                            <div class="stat-label" style="font-size: 11px;">主数据总数据量</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二排：正常状态数、停用数、归档数、审核中 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                            <div class="stat-value" style="font-size: 16px;">65.8M</div>
+                            <div class="stat-label" style="font-size: 10px;">正常状态数</div>
+                        </div>
+                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                            <div class="stat-value" style="font-size: 16px;">1.2M</div>
+                            <div class="stat-label" style="font-size: 10px;">停用数</div>
+                        </div>
+                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                            <div class="stat-value" style="font-size: 16px;">856K</div>
+                            <div class="stat-label" style="font-size: 10px;">归档数</div>
+                        </div>
+                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                            <div class="stat-value" style="font-size: 16px;">234</div>
+                            <div class="stat-label" style="font-size: 10px;">审核中</div>
+                        </div>
+                    </div>
+
+                    <!-- 区间统计 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            区间统计
+                        </div>
+                        
+                        <!-- 区间选项 -->
+                        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+                            <button class="tab active" onclick="switchPeriod('today')" style="padding: 4px 12px; font-size: 12px;">今日</button>
+                            <button class="tab" onclick="switchPeriod('7days')" style="padding: 4px 12px; font-size: 12px;">七天</button>
+                            <button class="tab" onclick="switchPeriod('30days')" style="padding: 4px 12px; font-size: 12px;">30天</button>
+                            <button class="tab" onclick="switchPeriod('90days')" style="padding: 4px 12px; font-size: 12px;">90天</button>
+                        </div>
+                        
+                        <!-- 今日统计 -->
+                        <div id="period-today" class="period-content active">
+                            <div style="display: flex; gap: 8px;">
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">156</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日新增</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">234</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日修改</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">12</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日冻结</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">8</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日解冻</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">189</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日审批通过</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">5</div>
+                                    <div class="stat-label" style="font-size: 10px;">今日驳回</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 七天统计 -->
+                        <div id="period-7days" class="period-content">
+                            <div style="display: flex; gap: 8px;">
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">1,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天新增</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">1,856</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天修改</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">89</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天冻结</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">45</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天解冻</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">1,567</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天审批通过</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">23</div>
+                                    <div class="stat-label" style="font-size: 10px;">七天驳回</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 30天统计 -->
+                        <div id="period-30days" class="period-content">
+                            <div style="display: flex; gap: 8px;">
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">5,678</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天新增</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">8,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天修改</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">345</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天冻结</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">189</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天解冻</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">7,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天审批通过</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">89</div>
+                                    <div class="stat-label" style="font-size: 10px;">30天驳回</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 90天统计 -->
+                        <div id="period-90days" class="period-content">
+                            <div style="display: flex; gap: 8px;">
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">15,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天新增</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">23,456</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天修改</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">1,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天冻结</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">567</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天解冻</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">21,234</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天审批通过</div>
+                                </div>
+                                <div class="stat-item" style="flex: 1; padding: 9px 4px;">
+                                    <div class="stat-value" style="font-size: 16px;">234</div>
+                                    <div class="stat-label" style="font-size: 10px;">90天驳回</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主数据新增趋势图 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                                主数据新增趋势
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="dataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="all">全部主数据</option>
+                                    <option value="customer">客户主数据</option>
+                                    <option value="product">产品主数据</option>
+                                    <option value="supplier">供应商主数据</option>
+                                    <option value="organization">组织架构</option>
+                                    <option value="employee">员工主数据</option>
+                                    <option value="material">物料主数据</option>
+                                </select>
+                                <select id="timeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="7days">近7日</option>
+                                    <option value="30days">近30天</option>
+                                    <option value="1year">近1年</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                            <!-- 折线图 -->
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟一周数据波动 -->
+                                <path d="M 20 60 L 60 40 L 100 25 L 140 38 L 180 30 L 220 50 L 260 35" 
+                                      stroke="#3fa7ff" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="60" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="60" cy="40" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="100" cy="25" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="140" cy="38" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="180" cy="30" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="220" cy="50" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <circle cx="260" cy="35" r="4" fill="#3fa7ff" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                            </svg>
+                            
+                            <!-- 底部标签 -->
+                            <div id="chartLabels" style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周一</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周二</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周三</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周四</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周五</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周六</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">周日</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 明细统计 -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">主数据类型</th>
+                                    <th style="width: 15%;">主数据总数</th>
+                                    <th style="width: 15%;">正常</th>
+                                    <th style="width: 15%;">停用</th>
+                                    <th style="width: 15%;">归档</th>
+                                    <th style="width: 10%;">审核中</th>
+                                    <th style="width: 10%;">待提交</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>客户主数据</td>
+                                    <td>45,678</td>
+                                    <td>44,123</td>
+                                    <td>1,234</td>
+                                    <td>234</td>
+                                    <td>67</td>
+                                    <td>20</td>
+                                </tr>
+                                <tr>
+                                    <td>产品主数据</td>
+                                    <td>12,345</td>
+                                    <td>11,987</td>
+                                    <td>234</td>
+                                    <td>89</td>
+                                    <td>23</td>
+                                    <td>12</td>
+                                </tr>
+                                <tr>
+                                    <td>供应商主数据</td>
+                                    <td>8,923</td>
+                                    <td>8,567</td>
+                                    <td>234</td>
+                                    <td>89</td>
+                                    <td>23</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td>组织架构</td>
+                                    <td>1,234</td>
+                                    <td>1,189</td>
+                                    <td>23</td>
+                                    <td>12</td>
+                                    <td>8</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>员工主数据</td>
+                                    <td>15,678</td>
+                                    <td>15,234</td>
+                                    <td>234</td>
+                                    <td>156</td>
+                                    <td>34</td>
+                                    <td>20</td>
+                                </tr>
+                                <tr>
+                                    <td>物料主数据</td>
+                                    <td>23,456</td>
+                                    <td>22,987</td>
+                                    <td>345</td>
+                                    <td>89</td>
+                                    <td>23</td>
+                                    <td>12</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 数据审批看板 -->
+                <div class="dashboard-card" style="height: 1200px;">
+                    <div class="card-header">数据审批看板</div>
+                    <div class="card-subtitle">监控审批流程和效率指标</div>
+                    <!-- 时间范围选择器 -->
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; color: var(--text-color-secondary);">时间范围：</span>
+                            <select id="approvalTimeRange" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">近7日</option>
+                                <option value="30days">近30天</option>
+                                <option value="1year">近1年</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">已审批总数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">待审批总数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98.2%</div>
+                            <div class="stat-label">审批完成率</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">2.3h</div>
+                            <div class="stat-label">平均审批时长</div>
+                        </div>
+                        <div class="stat-item" style="grid-column: 1 / 3;">
+                            <div class="stat-value">1,189</div>
+                            <div class="stat-label">通过审批数</div>
+                        </div>
+                        <div class="stat-item" style="grid-column: 3 / 4;">
+                            <div class="stat-value">58</div>
+                            <div class="stat-label">驳回数</div>
+                        </div>
+                        <div class="stat-item" style="grid-column: 4 / 5;">
+                            <div class="stat-value">4.7%</div>
+                            <div class="stat-label">驳回率</div>
+                        </div>
+                    </div>
+
+                    <!-- 总审批量趋势图 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                                总审批量趋势
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="all">全部主数据</option>
+                                    <option value="customer">客户主数据</option>
+                                    <option value="product">产品主数据</option>
+                                    <option value="supplier">供应商主数据</option>
+                                    <option value="organization">组织架构</option>
+                                    <option value="employee">员工主数据</option>
+                                    <option value="material">物料主数据</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 100px; position: relative;">
+                            <!-- 折线图 -->
+                            <svg width="100%" height="60" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟审批量趋势 -->
+                                <path d="M 20 45 L 60 35 L 100 25 L 140 30 L 180 20 L 220 40 L 260 15" 
+                                      stroke="#4ade80" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #4ade80)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="45" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="60" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="100" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="140" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="180" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="220" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="260" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            </svg>
+                            
+                            <!-- 底部标签 -->
+                            <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 平均时长趋势图 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                                平均审批时长趋势
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="all">全部主数据</option>
+                                    <option value="customer">客户主数据</option>
+                                    <option value="product">产品主数据</option>
+                                    <option value="supplier">供应商主数据</option>
+                                    <option value="organization">组织架构</option>
+                                    <option value="employee">员工主数据</option>
+                                    <option value="material">物料主数据</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 100px; position: relative;">
+                            <!-- 折线图 -->
+                            <svg width="100%" height="60" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟时长趋势（越低越好） -->
+                                <path d="M 20 20 L 60 25 L 100 35 L 140 30 L 180 40 L 220 25 L 260 15" 
+                                      stroke="#fbbf24" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="20" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="60" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="100" cy="35" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="140" cy="30" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="180" cy="40" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="220" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="260" cy="15" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                            </svg>
+                            
+                            <!-- 底部标签 -->
+                            <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tabs" style="margin-bottom: 12px;">
+                        <div class="tab active" onclick="switchTab('approval', 'efficiency')">审批效率TOP10排行</div>
+                        <div class="tab" onclick="switchTab('approval', 'details')">审批明细</div>
+                    </div>
+
+                    <!-- 审批效率TOP10排行 -->
+                    <div id="approval-efficiency" class="tab-content active">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 2px;">
+                            <!-- 第一栏：分模型的平均审批时长 -->
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 2px solid var(--primary-color); padding-left: 6px;">
+                                    模型平均审批时长 TOP10
+                                </div>
+                                <div style="background: transparent; border-radius: 6px; border: 1px solid #3fa7ff22; padding: 8px;">
+                                    <div class="metric-row">
+                                        <span class="metric-label">客户主数据</span>
+                                        <span class="metric-value">1.8小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">产品主数据</span>
+                                        <span class="metric-value">2.1小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">供应商主数据</span>
+                                        <span class="metric-value">2.3小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">组织架构</span>
+                                        <span class="metric-value">2.5小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">员工主数据</span>
+                                        <span class="metric-value">2.7小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">物料主数据</span>
+                                        <span class="metric-value">2.9小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">合同主数据</span>
+                                        <span class="metric-value">3.1小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">项目主数据</span>
+                                        <span class="metric-value">3.3小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">资产主数据</span>
+                                        <span class="metric-value">3.5小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">财务主数据</span>
+                                        <span class="metric-value">3.8小时</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第二栏：分组织的平均审批时长 -->
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 2px solid var(--primary-color); padding-left: 6px;">
+                                    组织平均审批时长 TOP10
+                                </div>
+                                <div style="background: transparent; border-radius: 6px; border: 1px solid #3fa7ff22; padding: 8px;">
+                                    <div class="metric-row">
+                                        <span class="metric-label">IT部门</span>
+                                        <span class="metric-value">1.5小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">人事部门</span>
+                                        <span class="metric-value">1.8小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">销售部门</span>
+                                        <span class="metric-value">2.0小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">市场部门</span>
+                                        <span class="metric-value">2.2小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">财务部门</span>
+                                        <span class="metric-value">2.8小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">采购部门</span>
+                                        <span class="metric-value">3.0小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">生产部门</span>
+                                        <span class="metric-value">3.2小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">质量部门</span>
+                                        <span class="metric-value">3.4小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">法务部门</span>
+                                        <span class="metric-value">3.6小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">行政部门</span>
+                                        <span class="metric-value">3.8小时</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第三栏：分人的平均审批时长 -->
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 2px solid var(--primary-color); padding-left: 6px;">
+                                    用户平均审批时长 TOP10
+                                </div>
+                                <div style="background: transparent; border-radius: 6px; border: 1px solid #3fa7ff22; padding: 8px;">
+                                    <div class="metric-row">
+                                        <span class="metric-label">张三</span>
+                                        <span class="metric-value">1.2小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">李四</span>
+                                        <span class="metric-value">1.5小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">王五</span>
+                                        <span class="metric-value">1.8小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">赵六</span>
+                                        <span class="metric-value">2.0小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">钱七</span>
+                                        <span class="metric-value">2.2小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">孙八</span>
+                                        <span class="metric-value">2.4小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">周九</span>
+                                        <span class="metric-value">2.6小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">吴十</span>
+                                        <span class="metric-value">2.8小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">郑十一</span>
+                                        <span class="metric-value">3.0小时</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">王十二</span>
+                                        <span class="metric-value">3.2小时</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 审批明细 -->
+                    <div id="approval-details" class="tab-content" style="margin-top: 2px;">
+                        <div class="table-container">
+                            <table class="data-table" style="font-size: 13px !important;">
+                                <thead>
+                                    <tr>
+                                        <th>主数据类型</th>
+                                        <th>提交申请数量</th>
+                                        <th>通过数量</th>
+                                        <th>驳回数量</th>
+                                        <th>平均审批时长</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>客户主数据</td>
+                                        <td>456</td>
+                                        <td>432</td>
+                                        <td>24</td>
+                                        <td>1.8小时</td>
+                                    </tr>
+                                    <tr>
+                                        <td>产品主数据</td>
+                                        <td>234</td>
+                                        <td>228</td>
+                                        <td>6</td>
+                                        <td>2.1小时</td>
+                                    </tr>
+                                    <tr>
+                                        <td>供应商主数据</td>
+                                        <td>189</td>
+                                        <td>178</td>
+                                        <td>11</td>
+                                        <td>3.2小时</td>
+                                    </tr>
+                                    <tr>
+                                        <td>组织架构</td>
+                                        <td>67</td>
+                                        <td>65</td>
+                                        <td>2</td>
+                                        <td>1.5小时</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 数据服务看板 -->
+            <div class="dashboard-card" style="height: 1850px; width: calc(100% - 10px);">
+                <div class="card-header">数据服务看板</div>
+                <div class="card-subtitle">监控数据分发和接口服务状态</div>
+                <!-- 第一排：服务个数 -->
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">采集服务个数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">推送服务个数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">查询服务个数</div>
+                    </div>
+                </div>
+
+                <!-- 第二排：数据总数 -->
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-item">
+                        <div class="stat-value">45.6K</div>
+                        <div class="stat-label">数据采集总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">23.4K</div>
+                        <div class="stat-label">数据推送总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">89.2K</div>
+                        <div class="stat-label">查询数据总数</div>
+                    </div>
+                </div>
+
+                <!-- 第三排：成功总数 -->
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-item">
+                        <div class="stat-value">44.2K</div>
+                        <div class="stat-label">数据采集成功总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">22.8K</div>
+                        <div class="stat-label">数据推送成功总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">87.1K</div>
+                        <div class="stat-label">查询数据成功总数</div>
+                    </div>
+                </div>
+
+                <!-- 第四排：失败总数 -->
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-item">
+                        <div class="stat-value">1.4K</div>
+                        <div class="stat-label">数据采集失败总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">600</div>
+                        <div class="stat-label">数据推送失败总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.1K</div>
+                        <div class="stat-label">查询数据失败总数</div>
+                    </div>
+                </div>
+
+                <!-- 数据采集趋势图 -->
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            数据采集趋势
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="collectionDataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="all">全部主数据</option>
+                                <option value="customer">客户主数据</option>
+                                <option value="product">产品主数据</option>
+                                <option value="supplier">供应商主数据</option>
+                                <option value="organization">组织架构</option>
+                                <option value="employee">员工主数据</option>
+                                <option value="material">物料主数据</option>
+                            </select>
+                            <select id="collectionTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">近7日</option>
+                                <option value="30days">近30天</option>
+                                <option value="1year">近1年</option>
+                            </select>
+                            <div style="display: flex; gap: 4px;">
+                                <button id="collectionSuccessBtn" class="tab active" onclick="switchCollectionTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
+                                <button id="collectionFailureBtn" class="tab" onclick="switchCollectionTrend('failure')" style="padding: 4px 8px; font-size: 11px;">失败趋势</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                        <!-- 成功趋势图 -->
+                        <div id="collection-success-trend" class="trend-content active">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟采集成功趋势 -->
+                                <path d="M 20 30 L 60 25 L 100 20 L 140 35 L 180 15 L 220 40 L 260 10" 
+                                      stroke="#4ade80" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #4ade80)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="60" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="100" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="140" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="180" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="220" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="260" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 失败趋势图 -->
+                        <div id="collection-failure-trend" class="trend-content">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟采集失败趋势 -->
+                                <path d="M 20 60 L 60 55 L 100 50 L 140 65 L 180 45 L 220 70 L 260 40" 
+                                      stroke="#f87171" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #f87171)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="60" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="100" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="140" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="180" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="220" cy="70" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="260" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 底部标签 -->
+                        <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据推送趋势图 -->
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            数据推送趋势
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="pushDataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="all">全部主数据</option>
+                                <option value="customer">客户主数据</option>
+                                <option value="product">产品主数据</option>
+                                <option value="supplier">供应商主数据</option>
+                                <option value="organization">组织架构</option>
+                                <option value="employee">员工主数据</option>
+                                <option value="material">物料主数据</option>
+                            </select>
+                            <select id="pushTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">近7日</option>
+                                <option value="30days">近30天</option>
+                                <option value="1year">近1年</option>
+                            </select>
+                            <div style="display: flex; gap: 4px;">
+                                <button id="pushSuccessBtn" class="tab active" onclick="switchPushTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
+                                <button id="pushFailureBtn" class="tab" onclick="switchPushTrend('failure')" style="padding: 4px 8px; font-size: 11px;">失败趋势</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                        <!-- 成功趋势图 -->
+                        <div id="push-success-trend" class="trend-content active">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟推送成功趋势 -->
+                                <path d="M 20 25 L 60 20 L 100 15 L 140 30 L 180 10 L 220 35 L 260 5" 
+                                      stroke="#4ade80" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #4ade80)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="60" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="100" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="140" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="180" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="220" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="260" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 失败趋势图 -->
+                        <div id="push-failure-trend" class="trend-content">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟推送失败趋势 -->
+                                <path d="M 20 55 L 60 50 L 100 45 L 140 60 L 180 40 L 220 65 L 260 35" 
+                                      stroke="#f87171" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #f87171)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="60" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="100" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="140" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="180" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="220" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="260" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 底部标签 -->
+                        <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据查询趋势图 -->
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            数据查询趋势
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="queryDataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="all">全部主数据</option>
+                                <option value="customer">客户主数据</option>
+                                <option value="product">产品主数据</option>
+                                <option value="supplier">供应商主数据</option>
+                                <option value="organization">组织架构</option>
+                                <option value="employee">员工主数据</option>
+                                <option value="material">物料主数据</option>
+                            </select>
+                            <select id="queryTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">近7日</option>
+                                <option value="30days">近30天</option>
+                                <option value="1year">近1年</option>
+                            </select>
+                            <div style="display: flex; gap: 4px;">
+                                <button id="querySuccessBtn" class="tab active" onclick="switchQueryTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
+                                <button id="queryFailureBtn" class="tab" onclick="switchQueryTrend('failure')" style="padding: 4px 8px; font-size: 11px;">失败趋势</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                        <!-- 成功趋势图 -->
+                        <div id="query-success-trend" class="trend-content active">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟查询成功趋势 -->
+                                <path d="M 20 20 L 60 15 L 100 10 L 140 25 L 180 5 L 220 30 L 260 0" 
+                                      stroke="#4ade80" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #4ade80)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="60" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="100" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="140" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="180" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="220" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="260" cy="0" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 失败趋势图 -->
+                        <div id="query-failure-trend" class="trend-content">
+                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                                <!-- 折线路径：模拟查询失败趋势 -->
+                                <path d="M 20 50 L 60 45 L 100 40 L 140 55 L 180 35 L 220 60 L 260 30" 
+                                      stroke="#f87171" 
+                                      stroke-width="3" 
+                                      fill="none" 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round"
+                                      filter="drop-shadow(0 0 4px #f87171)"/>
+                                
+                                <!-- 数据点 -->
+                                <circle cx="20" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="60" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="100" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="140" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="180" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="220" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="260" cy="30" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                            </svg>
+                        </div>
+                        
+                        <!-- 底部标签 -->
+                        <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- 数据服务明细 -->
+                <div style="margin-top: 20px; background: transparent; border-radius: 8px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            数据服务明细
+                        </div>
+                        <select id="serviceTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                            <option value="7days">近7日</option>
+                            <option value="30days">近30天</option>
+                            <option value="1year">近1年</option>
+                        </select>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('service', 'collection')">数据采集</div>
+                        <div class="tab" onclick="switchTab('service', 'push')">数据推送</div>
+                        <div class="tab" onclick="switchTab('service', 'query')">数据查询</div>
+                    </div>
+
+                    <!-- 数据采集 -->
+                    <div id="service-collection" class="tab-content active">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>主数据类型</th>
+                                        <th>业务系统</th>
+                                        <th>成功数</th>
+                                        <th>失败数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>客户主数据</td>
+                                        <td>CRM系统</td>
+                                        <td>15,234</td>
+                                        <td>156</td>
+                                    </tr>
+                                    <tr>
+                                        <td>产品主数据</td>
+                                        <td>ERP系统</td>
+                                        <td>8,567</td>
+                                        <td>89</td>
+                                    </tr>
+                                    <tr>
+                                        <td>供应商主数据</td>
+                                        <td>SRM系统</td>
+                                        <td>6,234</td>
+                                        <td>234</td>
+                                    </tr>
+                                    <tr>
+                                        <td>组织架构</td>
+                                        <td>OA系统</td>
+                                        <td>2,123</td>
+                                        <td>45</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 数据推送 -->
+                    <div id="service-push" class="tab-content">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>主数据类型</th>
+                                        <th>业务系统</th>
+                                        <th>成功数</th>
+                                        <th>失败数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>客户主数据</td>
+                                        <td>BI系统</td>
+                                        <td>7,234</td>
+                                        <td>67</td>
+                                    </tr>
+                                    <tr>
+                                        <td>产品主数据</td>
+                                        <td>电商系统</td>
+                                        <td>5,123</td>
+                                        <td>89</td>
+                                    </tr>
+                                    <tr>
+                                        <td>供应商主数据</td>
+                                        <td>财务系统</td>
+                                        <td>3,456</td>
+                                        <td>123</td>
+                                    </tr>
+                                    <tr>
+                                        <td>组织架构</td>
+                                        <td>HR系统</td>
+                                        <td>1,234</td>
+                                        <td>23</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 数据查询 -->
+                    <div id="service-query" class="tab-content">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>主数据类型</th>
+                                        <th>业务系统</th>
+                                        <th>成功数</th>
+                                        <th>失败数</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>客户主数据</td>
+                                        <td>CRM系统</td>
+                                        <td>25,234</td>
+                                        <td>234</td>
+                                    </tr>
+                                    <tr>
+                                        <td>产品主数据</td>
+                                        <td>ERP系统</td>
+                                        <td>18,567</td>
+                                        <td>189</td>
+                                    </tr>
+                                    <tr>
+                                        <td>供应商主数据</td>
+                                        <td>SRM系统</td>
+                                        <td>12,456</td>
+                                        <td>456</td>
+                                    </tr>
+                                    <tr>
+                                        <td>组织架构</td>
+                                        <td>OA系统</td>
+                                        <td>8,234</td>
+                                        <td>123</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        </div>
+    </div>
+    <script>
+        function switchTab(container, tabName) {
+            // 隐藏所有tab内容
+            const tabContents = document.querySelectorAll(`#${container}-${tabName}`).forEach(el => {
+                el.parentElement.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+            });
+            // 移除所有tab的active状态
+            const tabs = document.querySelectorAll(`#${container}-${tabName}`).forEach(el => {
+                el.parentElement.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            });
+            // 显示选中的tab内容
+            document.getElementById(`${container}-${tabName}`).classList.add('active');
+            // 激活选中的tab
+            event.target.classList.add('active');
+        }
+        
+        function switchPeriod(period) {
+            // 隐藏所有区间内容
+            document.querySelectorAll('.period-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有区间按钮的active状态
+            document.querySelectorAll('.period-content').forEach(el => {
+                el.parentElement.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            });
+            // 显示选中的区间内容
+            document.getElementById(`period-${period}`).classList.add('active');
+            // 激活选中的区间按钮
+            event.target.classList.add('active');
+        }
+        
+        function switchCollectionTrend(trendType) {
+            // 隐藏所有趋势内容
+            document.querySelectorAll('.trend-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有趋势按钮的active状态
+            document.querySelectorAll('.trend-content').forEach(el => {
+                el.parentElement.parentElement.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            });
+            // 显示选中的趋势内容
+            document.getElementById(`collection-${trendType}-trend`).classList.add('active');
+            // 激活选中的趋势按钮
+            event.target.classList.add('active');
+        }
+        
+        function switchPushTrend(trendType) {
+            // 隐藏所有趋势内容
+            document.querySelectorAll('.trend-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有趋势按钮的active状态
+            document.querySelectorAll('.trend-content').forEach(el => {
+                el.parentElement.parentElement.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            });
+            // 显示选中的趋势内容
+            document.getElementById(`push-${trendType}-trend`).classList.add('active');
+            // 激活选中的趋势按钮
+            event.target.classList.add('active');
+        }
+        
+        function switchQueryTrend(trendType) {
+            // 隐藏所有趋势内容
+            document.querySelectorAll('.trend-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有趋势按钮的active状态
+            document.querySelectorAll('.trend-content').forEach(el => {
+                el.parentElement.parentElement.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+            });
+            // 显示选中的趋势内容
+            document.getElementById(`query-${trendType}-trend`).classList.add('active');
+            // 激活选中的趋势按钮
+            event.target.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('主数据管理驾驶舱页面加载完成');
+            
+            // 主数据新增趋势图时间范围选择处理
+            const timeRangeSelect = document.getElementById('timeRangeSelect');
+            const chartLabels = document.getElementById('chartLabels');
+            
+            if (timeRangeSelect && chartLabels) {
+                timeRangeSelect.addEventListener('change', function() {
+                    const selectedRange = this.value;
+                    let labels = [];
+                    
+                    switch(selectedRange) {
+                        case '7days':
+                            labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                            break;
+                        case '30days':
+                            labels = ['第1周', '第2周', '第3周', '第4周'];
+                            break;
+                        case '1year':
+                            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                            break;
+                    }
+                    
+                    // 更新标签
+                    chartLabels.innerHTML = '';
+                    labels.forEach(label => {
+                        const div = document.createElement('div');
+                        div.style.fontSize = '10px';
+                        div.style.color = 'var(--text-color-secondary)';
+                        div.textContent = label;
+                        chartLabels.appendChild(div);
+                    });
+                    
+                    // 调整标签间距
+                    if (selectedRange === '1year') {
+                        chartLabels.style.fontSize = '9px';
+                    } else {
+                        chartLabels.style.fontSize = '10px';
+                    }
+                });
+            }
+            
+            // 审批看板时间范围选择处理
+            const approvalTimeRange = document.getElementById('approvalTimeRange');
+            if (approvalTimeRange) {
+                approvalTimeRange.addEventListener('change', function() {
+                    const selectedRange = this.value;
+                    let labels = [];
+                    
+                    switch(selectedRange) {
+                        case '7days':
+                            labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                            break;
+                        case '30days':
+                            labels = ['第1周', '第2周', '第3周', '第4周'];
+                            break;
+                        case '1year':
+                            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                            break;
+                    }
+                    
+                    // 更新审批看板中所有趋势图的标签
+                    const approvalChartLabels = document.querySelectorAll('#approval-efficiency').forEach(container => {
+                        const labelContainers = container.querySelectorAll('div[style*="position: absolute; bottom: 8px"]');
+                        labelContainers.forEach(labelContainer => {
+                            labelContainer.innerHTML = '';
+                            labels.forEach(label => {
+                                const div = document.createElement('div');
+                                div.style.fontSize = selectedRange === '1year' ? '9px' : '9px';
+                                div.style.color = 'var(--text-color-secondary)';
+                                div.textContent = label;
+                                labelContainer.appendChild(div);
+                            });
+                        });
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

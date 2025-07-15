@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>质量规则管理</title>
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f6f8fa; font-size:14px; }
+    .container { max-width: 1100px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 40px; }
+    .title { font-size: 20px; color: #185a99; font-weight: 600; margin-bottom: 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; }
+    .btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 6px 22px; margin-right: 10px; cursor: pointer; transition: background 0.18s; }
+    .btn:hover { background: #185a99; }
+    .table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+    th,td { border: 1px solid #e5e6eb; padding: 10px 12px; }
+    th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .action-btn { background: none; border: none; color: #2176c7; cursor: pointer; font-size: 14px; margin-right: 8px; }
+    .action-btn:hover { color: #e53935; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:480px; min-height:220px; padding:32px 32px 24px 32px; position:relative; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #185a99; margin-bottom: 18px; }
+    .form-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .form-label { width: 90px; color: #333; font-size: 14px; text-align: right; margin-right: 8px; }
+    .form-value { flex: 1; }
+    .form-control { width: 100%; padding: 7px 12px; border: 1.5px solid #c0d3eb; border-radius: 6px; font-size: 14px; }
+    .modal-footer { text-align: right; margin-top: 18px; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 6px; font-size: 14px; padding: 6px 22px; margin-left: 8px; cursor: pointer; }
+    .btn-line:hover { background: #f7faff; color: #185a99; border-color: #185a99; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">质量规则管理</div>
+    <!-- 查询区 -->
+    <div class="search-area" style="background:#f6f8fa;border-radius:8px;padding:18px 24px 10px 24px;margin-bottom:20px;">
+      <form id="searchForm" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:70px;display:inline-block;">规则名称</span>
+          <input id="searchName" class="form-control" style="width:140px;" placeholder="请输入规则名称">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">类型</span>
+          <select id="searchType" class="form-control" style="width:100px;">
+            <option value="">全部</option>
+            <option value="唯一性校验">唯一性校验</option>
+            <option value="约束条件校验">约束条件校验</option>
+            <option value="必填规则">必填规则</option>
+            <option value="只读规则">只读规则</option>
+            <option value="赋值规则">赋值规则</option>
+            <option value="显隐规则">显隐规则</option>
+            <option value="数据联动">数据联动</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">状态</span>
+          <select id="searchStatus" class="form-control" style="width:100px;">
+            <option value="">全部</option>
+            <option value="启用">启用</option>
+            <option value="禁用">禁用</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:60px;display:inline-block;">创建人</span>
+          <input id="searchCreator" class="form-control" style="width:100px;" placeholder="请输入创建人">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:70px;display:inline-block;">创建时间</span>
+          <input id="searchCreateTime" class="form-control" style="width:140px;" placeholder="如 2024-06-01">
+        </div>
+        <button type="button" class="btn" onclick="searchRule()">查询</button>
+        <button type="button" class="btn-line" onclick="resetSearch()">重置</button>
+      </form>
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="openModal()">新增规则</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>规则名称</th>
+          <th>类型</th>
+          <th>质检维度</th>
+          <th>状态</th>
+          <th>创建人</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>客户编码唯一性</td>
+          <td>唯一性校验</td>
+          <td>数据唯一性</td>
+          <td>启用</td>
+          <td>张三</td>
+          <td>2024-06-01 10:23</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+          </td>
+        </tr>
+        <tr>
+          <td>供应商名称必填</td>
+          <td>必填规则</td>
+          <td>数据完整性</td>
+          <td>禁用</td>
+          <td>李四</td>
+          <td>2024-06-02 09:15</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="modal" style="display:none;">
+    <div class="modal-window">
+      <div class="modal-title">新增质量规则</div>
+      <div class="form-row">
+        <div class="form-label">规则名称：</div>
+        <div class="form-value"><input class="form-control" placeholder="请输入规则名称"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">类型：</div>
+        <div class="form-value">
+          <select class="form-control" id="rule-type" onchange="onTypeChange()">
+            <option value="长度">长度</option>
+            <option value="正则">正则</option>
+            <option value="非空">非空</option>
+            <option value="枚举">枚举</option>
+            <option value="数值范围">数值范围</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">质检维度：</div>
+        <div class="form-value">
+          <select class="form-control">
+            <option value="数据完整性">数据完整性</option>
+            <option value="数据准确性">数据准确性</option>
+            <option value="数据一致性">数据一致性</option>
+            <option value="数据唯一性">数据唯一性</option>
+            <option value="数据及时性">数据及时性</option>
+            <option value="数据有效性">数据有效性</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" id="param-row-length" style="display:none;">
+        <div class="form-label">长度：</div>
+        <div class="form-value"><input class="form-control" id="input-length" placeholder="请输入最大长度"></div>
+      </div>
+      <div class="form-row" id="param-row-regex" style="display:none;">
+        <div class="form-label">正则表达式：</div>
+        <div class="form-value"><input class="form-control" id="input-regex" placeholder="请输入正则表达式"></div>
+      </div>
+      <div class="form-row" id="param-row-enum" style="display:none;">
+        <div class="form-label">主数据模型：</div>
+        <div class="form-value"><input class="form-control" id="input-enum-model" placeholder="请输入主数据模型"></div>
+      </div>
+      <div class="form-row" id="param-row-enum-attr" style="display:none;">
+        <div class="form-label">属性：</div>
+        <div class="form-value"><input class="form-control" id="input-enum-attr" placeholder="请输入属性"></div>
+      </div>
+      <div class="form-row" id="param-row-range" style="display:none;">
+        <div class="form-label">最小值：</div>
+        <div class="form-value"><input class="form-control" id="input-min" placeholder="请输入最小值"></div>
+      </div>
+      <div class="form-row" id="param-row-range-max" style="display:none;">
+        <div class="form-label">最大值：</div>
+        <div class="form-value"><input class="form-control" id="input-max" placeholder="请输入最大值"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">状态：</div>
+        <div class="form-value">
+          <select class="form-control">
+            <option>启用</option>
+            <option>禁用</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal()">保存</button>
+        <button class="btn-line" onclick="closeModal()">取消</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function openModal() {
+      document.getElementById('modal').style.display = 'flex';
+      // 默认显示长度参数
+      setTimeout(function() {
+        onTypeChange();
+      }, 0);
+    }
+    function onTypeChange() {
+      var type = document.getElementById('rule-type').value;
+      // 隐藏所有参数行
+      document.getElementById('param-row-length').style.display = 'none';
+      document.getElementById('param-row-regex').style.display = 'none';
+      document.getElementById('param-row-enum').style.display = 'none';
+      document.getElementById('param-row-enum-attr').style.display = 'none';
+      document.getElementById('param-row-range').style.display = 'none';
+      document.getElementById('param-row-range-max').style.display = 'none';
+      if(type === '长度') {
+        document.getElementById('param-row-length').style.display = 'flex';
+      } else if(type === '正则') {
+        document.getElementById('param-row-regex').style.display = 'flex';
+      } else if(type === '枚举') {
+        document.getElementById('param-row-enum').style.display = 'flex';
+        document.getElementById('param-row-enum-attr').style.display = 'flex';
+      } else if(type === '数值范围') {
+        document.getElementById('param-row-range').style.display = 'flex';
+        document.getElementById('param-row-range-max').style.display = 'flex';
+      }
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function searchRule() {
+      alert('查询功能已触发，规则名称：' + document.getElementById('searchName').value + ', 类型：' + document.getElementById('searchType').value + ', 状态：' + document.getElementById('searchStatus').value + ', 创建人：' + document.getElementById('searchCreator').value + ', 创建时间：' + document.getElementById('searchCreateTime').value);
+    }
+    function resetSearch() {
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchType').value = '';
+      document.getElementById('searchStatus').value = '';
+      document.getElementById('searchCreator').value = '';
+      document.getElementById('searchCreateTime').value = '';
+    }
+  </script>
+</body>
+</html> 

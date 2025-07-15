@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>质量检查任务</title>
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f6f8fa; font-size:14px; }
+    .container { max-width: 1100px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 40px; }
+    .title { font-size: 20px; color: #185a99; font-weight: 600; margin-bottom: 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; }
+    .btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 6px 22px; margin-right: 10px; cursor: pointer; transition: background 0.18s; }
+    .btn:hover { background: #185a99; }
+    .table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+    th,td { border: 1px solid #e5e6eb; padding: 10px 12px; }
+    th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .action-btn { background: none; border: none; color: #2176c7; cursor: pointer; font-size: 14px; margin-right: 8px; }
+    .action-btn:hover { color: #e53935; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:792px; min-height:422px; padding:42px 42px 32px 42px; position:relative; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #185a99; margin-bottom: 18px; }
+    .step-bar { display: flex; align-items: center; margin-bottom: 24px; justify-content: center; }
+    .step { display: flex; align-items: center; font-size: 15px; color: #888; font-weight: 500; margin-right: 32px; }
+    .step.active { color: #2176c7; font-weight: 600; }
+    .step-index { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #e5e6eb; color: #888; font-size: 15px; font-weight: 600; margin-right: 6px; }
+    .step.active .step-index { background: #2176c7; color: #fff; }
+    .form-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .form-label { width: 110px; color: #333; font-size: 14px; text-align: right; margin-right: 8px; }
+    .form-value { flex: 1; }
+    .form-control { width: 100%; padding: 7px 12px; border: 1.5px solid #c0d3eb; border-radius: 6px; font-size: 14px; }
+    .modal-footer { text-align: right; margin-top: 18px; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 6px; font-size: 14px; padding: 6px 22px; margin-left: 8px; cursor: pointer; }
+    .btn-line:hover { background: #f7faff; color: #185a99; border-color: #185a99; }
+    /* switch 开关样式 */
+    .switch { position: relative; display: inline-block; width: 38px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+    input:checked + .slider { background-color: #2176c7; }
+    input:checked + .slider:before { transform: translateX(16px); }
+    /* 字段映射表格数据集字段输入框宽度缩小10% */
+    #mapping-area input.form-control { width: 90%; min-width: 40px; max-width: 180px; }
+    /* 抽屉样式 */
+    .drawer-mask { position: fixed; top:0; right:0; bottom:0; left:0; background:rgba(0,0,0,0.18); z-index:2000; display:none; }
+    .drawer { position: fixed; top:0; right:0; width:420px; height:100%; background:#fff; box-shadow: -2px 0 16px rgba(0,0,0,0.12); z-index:2100; padding:32px 28px; display:flex; flex-direction:column; }
+    .drawer-title { font-size: 17px; font-weight: 600; color: #185a99; margin-bottom: 18px; }
+    .drawer-close { position:absolute; right:18px; top:18px; font-size:22px; color:#888; cursor:pointer; }
+    .drawer-footer { margin-top:auto; text-align:right; position:relative; bottom:50px; }
+    /* 步骤条底部按钮固定 */
+    .modal-footer { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; padding: 18px 42px 18px 0; box-shadow: 0 -2px 12px rgba(33,118,199,0.04); z-index: 10; }
+    .modal-window { position: relative; }
+    .drawer .form-row { margin-bottom: 14px; }
+    .drawer .form-label { width: 90px; }
+    .drawer .form-value { flex: 1; }
+    /* 多选下拉样式 */
+    .multi-select-wrap { position: relative; }
+    .multi-select-input { display: flex; align-items: center; padding: 0 8px; border: 1px solid #d0d7de; border-radius: 6px; height: 28px; background-color: #fff; cursor: pointer; }
+    .multi-select-input:focus { border-color: #2176c7; box-shadow: 0 0 0 2px #2176c7; }
+    .multi-select-hidden-input { border: none; outline: none; flex: 1 1 40px; min-width: 40px; height: 28px; background: transparent; padding: 0; margin: 0; display: inline-block; }
+    .multi-tag { display: inline-flex; align-items: center; background-color: #e0e0e0; border-radius: 4px; padding: 2px 6px; margin-right: 4px; margin-bottom: 4px; font-size: 12px; color: #333; }
+    .multi-tag-close { margin-left: 4px; cursor: pointer; color: #888; }
+    .multi-select-dropdown { position: absolute; top: 110%; left: 0; width: 100%; background: #fff; border: 1.5px solid #d0d7de; border-radius: 7px; box-shadow: 0 2px 12px rgba(33,118,199,0.10); z-index: 10; max-height: 180px; overflow: auto; }
+    .multi-select-option { padding: 6px 12px; cursor: pointer; background: #fff; }
+    .multi-select-option:hover { background: #f4f7fa; }
+    .multi-select-option.selected { background: #f4f7fa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">质量检查任务</div>
+    <!-- 查询区 -->
+    <div class="search-area" style="background:#f6f8fa;border-radius:8px;padding:18px 24px 10px 24px;margin-bottom:20px;">
+      <form id="searchForm" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:70px;display:inline-block;">任务名称</span>
+          <input id="searchName" class="form-control" style="width:140px;" placeholder="请输入任务名称">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">类型</span>
+          <select id="searchType" class="form-control" style="width:100px;">
+            <option value="">全部</option>
+            <option value="质量规则">质量规则</option>
+            <option value="数据对比">数据对比</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:90px;display:inline-block;">主数据模型</span>
+          <input id="searchModel" class="form-control" style="width:120px;" placeholder="请输入主数据模型">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">状态</span>
+          <select id="searchStatus" class="form-control" style="width:100px;">
+            <option value="">全部</option>
+            <option value="启用">启用</option>
+            <option value="禁用">禁用</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="color:#185a99;font-size:14px;width:110px;display:inline-block;">最后执行时间</span>
+          <input id="searchExecTime" class="form-control" style="width:140px;" placeholder="如 2024-01-15">
+        </div>
+        <button type="button" class="btn" onclick="searchTask()">查询</button>
+        <button type="button" class="btn-line" onclick="resetSearch()">重置</button>
+      </form>
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="openModal()">新增任务</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>任务名称</th>
+          <th>类型</th>
+          <th>主数据模型</th>
+          <th>数据集</th>
+          <th>状态</th>
+          <th>最后执行时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>员工主数据对比</td>
+          <td>数据对比</td>
+          <td>员工主数据</td>
+          <td>员工数据集A</td>
+          <td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td>
+          <td>2024-01-15 14:30:25</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+            <button class="action-btn">执行</button>
+            <button class="action-btn">任务调度</button>
+          </td>
+        </tr>
+        <tr>
+          <td>员工主数据质量规则</td>
+          <td>质量规则</td>
+          <td>员工主数据</td>
+          <td>员工数据集B</td>
+          <td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>
+          <td>2024-01-14 09:15:42</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+            <button class="action-btn">执行</button>
+            <button class="action-btn">任务调度</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="modal" style="display:none;">
+    <div class="modal-window">
+      <div class="modal-title">新增质量检查任务</div>
+      <div class="step-bar" id="step-bar">
+        <div class="step active"><span class="step-index">1</span>选择模型/数据集</div>
+        <div class="step" id="step2-bar"><span class="step-index">2</span>字段映射</div>
+        <div class="step"><span class="step-index">3</span>完成</div>
+      </div>
+      <!-- 步骤1内容区域 -->
+      <div id="step-content-1" style="margin-bottom: 16px;">
+        <div class="form-row">
+          <div class="form-label">任务名称：</div>
+          <div class="form-value"><input class="form-control" placeholder="请输入任务名称"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">质检类型：</div>
+          <div class="form-value">
+            <select class="form-control" id="qc-type" onchange="onQcTypeChange(); showStep(1);">
+              <option value="质量规则">质量规则</option>
+              <option value="数据对比">数据对比</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">主数据模型：</div>
+          <div class="form-value">
+            <select class="form-control">
+              <option>员工主数据</option>
+              <option>供应商主数据</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="dataset-row" style="display:none;">
+          <div class="form-label">数据集：</div>
+          <div class="form-value">
+            <select class="form-control">
+              <option>员工数据集A</option>
+              <option>员工数据集B</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="qc-scope-row">
+          <div class="form-label">质检数据范围：</div>
+          <div class="form-value" style="position:relative;display:flex;align-items:center;">
+            <input class="form-control" id="qc-scope-input" placeholder="点击右侧按钮编辑" style="width:100%;padding-right:32px;" readonly onclick="openQcScopeEditor()">
+            <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;" title="范围编辑" onclick="openQcScopeEditor()">🔍</span>
+          </div>
+        </div>
+      </div>
+      <!-- 步骤2内容区域 -->
+      <div id="step-content-2" style="display:none; margin-bottom: 16px;">
+        <!-- 质量规则类型下的规则列表和新增按钮 -->
+        <div id="rule-list-area" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-weight:500; color:#185a99;">质检规则列表</span>
+            <div>
+              <button class="btn" onclick="loadModelBizRules()" style="margin-right:10px;">加载模型业务规则</button>
+              <button class="btn" onclick="openDrawer()">新增质检规则</button>
+            </div>
+          </div>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#f6f8fa;"><th style="padding:6px 8px; border:1px solid #e5e6eb;">字段</th><th style="padding:6px 8px; border:1px solid #e5e6eb;">规则类型</th><th style="padding:6px 8px; border:1px solid #e5e6eb;">规则内容</th><th style="padding:6px 8px; border:1px solid #e5e6eb;">操作</th></tr></thead>
+            <tbody id="rule-list-tbody">
+              <!-- 动态填充 -->
+            </tbody>
+          </table>
+        </div>
+        <!-- 数据对比类型下的字段映射 -->
+        <div id="mapping-area" style="display:none;">
+          <div style="font-weight:500; color:#185a99; margin-bottom:8px;">请指定模型字段与数据集字段的映射关系：</div>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#f6f8fa;"><th style="padding:6px 8px; border:1px solid #e5e6eb;">模型字段</th><th style="padding:6px 8px; border:1px solid #e5e6eb;">数据集字段</th></tr></thead>
+            <tbody>
+              <tr><td style="padding:6px 8px; border:1px solid #e5e6eb;">name</td><td style="padding:6px 8px; border:1px solid #e5e6eb;"><input class="form-control" placeholder="请选择或输入数据集字段"></td></tr>
+              <tr><td style="padding:6px 8px; border:1px solid #e5e6eb;">code</td><td style="padding:6px 8px; border:1px solid #e5e6eb;"><input class="form-control" placeholder="请选择或输入数据集字段"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- 步骤3内容区域 -->
+      <div id="step-content-3" style="display:none; margin-bottom: 16px;">
+        <div style="font-weight:500; color:#185a99; margin-bottom:8px;">任务已完成，可点击保存。</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-line" onclick="closeModal()">取消</button>
+        <button class="btn" id="prev-btn" onclick="prevStep()" style="display:none;">上一步</button>
+        <button class="btn" id="next-btn" onclick="nextStep()">下一步</button>
+        <button class="btn" id="save-btn" onclick="closeModal()" style="display:none;">保存</button>
+      </div>
+    </div>
+  </div>
+  <!-- 规则抽屉 -->
+  <div class="drawer-mask" id="drawer-mask">
+    <div class="drawer">
+      <div class="drawer-title">新增质检规则 <span class="drawer-close" onclick="closeDrawer()">×</span></div>
+      <div class="form-row">
+        <div class="form-label">检验字段：</div>
+        <div class="form-value">
+          <div class='multi-select-wrap' style='width:100%;position:relative;'>
+            <div class='multi-select-input' id='drawerFieldsMulti' tabindex='0' style='width:100%;'>
+              <!-- 动态标签 -->
+              <input class='multi-select-hidden-input' id='drawerFieldsInput' style='border:none;outline:none;flex:1 1 40px;min-width:40px;height:28px;background:transparent;padding:0;margin:0;display:inline-block;' readonly placeholder='请选择检验字段，可多选'>
+            </div>
+            <div class='multi-select-dropdown' id='drawerFieldsDropdown' style='display:none;position:absolute;top:110%;left:0;width:100%;background:#fff;border:1.5px solid #d0d7de;border-radius:7px;box-shadow:0 2px 12px rgba(33,118,199,0.10);z-index:10;max-height:180px;overflow:auto;'></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">规则类型：</div>
+        <div class="form-value">
+          <select class="form-control" id="drawer-rule-type" onchange="onDrawerRuleTypeChange()">
+            <option value="内置">系统规则</option>
+            <option value="自定义">自定义校验表达式</option>
+            <option value="sql">自定义SQL</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" id="drawer-inner-rule-row">
+        <div class="form-label">质量规则：</div>
+        <div class="form-value">
+          <select class="form-control">
+            <option>长度检查</option>
+            <option>正则校验</option>
+            <option>非空</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" id="drawer-custom-row" style="display:none;">
+        <div class="form-label">校验表达式：</div>
+        <div class="form-value" style="position:relative;display:flex;align-items:center;">
+          <input class="form-control" id="drawer-custom-expr" placeholder="请输入自定义校验表达式" style="width:100%;padding-right:32px;" readonly>
+          <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;" title="表达式编辑" onclick="openCustomExprEditor()">🔍</span>
+        </div>
+      </div>
+      <div class="form-row" id="drawer-sql-row" style="display:none;">
+        <div class="form-label">SQL：</div>
+        <div class="form-value" style="position:relative;display:flex;align-items:center;">
+          <input class="form-control" id="drawer-sql-expr" placeholder="请输入自定义SQL" style="width:100%;padding-right:32px;" readonly onclick="openSqlEditor()">
+          <span class="expr-query-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;" title="SQL编辑" onclick="openSqlEditor()">🔍</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">质检维度：</div>
+        <div class="form-value">
+          <select class="form-control">
+            <option value="数据完整性">数据完整性</option>
+            <option value="数据准确率">数据准确率</option>
+            <option value="数据一致性">数据一致性</option>
+            <option value="数据唯一性">数据唯一性</option>
+            <option value="数据及时性">数据及时性</option>
+            <option value="数据有效性">数据有效性</option>
+          </select>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn" onclick="closeDrawer()">确定</button>
+        <button class="btn-line" onclick="closeDrawer()">取消</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let currentStep = 1;
+    function openModal() { document.getElementById('modal').style.display = 'flex'; onQcTypeChange(); showStep(1); }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function onQcTypeChange() {
+      var type = document.getElementById('qc-type').value;
+      var datasetRow = document.getElementById('dataset-row');
+      if(type === '数据对比') {
+        datasetRow.style.display = 'flex';
+      } else {
+        datasetRow.style.display = 'none';
+      }
+    }
+    // 步骤内容切换
+    function showStep(step) {
+      currentStep = step;
+      // 步骤条高亮
+      var steps = document.querySelectorAll('.step');
+      steps.forEach((el, idx) => {
+        if(idx === step-1) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+      // 按钮显示
+      document.getElementById('prev-btn').style.display = step > 1 ? 'inline-block' : 'none';
+      document.getElementById('next-btn').style.display = step < 3 ? 'inline-block' : 'none';
+      document.getElementById('save-btn').style.display = step === 3 ? 'inline-block' : 'none';
+      // 步骤内容显示
+      document.getElementById('step-content-1').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('step-content-2').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('step-content-3').style.display = step === 3 ? 'block' : 'none';
+      // 步骤2内容和名称动态
+      var qcType = document.getElementById('qc-type').value;
+      var step2Bar = document.getElementById('step2-bar');
+      var mappingArea = document.getElementById('mapping-area');
+      var ruleListArea = document.getElementById('rule-list-area');
+      if(step === 2 && qcType === '数据对比') {
+        step2Bar.innerHTML = '<span class="step-index">2</span>字段映射';
+        mappingArea.style.display = 'block';
+        ruleListArea.style.display = 'none';
+      } else if(step === 2 && qcType === '质量规则') {
+        step2Bar.innerHTML = '<span class="step-index">2</span>质检规则配置';
+        mappingArea.style.display = 'none';
+        ruleListArea.style.display = 'block';
+        renderBizRuleList();
+      } else {
+        // 步骤1时也要根据类型动态显示第二步名称
+        if(step === 1 && qcType === '质量规则') {
+          step2Bar.innerHTML = '<span class="step-index">2</span>质检规则配置';
+        } else {
+          step2Bar.innerHTML = '<span class="step-index">2</span>字段映射';
+        }
+        mappingArea.style.display = 'none';
+        ruleListArea.style.display = 'none';
+      }
+    }
+    // 规则抽屉相关
+    function openDrawer() {
+      document.getElementById('drawer-mask').style.display = 'block';
+      document.getElementById('drawer-rule-type').value = '内置';
+      onDrawerRuleTypeChange();
+      // 检验字段多选下拉逻辑
+      const QC_FIELD_OPTIONS = ['name', 'code', 'org'];
+      let qcFieldSelected = [];
+      function renderDrawerFieldsMulti() {
+        const inputWrap = document.getElementById('drawerFieldsMulti');
+        const dropdown = document.getElementById('drawerFieldsDropdown');
+        inputWrap.innerHTML = qcFieldSelected.map(attr=>`<span class='multi-tag'>${attr}<span class='multi-tag-close' data-value='${attr}' style='margin-left:2px;cursor:pointer;'>&times;</span></span>`).join('') +
+          `<input class='multi-select-hidden-input' id='drawerFieldsInput' style='border:none;outline:none;flex:1 1 40px;min-width:40px;height:28px;background:transparent;padding:0;margin:0;display:inline-block;' readonly placeholder='请选择检验字段，可多选'>`;
+        // 绑定删除事件
+        inputWrap.querySelectorAll('.multi-tag-close').forEach(closeBtn => {
+          closeBtn.onclick = function(ev) {
+            ev.stopPropagation();
+            const v = closeBtn.getAttribute('data-value');
+            qcFieldSelected = qcFieldSelected.filter(x=>x!==v);
+            renderDrawerFieldsMulti();
+          };
+        });
+      }
+      function renderDrawerFieldsDropdown() {
+        const dropdown = document.getElementById('drawerFieldsDropdown');
+        dropdown.innerHTML = QC_FIELD_OPTIONS.map(opt=>`<div class='multi-select-option' data-value='${opt}' style='padding:6px 12px;cursor:pointer;background:${qcFieldSelected.includes(opt)?'#f4f7fa':'#fff'};'>${opt}${qcFieldSelected.includes(opt)?' <span style=\"color:#2176c7;\">✔</span>':''}</div>`).join('');
+      }
+      setTimeout(()=>{
+        const inputWrap = document.getElementById('drawerFieldsMulti');
+        const dropdown = document.getElementById('drawerFieldsDropdown');
+        if(inputWrap && dropdown) {
+          renderDrawerFieldsMulti();
+          inputWrap.onclick = function(e) {
+            e.stopPropagation();
+            renderDrawerFieldsDropdown();
+            dropdown.style.display = 'block';
+          };
+          dropdown.onclick = function(e) {
+            const v = e.target.getAttribute('data-value');
+            if (!v) return;
+            if (qcFieldSelected.includes(v)) {
+              qcFieldSelected = qcFieldSelected.filter(x=>x!==v);
+            } else {
+              qcFieldSelected = qcFieldSelected.concat(v);
+            }
+            renderDrawerFieldsMulti();
+            renderDrawerFieldsDropdown();
+          };
+          inputWrap.onblur = function() { setTimeout(()=>{dropdown.style.display='none';},120); };
+          document.addEventListener('click', function(){ dropdown.style.display='none'; });
+        }
+      }, 300);
+    }
+    function closeDrawer() {
+      document.getElementById('drawer-mask').style.display = 'none';
+    }
+    function onDrawerRuleTypeChange() {
+      var type = document.getElementById('drawer-rule-type').value;
+      document.getElementById('drawer-inner-rule-row').style.display = (type === '内置') ? 'flex' : 'none';
+      document.getElementById('drawer-custom-row').style.display = (type === '自定义') ? 'flex' : 'none';
+      document.getElementById('drawer-sql-row').style.display = (type === 'sql') ? 'flex' : 'none';
+    }
+    function nextStep() { if(currentStep < 3) showStep(currentStep+1); }
+    function prevStep() { if(currentStep > 1) showStep(currentStep-1); }
+    // 自定义校验表达式编辑按钮事件
+    function openCustomExprEditor() {
+      var input = document.getElementById('drawer-custom-expr');
+      var win = window.open('expression.html', '_blank', 'width=700,height=600');
+      // 监听子窗口请求初始值
+      window.addEventListener('message', function handler(e) {
+        if (e.data && e.data.type === 'getExprInit') {
+          win.postMessage({ type: 'exprInit', value: input.value }, '*');
+          window.removeEventListener('message', handler);
+        }
+      });
+      // 监听子窗口回传表达式
+      window.addEventListener('message', function handler(e) {
+        if (e.data && e.data.type === 'exprResult') {
+          input.value = e.data.value;
+          win.close && win.close();
+          window.removeEventListener('message', handler);
+        }
+      });
+    }
+    // 自定义SQL编辑按钮事件
+    function openSqlEditor() {
+      var input = document.getElementById('drawer-sql-expr');
+      var win = window.open('sql_editor.html', '_blank', 'width=800,height=500');
+      // 监听子窗口请求初始值
+      window.addEventListener('message', function handler(e) {
+        if (e.data && e.data.type === 'getSqlInit') {
+          win.postMessage({ type: 'sqlInit', value: input.value }, '*');
+          window.removeEventListener('message', handler);
+        }
+      });
+      // 监听子窗口回传SQL
+      window.addEventListener('message', function handler(e) {
+        if (e.data && e.data.type === 'sqlResult') {
+          input.value = e.data.value;
+          win.close && win.close();
+          window.removeEventListener('message', handler);
+        }
+      });
+    }
+    // 质检数据范围编辑按钮事件
+    function openQcScopeEditor() {
+      window.open('condition_new.html', '_blank', 'width=800,height=600');
+    }
+    // 模拟业务规则数据
+    const mockBizRules = [
+      { field: 'name', type: '唯一性校验', content: '员工姓名唯一', enabled: true },
+      { field: 'code', type: '唯一性校验', content: '员工编码唯一', enabled: true },
+      { field: 'org', type: '约束条件校验', content: '所属部门必须存在', enabled: false }
+    ];
+    // 渲染业务规则列表
+    function renderBizRuleList() {
+      const tbody = document.getElementById('rule-list-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = mockBizRules.map((item, idx) => `
+        <tr>
+          <td>${item.field}</td>
+          <td>${item.type}</td>
+          <td>${item.content}</td>
+          <td><label class="switch"><input type="checkbox" ${item.enabled ? 'checked' : ''} onchange="toggleBizRule(${idx})"><span class="slider"></span></label></td>
+        </tr>
+      `).join('');
+    }
+    // 切换开关
+    window.toggleBizRule = function(idx) {
+      mockBizRules[idx].enabled = !mockBizRules[idx].enabled;
+    };
+
+    // 加载模型业务规则按钮事件
+    function loadModelBizRules() {
+      // 这里可以根据实际业务从后端加载，这里直接重置为 mockBizRules
+      renderBizRuleList();
+    }
+
+function searchTask() {
+  alert('查询功能已触发，任务名称：' + document.getElementById('searchName').value + ', 类型：' + document.getElementById('searchType').value + ', 主数据模型：' + document.getElementById('searchModel').value + ', 状态：' + document.getElementById('searchStatus').value + ', 最后执行时间：' + document.getElementById('searchExecTime').value);
+}
+function resetSearch() {
+  document.getElementById('searchName').value = '';
+  document.getElementById('searchType').value = '';
+  document.getElementById('searchModel').value = '';
+  document.getElementById('searchStatus').value = '';
+  document.getElementById('searchExecTime').value = '';
+}
+  </script>
+</body>
+</html> 

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>SQL编辑器</title>
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f6f8fa; font-size:15px; }
+    .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); padding: 32px 36px; }
+    .title { font-size: 20px; color: #185a99; font-weight: 600; margin-bottom: 18px; }
+    .editor-label { font-size: 15px; color: #2176c7; font-weight: 500; margin-bottom: 8px; }
+    .sql-textarea { width: 100%; min-height: 180px; font-size: 15px; border: 1.5px solid #c0d3eb; border-radius: 8px; padding: 12px; resize: vertical; background: #fafdff; margin-bottom: 18px; }
+    .btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 15px; padding: 8px 32px; margin-right: 16px; cursor: pointer; transition: background 0.18s; }
+    .btn:hover { background: #185a99; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 6px; font-size: 15px; padding: 8px 32px; margin-left: 8px; cursor: pointer; }
+    .btn-line:hover { background: #f7faff; color: #185a99; border-color: #185a99; }
+    .footer { text-align: right; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">SQL编辑器</div>
+    <div class="editor-label">请输入或编辑SQL语句：</div>
+    <textarea class="sql-textarea" id="sqlInput" placeholder="请输入SQL语句"></textarea>
+    <div class="footer">
+      <button class="btn" onclick="onConfirm()">确定</button>
+      <button class="btn-line" onclick="onCancel()">取消</button>
+    </div>
+  </div>
+  <script>
+    // 初始化SQL内容
+    window.addEventListener('message', function(e) {
+      if (e.data && (e.data.type === 'sqlInit' || e.data.type === 'getSqlInit')) {
+        document.getElementById('sqlInput').value = e.data.value || '';
+      }
+    });
+    // 请求初始值
+    window.opener && window.opener.postMessage({ type: 'getSqlInit' }, '*');
+    function onConfirm() {
+      const sql = document.getElementById('sqlInput').value;
+      window.opener && window.opener.postMessage({ type: 'sqlResult', value: sql }, '*');
+      window.close();
+    }
+    function onCancel() {
+      window.close();
+    }
+    // 支持Ctrl+Enter快捷键提交
+    document.getElementById('sqlInput').addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        onConfirm();
+      }
+    });
+  </script>
+</body>
+</html> 

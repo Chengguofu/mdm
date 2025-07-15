@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>数据集管理</title>
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f6f8fa; font-size:14px; }
+    .container { max-width: 1100px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 40px; }
+    .title { font-size: 20px; color: #185a99; font-weight: 600; margin-bottom: 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; }
+    .btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 6px 22px; margin-right: 10px; cursor: pointer; transition: background 0.18s; }
+    .btn:hover { background: #185a99; }
+    .table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+    th,td { border: 1px solid #e5e6eb; padding: 10px 12px; }
+    th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .action-btn { background: none; border: none; color: #2176c7; cursor: pointer; font-size: 14px; margin-right: 8px; }
+    .action-btn:hover { color: #e53935; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:726px; min-width:726px; min-height:440px; padding:32px 40px 24px 40px; position:relative; transition: width 0.2s; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #185a99; margin-bottom: 18px; }
+    .form-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .form-label { width: 90px; color: #333; font-size: 14px; text-align: right; margin-right: 8px; }
+    .form-value { flex: 1; }
+    .form-control { width: 100%; padding: 7px 12px; border: 1.5px solid #c0d3eb; border-radius: 6px; font-size: 14px; }
+    .modal-footer { text-align: right; margin-top: 18px; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 6px; font-size: 14px; padding: 6px 22px; margin-left: 8px; cursor: pointer; }
+    .btn-line:hover { background: #f7faff; color: #185a99; border-color: #185a99; }
+    .field-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .field-table th, .field-table td { border: 1px solid #e5e6eb; padding: 5px 7px; font-size: 11.7px; }
+    .field-table th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .field-table input.alias-input { width: 42%; min-width: 40px; max-width: 80px; }
+    .field-table input.api-path-input { width: 60%; min-width: 60px; max-width: 140px; }
+    .field-table input.name-input { width: 32%; min-width: 32px; max-width: 60px; color: #999; }
+    .field-table input.desc-input { width: 60%; min-width: 60px; max-width: 120px; }
+    #table-select { width: 60%; min-width: 60px; max-width: 120px; }
+    #api-fields-table { width: 100%; min-width: 0; }
+    
+    /* 步骤条样式 */
+    .step-container { display: flex; align-items: center; margin-bottom: 24px; justify-content: center; }
+    .step { display: flex; align-items: center; }
+    .step-number { width: 28px; height: 28px; border-radius: 50%; background: #e5e6eb; color: #666; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; margin-right: 8px; }
+    .step-number.active { background: #2176c7; color: #fff; }
+    .step-number.completed { background: #52c41a; color: #fff; }
+    .step-text { color: #666; font-size: 14px; margin-right: 16px; }
+    .step-text.active { color: #2176c7; font-weight: 500; }
+    .step-text.completed { color: #52c41a; }
+    .step-line { width: 40px; height: 2px; background: #e5e6eb; margin: 0 8px; }
+    .step-line.active { background: #2176c7; }
+    
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+    
+    .btn-disabled { background: #e5e6eb; color: #999; cursor: not-allowed; }
+    .btn-disabled:hover { background: #e5e6eb; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    .field-table { width: 100%; min-width: 0; }
+    #api-fields-table { width: 100%; min-width: 0; }
+    /* 接口字段表格表头宽度优化 */
+    #api-fields-table th:nth-child(1) { width: 64px; min-width: 29px; }
+    #api-fields-table th:nth-child(2) { width: 100px; min-width: 58px; }
+    #api-fields-table th:nth-child(3) { width: 36px; min-width: 22px; }
+    .pk-icon svg { vertical-align:middle; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">数据集管理</div>
+    <!-- 查询区 -->
+    <div class="search-area" style="background:#f6f8fa;border-radius:8px;padding:18px 24px 10px 24px;margin-bottom:20px;">
+      <form id="searchForm" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:80px;display:inline-block;">数据集名称</span>
+            <input id="searchName" class="form-control" style="width:140px;" placeholder="请输入数据集名称">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:60px;display:inline-block;">数据源</span>
+            <input id="searchSource" class="form-control" style="width:120px;" placeholder="请输入数据源">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">类型</span>
+            <select id="searchType" class="form-control" style="width:100px;">
+              <option value="">全部</option>
+              <option value="数据库">数据库</option>
+              <option value="接口">接口</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:80px;display:inline-block;">业务系统</span>
+            <select id="searchSystem" class="form-control" style="width:140px;">
+              <option value="">全部</option>
+              <option value="ERP">ERP系统</option>
+              <option value="CRM">CRM系统</option>
+              <option value="HR">人力资源系统</option>
+              <option value="SCM">供应链系统</option>
+              <option value="FIN">财务系统</option>
+              <option value="OA">办公自动化</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+          <button type="button" class="btn" onclick="searchDs()">查询</button>
+          <button type="button" class="btn-line" onclick="resetSearch()">重置</button>
+        </div>
+      </form>
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="openModal()">新增数据集</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>数据集名称</th>
+          <th>数据源</th>
+          <th>类型</th>
+          <th>业务系统</th>
+          <th>创建人</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>员工表</td>
+          <td>主库</td>
+          <td>数据库</td>
+          <td>ERP系统</td>
+          <td>张三</td>
+          <td>2024-06-01 10:23</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+          </td>
+        </tr>
+        <tr>
+          <td>接口A数据</td>
+          <td>接口A</td>
+          <td>接口</td>
+          <td>CRM系统</td>
+          <td>李四</td>
+          <td>2024-06-02 09:15</td>
+          <td>
+            <button class="action-btn">编辑</button>
+            <button class="action-btn">删除</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="modal" style="display:none;">
+    <div class="modal-window">
+      <div class="modal-title">新增数据集</div>
+      
+      <!-- 步骤条 -->
+      <div class="step-container">
+        <div class="step">
+          <div class="step-number active" id="step1-number">1</div>
+          <div class="step-text active" id="step1-text">基本信息</div>
+        </div>
+        <div class="step-line" id="step1-line"></div>
+        <div class="step">
+          <div class="step-number" id="step2-number">2</div>
+          <div class="step-text" id="step2-text">字段配置</div>
+        </div>
+      </div>
+      
+      <!-- 第一步：基本信息 -->
+      <div class="step-content active" id="step1-content">
+      <div class="form-row">
+        <div class="form-label">数据集名称：</div>
+          <div class="form-value"><input class="form-control" id="dataset-name" placeholder="请输入数据集名称"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">数据源：</div>
+        <div class="form-value">
+            <select class="form-control" id="data-source" onchange="onDataSourceChange()">
+              <option value="">请选择数据源</option>
+              <option value="database">主库</option>
+              <option value="restful">RESTful接口</option>
+              <option value="webservice">WebService接口</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">业务系统：</div>
+        <div class="form-value">
+            <input class="form-control" id="business-system" placeholder="选择数据源后自动带出" readonly>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 第二步：字段配置 -->
+      <div class="step-content" id="step2-content">
+        <!-- 数据库表字段配置 -->
+        <div id="database-fields" style="display:none;">
+          <div class="form-row" id="table-select-row" style="margin-bottom: 8px;">
+            <div class="form-label">选择表：</div>
+        <div class="form-value">
+              <select class="form-control" id="table-select" onchange="onTableSelectChange()">
+                <option value="">请选择表</option>
+                <option value="employee">员工表</option>
+                <option value="department">部门表</option>
+                <option value="user">用户表</option>
+          </select>
+        </div>
+      </div>
+          <div style="margin-bottom: 8px; text-align: right;">
+            <button class="btn" style="padding:4px 16px; font-size:13px;" onclick="addDbField()">添加字段</button>
+            <button class="btn-line" style="padding:4px 16px; font-size:13px;margin-left:10px;" onclick="openPkModal()">设置主键</button>
+          </div>
+          <div class="table-wrapper">
+          <table class="field-table">
+              <thead><tr><th>字段名</th><th>字段描述</th><th>别名</th><th>操作</th></tr></thead>
+              <tbody id="database-fields-tbody">
+                <!-- 动态生成字段行 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- 接口字段配置 -->
+        <div id="api-fields" style="display:none;">
+          <div style="margin-bottom: 8px; font-weight: 500; color: #185a99;">接口字段：</div>
+          <div style="margin-bottom: 8px; text-align: right;">
+            <button class="btn" style="padding:4px 16px; font-size:13px;" onclick="addApiField()">添加字段</button>
+            <button class="btn-line" style="padding:4px 16px; font-size:13px;margin-left:10px;" onclick="openPkModalApi()">设置主键</button>
+          </div>
+          <div class="table-wrapper">
+            <table class="field-table" id="api-fields-table">
+              <thead><tr><th>字段名</th><th>接口路径</th><th>操作</th></tr></thead>
+              <tbody id="api-fields-tbody">
+                <!-- 动态生成字段行 -->
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-line" onclick="closeModal()">取消</button>
+        <button class="btn" id="prev-btn" onclick="prevStep()" style="display:none;">上一步</button>
+        <button class="btn" id="next-btn" onclick="nextStep()">下一步</button>
+        <button class="btn" id="save-btn" onclick="saveDataset()" style="display:none;">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 主键设置弹窗 -->
+  <div class="modal-mask" id="pkModal" style="display:none;z-index:2000;">
+    <div class="modal-window" style="width:340px;min-width:0;padding:28px 28px 18px 28px;">
+      <div class="modal-title">设置主键字段</div>
+      <div id="pkFieldList" style="margin-bottom:18px;"></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="savePkField()">确定</button>
+        <button class="btn-line" onclick="closePkModal()">取消</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 主键设置弹窗（接口字段） -->
+  <div class="modal-mask" id="pkModalApi" style="display:none;z-index:2000;">
+    <div class="modal-window" style="width:340px;min-width:0;padding:28px 28px 18px 28px;">
+      <div class="modal-title">设置主键字段</div>
+      <div id="pkFieldListApi" style="margin-bottom:18px;"></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="savePkFieldApi()">确定</button>
+        <button class="btn-line" onclick="closePkModalApi()">取消</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let currentStep = 1;
+    let dataSourceType = '';
+    let pkFields = [];
+    let pkFieldsApi = [];
+    
+    // 数据源与业务系统映射
+    const dataSourceSystemMap = {
+      'database': 'ERP系统',
+      'restful': 'CRM系统', 
+      'webservice': '供应链系统'
+    };
+    
+    // 数据库表字段映射
+    const tableFields = {
+      'employee': [
+        {name: 'code', alias: '员工编码', desc: '员工在系统中的唯一标识'},
+        {name: 'name', alias: '员工姓名', desc: '员工的真实姓名'},
+        {name: 'org', alias: '所属部门', desc: '员工所属的部门'},
+        {name: 'position', alias: '职位', desc: '员工的具体职位'},
+        {name: 'email', alias: '邮箱', desc: '员工的工作邮箱'}
+      ],
+      'department': [
+        {name: 'dept_code', alias: '部门编码', desc: '部门在系统中的唯一标识'},
+        {name: 'dept_name', alias: '部门名称', desc: '部门的名称'},
+        {name: 'parent_dept', alias: '上级部门', desc: '该部门的上级部门'},
+        {name: 'manager', alias: '部门经理', desc: '部门的负责人'}
+      ],
+      'user': [
+        {name: 'user_id', alias: '用户ID', desc: '用户在系统中的唯一标识'},
+        {name: 'username', alias: '用户名', desc: '用户在系统中的登录名'},
+        {name: 'email', alias: '邮箱', desc: '用户的个人邮箱'},
+        {name: 'status', alias: '状态', desc: '用户的状态，如：正常、禁用'}
+      ]
+    };
+    
+    function openModal() { 
+      document.getElementById('modal').style.display = 'flex'; 
+      resetModal();
+    }
+    
+    function closeModal() { 
+      document.getElementById('modal').style.display = 'none'; 
+      resetModal();
+    }
+    
+    function resetModal() {
+      currentStep = 1;
+      dataSourceType = '';
+      updateStepUI();
+      document.getElementById('dataset-name').value = '';
+      document.getElementById('data-source').value = '';
+      document.getElementById('business-system').value = '';
+      document.getElementById('table-select').value = '';
+      document.getElementById('database-fields').style.display = 'none';
+      document.getElementById('api-fields').style.display = 'none';
+      pkFields = []; // 重置主键字段
+      pkFieldsApi = []; // 重置接口主键字段
+      renderDbFieldsWithPk(); // 刷新主键图标
+      renderApiFieldsWithPk(); // 刷新接口主键图标
+    }
+    
+    function onDataSourceChange() {
+      dataSourceType = document.getElementById('data-source').value;
+      // 根据选择的数据源自动带出业务系统信息
+      const businessSystem = document.getElementById('business-system');
+      if (dataSourceType && dataSourceSystemMap[dataSourceType]) {
+        businessSystem.value = dataSourceSystemMap[dataSourceType];
+      } else {
+        businessSystem.value = '';
+      }
+      // 不再在第一步显示选择表
+    }
+    
+    function onTableSelectChange() {
+      const tableSelect = document.getElementById('table-select').value;
+      if (tableSelect) {
+        loadDatabaseFields(tableSelect);
+      } else {
+        document.getElementById('database-fields-tbody').innerHTML = '';
+      }
+    }
+    
+    function nextStep() {
+      if (currentStep === 1) {
+        // 验证第一步
+        const datasetName = document.getElementById('dataset-name').value.trim();
+        const dataSource = document.getElementById('data-source').value;
+        
+        if (!datasetName) {
+          alert('请输入数据集名称');
+          return;
+        }
+        
+        if (!dataSource) {
+          alert('请选择数据源');
+          return;
+        }
+        
+        currentStep = 2;
+        updateStepUI();
+      }
+    }
+    
+    function prevStep() {
+      if (currentStep === 2) {
+        currentStep = 1;
+        updateStepUI();
+      }
+    }
+    
+    function updateStepUI() {
+      // 更新步骤条
+      if (currentStep === 1) {
+        document.getElementById('step1-number').className = 'step-number active';
+        document.getElementById('step1-text').className = 'step-text active';
+        document.getElementById('step1-line').className = 'step-line';
+        document.getElementById('step2-number').className = 'step-number';
+        document.getElementById('step2-text').className = 'step-text';
+        
+        document.getElementById('step1-content').className = 'step-content active';
+        document.getElementById('step2-content').className = 'step-content';
+        
+        document.getElementById('prev-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'inline-block';
+        document.getElementById('save-btn').style.display = 'none';
+      } else {
+        document.getElementById('step1-number').className = 'step-number completed';
+        document.getElementById('step1-text').className = 'step-text completed';
+        document.getElementById('step1-line').className = 'step-line active';
+        document.getElementById('step2-number').className = 'step-number active';
+        document.getElementById('step2-text').className = 'step-text active';
+        
+        document.getElementById('step1-content').className = 'step-content';
+        document.getElementById('step2-content').className = 'step-content active';
+        
+        document.getElementById('prev-btn').style.display = 'inline-block';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('save-btn').style.display = 'inline-block';
+        
+        // 显示对应的字段配置
+        if (dataSourceType === 'database') {
+          document.getElementById('database-fields').style.display = 'block';
+          document.getElementById('api-fields').style.display = 'none';
+          document.getElementById('table-select-row').style.display = 'flex';
+          document.getElementById('api-fields-table').style.width = '';
+          document.querySelector('.modal-window').style.width = '660px';
+        } else {
+          document.getElementById('database-fields').style.display = 'none';
+          document.getElementById('api-fields').style.display = 'block';
+          document.getElementById('table-select-row').style.display = 'none';
+          document.getElementById('api-fields-table').style.width = '110%';
+          document.querySelector('.modal-window').style.width = '726px';
+        }
+      }
+    }
+    
+    function loadDatabaseFields(tableName) {
+      const fields = tableFields[tableName] || [];
+      const tbody = document.getElementById('database-fields-tbody');
+      tbody.innerHTML = '';
+      fields.forEach(field => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td><input class="form-control name-input" value="${field.name}" disabled></td>
+          <td><input class="form-control desc-input" value="${field.desc || ''}" placeholder="字段描述"></td>
+          <td><input class="form-control alias-input" value="${field.name}"></td>
+          <td><button class="action-btn" onclick="removeField(this)">删除</button></td>
+        `;
+      });
+    }
+    
+    function addApiField() {
+      const tbody = document.getElementById('api-fields-tbody');
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td><input class="form-control name-input" placeholder="字段名"></td>
+        <td><input class="form-control api-path-input" placeholder="接口返回路径，如: data.items[0].name"></td>
+        <td><button class="action-btn" onclick="removeField(this)">删除</button></td>
+      `;
+    }
+    
+    function removeField(btn) {
+      btn.closest('tr').remove();
+    }
+
+    function addDbField() {
+      const tbody = document.getElementById('database-fields-tbody');
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td><input class="form-control name-input" placeholder="字段名" disabled></td>
+        <td><input class="form-control desc-input" placeholder="字段描述"></td>
+        <td><input class="form-control alias-input" placeholder="别名"></td>
+        <td><button class="action-btn" onclick="removeField(this)">删除</button></td>
+      `;
+    }
+    
+    function saveDataset() {
+      const datasetName = document.getElementById('dataset-name').value.trim();
+      const dataSource = document.getElementById('data-source').value;
+      const businessSystem = document.getElementById('business-system').value;
+      
+      // 这里可以添加保存逻辑
+      console.log('保存数据集:', {
+        name: datasetName,
+        dataSource: dataSource,
+        businessSystem: businessSystem,
+        type: dataSourceType,
+        fields: getFieldsData()
+      });
+      
+      alert('数据集保存成功！');
+      closeModal();
+    }
+    
+    function getFieldsData() {
+      if (dataSourceType === 'database') {
+        const rows = document.getElementById('database-fields-tbody').rows;
+        const fields = [];
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].cells;
+          fields.push({
+            name: cells[0].querySelector('input').value,
+            desc: cells[1].querySelector('input').value,
+            alias: cells[2].querySelector('input').value
+          });
+        }
+        return fields;
+      } else {
+        const rows = document.getElementById('api-fields-tbody').rows;
+        const fields = [];
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].cells;
+          fields.push({
+            name: cells[0].querySelector('input').value,
+            path: cells[1].querySelector('input').value
+          });
+        }
+        return fields;
+      }
+    }
+
+    function searchDs() {
+      // 这里只做前端演示，实际应调用后端接口
+      alert('查询功能已触发，数据集名称：' + document.getElementById('searchName').value + ', 数据源：' + document.getElementById('searchSource').value + ', 类型：' + document.getElementById('searchType').value + ', 业务系统：' + document.getElementById('searchSystem').value);
+    }
+    function resetSearch() {
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchSource').value = '';
+      document.getElementById('searchType').value = '';
+      document.getElementById('searchSystem').value = '';
+    }
+
+    function openPkModal() {
+      // 获取当前字段名
+      const rows = document.getElementById('database-fields-tbody').rows;
+      let html = '';
+      for(let i=0;i<rows.length;i++) {
+        const name = rows[i].cells[0].querySelector('input').value;
+        html += `<div style='margin-bottom:8px;'><label><input type='checkbox' name='pkField' value='${name}' ${pkFields.includes(name)?'checked':''}> <span style='font-family:monospace;'>${name}</span></label></div>`;
+      }
+      document.getElementById('pkFieldList').innerHTML = html;
+      document.getElementById('pkModal').style.display = 'flex';
+    }
+    function closePkModal() {
+      document.getElementById('pkModal').style.display = 'none';
+    }
+    function savePkField() {
+      pkFields = [];
+      const checks = document.getElementsByName('pkField');
+      for(let c of checks) { if(c.checked) pkFields.push(c.value); }
+      renderDbFieldsWithPk();
+      closePkModal();
+    }
+    function renderDbFieldsWithPk() {
+      const rows = document.getElementById('database-fields-tbody').rows;
+      for(let i=0;i<rows.length;i++) {
+        const name = rows[i].cells[0].querySelector('input').value;
+        let icon = rows[i].querySelector('.pk-icon');
+        if(icon) icon.remove();
+        if(pkFields && pkFields.includes(name)) {
+          const pkIcon = document.createElement('span');
+          pkIcon.className = 'pk-icon';
+          pkIcon.innerHTML = `<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#f7b500' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='7.5' cy='15.5' r='2.5'/><path d='M21 2l-9.6 9.6'/><path d='M10.5 13.5l6-6'/><path d='M13.5 10.5l6-6'/></svg>`;
+          pkIcon.style.marginLeft = '6px';
+          rows[i].cells[0].appendChild(pkIcon);
+        }
+      }
+    }
+
+    function openPkModalApi() {
+      // 获取当前接口字段名
+      const rows = document.getElementById('api-fields-tbody').rows;
+      let html = '';
+      for(let i=0;i<rows.length;i++) {
+        const name = rows[i].cells[0].querySelector('input').value;
+        html += `<div style='margin-bottom:8px;'><label><input type='checkbox' name='pkFieldApi' value='${name}' ${pkFieldsApi.includes(name)?'checked':''}> <span style='font-family:monospace;'>${name}</span></label></div>`;
+      }
+      document.getElementById('pkFieldListApi').innerHTML = html;
+      document.getElementById('pkModalApi').style.display = 'flex';
+    }
+    function closePkModalApi() {
+      document.getElementById('pkModalApi').style.display = 'none';
+    }
+    function savePkFieldApi() {
+      pkFieldsApi = [];
+      const checks = document.getElementsByName('pkFieldApi');
+      for(let c of checks) { if(c.checked) pkFieldsApi.push(c.value); }
+      renderApiFieldsWithPk();
+      closePkModalApi();
+    }
+    function renderApiFieldsWithPk() {
+      const rows = document.getElementById('api-fields-tbody').rows;
+      for(let i=0;i<rows.length;i++) {
+        const name = rows[i].cells[0].querySelector('input').value;
+        let icon = rows[i].querySelector('.pk-icon');
+        if(icon) icon.remove();
+        if(pkFieldsApi && pkFieldsApi.includes(name)) {
+          const pkIcon = document.createElement('span');
+          pkIcon.className = 'pk-icon';
+          pkIcon.innerHTML = `<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='#f7b500' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='7.5' cy='15.5' r='2.5'/><path d='M21 2l-9.6 9.6'/><path d='M10.5 13.5l6-6'/><path d='M13.5 10.5l6-6'/></svg>`;
+          pkIcon.style.marginLeft = '6px';
+          rows[i].cells[0].appendChild(pkIcon);
+        }
+      }
+    }
+    // 在字段变动后自动刷新主键icon
+    const origLoadDatabaseFields = loadDatabaseFields;
+    loadDatabaseFields = function(tableName) {
+      origLoadDatabaseFields(tableName);
+      setTimeout(renderDbFieldsWithPk, 0);
+    }
+    const origAddDbField = addDbField;
+    addDbField = function() {
+      origAddDbField();
+      setTimeout(renderDbFieldsWithPk, 0);
+    }
+    // 在接口字段变动后自动刷新主键icon
+    const origAddApiField = addApiField;
+    addApiField = function() {
+      origAddApiField();
+      setTimeout(renderApiFieldsWithPk, 0);
+    }
+    // 在步骤切换时自动刷新主键icon
+    const origUpdateStepUI = updateStepUI;
+    updateStepUI = function() {
+      origUpdateStepUI();
+      setTimeout(renderApiFieldsWithPk, 0);
+    }
+  </script>
+</body>
+</html> 

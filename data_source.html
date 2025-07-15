@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>数据源管理</title>
+  <style>
+    body { margin:0; font-family: 'Microsoft YaHei', Arial, sans-serif; background:#f6f8fa; font-size:14px; }
+    .container { max-width: 1100px; margin: 36px auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 40px; }
+    .title { font-size: 20px; color: #185a99; font-weight: 600; margin-bottom: 24px; }
+    .toolbar { display: flex; align-items: center; margin-bottom: 18px; }
+    .btn { background: #2176c7; color: #fff; border: none; border-radius: 6px; font-weight: 500; font-size: 14px; padding: 6px 22px; margin-right: 10px; cursor: pointer; transition: background 0.18s; }
+    .btn:hover { background: #185a99; }
+    .table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+    th,td { border: 1px solid #e5e6eb; padding: 10px 12px; }
+    th { background: #f6f8fa; color: #185a99; font-weight: 500; }
+    .action-btn { background: none; border: none; color: #2176c7; cursor: pointer; font-size: 14px; margin-right: 8px; }
+    .action-btn:hover { color: #e53935; }
+    .modal-mask { position: fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.18); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .modal-window { background:#fff; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.18); width:462px; min-width:420px; min-height:220px; padding:32px 32px 24px 32px; position:relative; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #185a99; margin-bottom: 18px; }
+    .form-row { display: flex; align-items: center; margin-bottom: 16px; }
+    .form-label { width: 90px; color: #333; font-size: 14px; text-align: right; margin-right: 8px; }
+    .form-value { flex: 1; }
+    .form-control { width: 100%; padding: 7px 12px; border: 1.5px solid #c0d3eb; border-radius: 6px; font-size: 14px; }
+    .modal-footer { text-align: right; margin-top: 18px; }
+    .btn-line { background: #fff; color: #2176c7; border: 1.5px solid #2176c7; border-radius: 6px; font-size: 14px; padding: 6px 22px; margin-left: 8px; cursor: pointer; }
+    .btn-line:hover { background: #f7faff; color: #185a99; border-color: #185a99; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">数据源管理</div>
+    <!-- 查询区 -->
+    <div class="search-area" style="background:#f6f8fa;border-radius:8px;padding:18px 24px 10px 24px;margin-bottom:20px;">
+      <form id="searchForm" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:80px;display:inline-block;">数据源名称</span>
+            <input id="searchName" class="form-control" style="width:140px;" placeholder="请输入数据源名称">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">类型</span>
+            <select id="searchType" class="form-control" style="width:120px;">
+              <option value="">全部</option>
+              <option value="JDBC">数据库 (JDBC)</option>
+              <option value="Restful">Restful</option>
+              <option value="Webservice">Webservice</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:48px;display:inline-block;">描述</span>
+            <input id="searchDesc" class="form-control" style="width:180px;" placeholder="请输入描述">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="color:#185a99;font-size:14px;width:80px;display:inline-block;">业务系统</span>
+            <select id="searchSystem" class="form-control" style="width:140px;">
+              <option value="">全部</option>
+              <option value="ERP">ERP系统</option>
+              <option value="CRM">CRM系统</option>
+              <option value="HR">人力资源系统</option>
+              <option value="SCM">供应链系统</option>
+              <option value="FIN">财务系统</option>
+              <option value="OA">办公自动化</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="btn" onclick="searchDs()">查询</button>
+          <button type="button" class="btn-line" onclick="resetSearch()">重置</button>
+        </div>
+      </form>
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="openModal()">新增数据源</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>数据源名称</th>
+          <th>描述</th>
+          <th>类型</th>
+          <th>业务系统</th>
+          <th>连接参数</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>主库</td>
+          <td>主数据MySQL数据库</td>
+          <td>JDBC</td>
+          <td>ERP系统</td>
+          <td>jdbc:mysql://localhost:3306/mdm</td>
+          <td>2024-06-01 10:23</td>
+          <td>
+            <button class="action-btn" onclick="openModal('edit','JDBC')">编辑</button>
+            <button class="action-btn">删除</button>
+            <button class="action-btn">测试连接</button>
+          </td>
+        </tr>
+        <tr>
+          <td>接口A</td>
+          <td>外部API接口</td>
+          <td>Restful</td>
+          <td>CRM系统</td>
+          <td>https://api.xxx.com/data</td>
+          <td>2024-06-02 09:15</td>
+          <td>
+            <button class="action-btn" onclick="openModal('edit','Restful')">编辑</button>
+            <button class="action-btn">删除</button>
+            <button class="action-btn">测试连接</button>
+          </td>
+        </tr>
+        <tr>
+          <td>供应商WebService</td>
+          <td>供应商主数据WebService</td>
+          <td>WebService</td>
+          <td>供应链系统</td>
+          <td>http://supplier.com/service?wsdl</td>
+          <td>2024-06-03 14:20</td>
+          <td>
+            <button class="action-btn" onclick="openModal('edit','Webservice')">编辑</button>
+            <button class="action-btn">删除</button>
+            <button class="action-btn">测试连接</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-mask" id="modal" style="display:none;">
+    <div class="modal-window" id="modalWindow">
+      <span style="position:absolute;right:18px;top:12px;font-size:22px;cursor:pointer;color:#888;z-index:10;" onclick="closeModal()">×</span>
+      <div class="modal-title" id="modalTitle">新增数据源</div>
+      <div class="form-row">
+        <div class="form-label">数据源名称：</div>
+        <div class="form-value"><input class="form-control" id="dsName" placeholder="请输入数据源名称"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">数据源类型：</div>
+        <div class="form-value">
+          <select class="form-control" id="dsType" onchange="switchDsType()">
+            <option value="JDBC">数据库 (JDBC)</option>
+            <option value="Restful">Restful</option>
+            <option value="Webservice">Webservice</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-label">业务系统：</div>
+        <div class="form-value">
+          <select class="form-control" id="dsSystem">
+            <option value="">请选择业务系统</option>
+            <option value="ERP">ERP系统</option>
+            <option value="CRM">CRM系统</option>
+            <option value="HR">人力资源系统</option>
+            <option value="SCM">供应链系统</option>
+            <option value="FIN">财务系统</option>
+            <option value="OA">办公自动化</option>
+          </select>
+        </div>
+      </div>
+      <div id="jdbcFields">
+        <div class="form-row">
+          <div class="form-label">描述：</div>
+          <div class="form-value"><textarea class="form-control" id="dsDesc" placeholder="数据源描述"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">主机地址：</div>
+          <div class="form-value"><input class="form-control" id="dsHost" placeholder="如 192.168.1.100"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">端口：</div>
+          <div class="form-value"><input class="form-control" id="dsPort" placeholder="如 3306"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">数据库名：</div>
+          <div class="form-value"><input class="form-control" id="dsDbName" placeholder="如 customer_db"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">用户名：</div>
+          <div class="form-value"><input class="form-control" id="dsUser" placeholder="数据库用户名"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">密码：</div>
+          <div class="form-value"><input class="form-control" id="dsPwd" type="password" placeholder="数据库密码"></div>
+        </div>
+      </div>
+      <div id="apiFields" style="display:none;">
+        <div class="form-row">
+          <div class="form-label">描述：</div>
+          <div class="form-value"><textarea class="form-control" id="apiDesc" placeholder="API描述"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">基础URL：</div>
+          <div class="form-value"><input class="form-control" id="apiBaseUrl" placeholder="如 https://api.product.com/v1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">API密钥：</div>
+          <div class="form-value"><input class="form-control" id="apiKey" type="password" placeholder="API密钥"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">用户名：</div>
+          <div class="form-value"><input class="form-control" id="apiUser" placeholder="API用户名"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">密码：</div>
+          <div class="form-value"><input class="form-control" id="apiPwd" type="password" placeholder="API密码"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">请求头 (JSON格式)：</div>
+          <div class="form-value"><textarea class="form-control" id="apiHeader" placeholder='{"Content-Type": "application/json"}'></textarea></div>
+        </div>
+      </div>
+      <div id="wsFields" style="display:none;">
+        <div class="form-row">
+          <div class="form-label">描述：</div>
+          <div class="form-value"><textarea class="form-control" id="wsDesc" placeholder="WebService描述"></textarea></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">WSDL地址：</div>
+          <div class="form-value"><input class="form-control" id="wsUrl" placeholder="如 http://supplier.com/service?wsdl"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">命名空间：</div>
+          <div class="form-value"><input class="form-control" id="wsNamespace" placeholder="如 http://supplier.com/"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">用户名：</div>
+          <div class="form-value"><input class="form-control" id="wsUser" placeholder="WebService用户名"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">密码：</div>
+          <div class="form-value"><input class="form-control" id="wsPwd" type="password" placeholder="WebService密码"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal()">保存</button>
+        <button class="btn-line" onclick="closeModal()">取消</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function openModal() { document.getElementById('modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function switchDsType() {
+      var type = document.getElementById('dsType').value;
+      document.getElementById('jdbcFields').style.display = (type === 'JDBC') ? '' : 'none';
+      document.getElementById('apiFields').style.display = (type === 'Restful') ? '' : 'none';
+      document.getElementById('wsFields').style.display = (type === 'Webservice') ? '' : 'none';
+    }
+    function openModal(mode, type) {
+      document.getElementById('modal').style.display = 'flex';
+      var modalWindow = document.getElementById('modalWindow');
+      modalWindow.style.width = '508px'; // 462px * 1.1 = 508px
+      document.getElementById('modalTitle').textContent = mode === 'edit' ? '编辑数据源' : '新增数据源';
+      if(type) {
+        document.getElementById('dsType').value = type;
+        switchDsType();
+      }
+    }
+    // 初始化默认显示
+    switchDsType();
+
+    function searchDs() {
+      // 这里只做前端演示，实际应调用后端接口
+      alert('查询功能已触发，名称：' + document.getElementById('searchName').value + ', 类型：' + document.getElementById('searchType').value + ', 描述：' + document.getElementById('searchDesc').value + ', 业务系统：' + document.getElementById('searchSystem').value);
+    }
+    function resetSearch() {
+      document.getElementById('searchName').value = '';
+      document.getElementById('searchType').value = '';
+      document.getElementById('searchDesc').value = '';
+      document.getElementById('searchSystem').value = '';
+    }
+  </script>
+</body>
+</html> 

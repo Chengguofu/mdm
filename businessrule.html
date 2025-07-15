@@ -512,6 +512,22 @@
               </select>
             </div>
           </div>
+          <div class="form-row" id="modelAttrRow" style="display:none;">
+            <div class="form-label">模型属性<span class="required">*</span>：</div>
+            <div class="form-value">
+              <select id="modelAttrSelect" required style="width:70%">
+                <option value="">请选择模型属性</option>
+                <option value="customerName">客户名称</option>
+                <option value="customerCode">客户编码</option>
+                <option value="supplierName">供应商名称</option>
+                <option value="supplierCode">供应商编码</option>
+                <option value="materialName">物料名称</option>
+                <option value="materialCode">物料编码</option>
+                <option value="useUnitName">使用单位名称</option>
+                <option value="useUnitCode">使用单位编码</option>
+              </select>
+            </div>
+          </div>
           <div id="ruleDetailArea"></div>
           <div class="form-row">
             <div class="form-label">状态：</div>
@@ -609,6 +625,13 @@
     };
     document.getElementById('editType').onchange = function() {
       renderRuleDetail(this.value, null);
+      // 控制模型属性字段的显示/隐藏
+      const modelAttrRow = document.getElementById('modelAttrRow');
+      if (this.value === '约束条件校验') {
+        modelAttrRow.style.display = 'flex';
+      } else {
+        modelAttrRow.style.display = 'none';
+      }
     };
     // 显示抽屉
     function showDrawer() {
@@ -638,6 +661,19 @@
       if (editStatusSwitch) editStatusSwitch.checked = item.status === '启用';
       var editStatusLabel = document.getElementById('editStatusLabel');
       if (editStatusLabel) editStatusLabel.textContent = item.status;
+      
+      // 控制模型属性字段的显示/隐藏和数据回显
+      const modelAttrRow = document.getElementById('modelAttrRow');
+      const modelAttrSelect = document.getElementById('modelAttrSelect');
+      if (item.type === '约束条件校验') {
+        modelAttrRow.style.display = 'flex';
+        if (modelAttrSelect && item.detail && item.detail.modelAttr) {
+          modelAttrSelect.value = item.detail.modelAttr;
+        }
+      } else {
+        modelAttrRow.style.display = 'none';
+      }
+      
       renderRuleDetail(item.type, item.detail);
       showDrawer();
     };
@@ -772,6 +808,7 @@
           // 新增：校验类型下拉
           let validateType = (detail && detail.validateType) || '正则表达式校验';
           html += `<div class='form-row'><div class='form-label'>校验类型：</div><div class='form-value'><select id='validateTypeSelect' style='width:70%'><option value='正则表达式校验' ${validateType==='正则表达式校验'?'selected':''}>正则表达式校验</option><option value='约束表达式' ${validateType==='约束表达式'?'selected':''}>约束表达式</option></select></div></div>`;
+          
           // 正则表达式输入框
           html += `<div class='form-row' id='regexRow' style='display:${validateType==='正则表达式校验'?'flex':'none'};'><div class='form-label'>正则表达式：</div><div class='form-value' style='position:relative;display:flex;align-items:center;'><input id='regexInput' class='form-control' style='width:100%;' placeholder='请输入或选择正则表达式'><span class='cond-query-btn' style='position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#2176c7;' title='选择正则表达式' id='regexSelectBtn'>🔍</span></div></div>`;
           // 约束表达式输入框
@@ -1249,6 +1286,9 @@
           if (constraintRuleEl) detail.constraintRule = constraintRuleEl.value;
           const constraintCondEl = document.getElementById('constraintCondInput');
           if (constraintCondEl) detail.constraintCond = constraintCondEl.value;
+          // 采集模型属性字段（从全局字段获取）
+          const modelAttrEl = document.getElementById('modelAttrSelect');
+          if (modelAttrEl) detail.modelAttr = modelAttrEl.value;
         } else {
           // 其他校验类型才采集约束条件和提示语
           const constraintCondEl = document.getElementById('constraintCond');

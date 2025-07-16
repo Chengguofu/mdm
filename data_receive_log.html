@@ -117,7 +117,7 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr><th id="selectAllHeader" style="display:none;"><input type="checkbox" class="checkbox" id="selectAll" onclick="toggleSelectAll()"></th><th>序号</th><th>编码</th><th>名称</th><th>同步结果</th><th>同步信息</th><th>同步时间</th><th>操作人</th><th>操作</th></tr>
+                    <tr><th id="selectAllHeader" style="display:none;"><input type="checkbox" class="checkbox" id="selectAll" onclick="toggleSelectAll()"></th><th>序号</th><th>编码</th><th>名称</th><th>业务系统</th><th>同步结果</th><th>同步信息</th><th>同步时间</th><th>操作人</th><th>操作</th></tr>
                 </thead>
                 <tbody id="logTableBody"></tbody>
             </table>
@@ -148,31 +148,39 @@
 // 模拟数据
 const allSyncLogs = {
     '客户主数据': [
-        { id: 1, code: 'API_001', name: '客户主数据接收接口', result: '成功', info: '同步完成', time: '2024-06-01 10:00', user: '张三', req: { dataType: '客户主数据', op: 'CREATE' }, resp: { code: 200, msg: 'ok' } },
-        { id: 2, code: 'API_002', name: '客户主数据接收接口', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
+        { id: 1, code: 'API_001', name: '客户主数据接收接口', system: 'CRM系统', result: '成功', info: '同步完成', time: '2024-06-01 10:00', user: '张三', req: { dataType: '客户主数据', op: 'CREATE' }, resp: { code: 200, msg: 'ok' } },
+        { id: 2, code: 'API_002', name: '客户主数据接收接口', system: 'ERP系统', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
     ],
     '产品主数据': [
-        { id: 3, code: 'API_003', name: '产品主数据接收接口', result: '进行中', info: '正在处理', time: '2024-05-31 17:20', user: '王五', req: { dataType: '产品主数据', op: 'CREATE' }, resp: { code: 0, msg: '' } }
+        { id: 3, code: 'API_003', name: '产品主数据接收接口', system: 'ERP系统', result: '进行中', info: '正在处理', time: '2024-05-31 17:20', user: '王五', req: { dataType: '产品主数据', op: 'CREATE' }, resp: { code: 0, msg: '' } }
     ],
-    '供应商主数据': [],
-    '员工主数据': [],
-    '组织主数据': [],
+    '供应商主数据': [
+        { id: 4, code: 'API_004', name: '供应商主数据接收接口', system: 'SRM系统', result: '成功', info: '同步完成', time: '2024-05-31 16:45', user: '赵六', req: { dataType: '供应商主数据', op: 'CREATE' }, resp: { code: 200, msg: 'ok' } }
+    ],
+    '员工主数据': [
+        { id: 5, code: 'API_005', name: '员工主数据接收接口', system: 'HR系统', result: '成功', info: '同步完成', time: '2024-05-31 15:30', user: '钱七', req: { dataType: '员工主数据', op: 'UPDATE' }, resp: { code: 200, msg: 'ok' } }
+    ],
+    '组织主数据': [
+        { id: 6, code: 'API_006', name: '组织主数据接收接口', system: 'OA系统', result: '失败', info: '网络连接超时', time: '2024-05-31 14:20', user: '孙八', req: { dataType: '组织主数据', op: 'CREATE' }, resp: { code: 408, msg: 'timeout' } }
+    ],
     '地点主数据': []
 };
 const allFailLogs = {
     '客户主数据': [
-        { id: 2, code: 'API_002', name: '客户主数据接收接口', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
+        { id: 2, code: 'API_002', name: '客户主数据接收接口', system: 'ERP系统', result: '失败', info: '数据格式错误', time: '2024-06-01 09:30', user: '李四', req: { dataType: '客户主数据', op: 'UPDATE' }, resp: { code: 500, msg: 'error' } }
     ],
     '产品主数据': [],
     '供应商主数据': [],
     '员工主数据': [],
-    '组织主数据': [],
+    '组织主数据': [
+        { id: 6, code: 'API_006', name: '组织主数据接收接口', system: 'OA系统', result: '失败', info: '网络连接超时', time: '2024-05-31 14:20', user: '孙八', req: { dataType: '组织主数据', op: 'CREATE' }, resp: { code: 408, msg: 'timeout' } }
+    ],
     '地点主数据': []
 };
 const statusClass = { '成功': 'status-success', '失败': 'status-fail', '进行中': 'status-running' };
 let currentTab = 'sync';
 let currentType = '客户主数据';
-let query = { code: '', result: '', info: '', time: '', user: '' };
+let query = { code: '', system: '', result: '', info: '', time: '', user: '' };
 let selectedIds = [];
 
 function renderQuerySection() {
@@ -180,6 +188,17 @@ function renderQuerySection() {
         <div class="query-item">
             <label class="query-label">编码</label>
             <input class="query-input" id="qCode" placeholder="请输入编码" value="${query.code||''}">
+        </div>
+        <div class="query-item">
+            <label class="query-label">业务系统</label>
+            <select class="query-select" id="qSystem">
+                <option value="">全部</option>
+                <option value="CRM系统">CRM系统</option>
+                <option value="ERP系统">ERP系统</option>
+                <option value="SRM系统">SRM系统</option>
+                <option value="HR系统">HR系统</option>
+                <option value="OA系统">OA系统</option>
+            </select>
         </div>
         <div class="query-item">
             <label class="query-label">同步状态</label>
@@ -208,11 +227,13 @@ function renderQuerySection() {
         </div>
     `;
     document.getElementById('qResult').value = query.result;
+    document.getElementById('qSystem').value = query.system;
 }
 
 function filterLogs(logs) {
     return logs.filter(l =>
         (!query.code || l.code.includes(query.code)) &&
+        (!query.system || l.system === query.system) &&
         (!query.result || l.result === query.result) &&
         (!query.info || l.info.includes(query.info)) &&
         (!query.time || l.time.includes(query.time)) &&
@@ -236,6 +257,7 @@ function renderTable() {
                 <td><span class="serial-link" onclick="openDrawer(${l.id})">${i+1}</span></td>
                 <td>${l.code}</td>
                 <td>${l.name}</td>
+                <td>${l.system}</td>
                 <td><span class="status-badge ${statusClass[l.result]||''}">${l.result}</span></td>
                 <td>${l.info}</td>
                 <td>${l.time}</td>
@@ -245,7 +267,7 @@ function renderTable() {
                 </td>
             </tr>
         `;
-    }).join('') : '<tr><td colspan="9" style="text-align:center;color:#aaa;">暂无日志</td></tr>';
+    }).join('') : '<tr><td colspan="10" style="text-align:center;color:#aaa;">暂无日志</td></tr>';
     
     updateToolbarButtons();
 }
@@ -324,6 +346,7 @@ function switchTab(tab) {
 
 function doQuery() {
     query.code = document.getElementById('qCode').value.trim();
+    query.system = document.getElementById('qSystem').value;
     query.result = document.getElementById('qResult').value;
     query.info = document.getElementById('qInfo').value.trim();
     query.time = document.getElementById('qTime').value.trim();
@@ -331,7 +354,7 @@ function doQuery() {
     renderTable();
 }
 function resetQuery() {
-    query = { code: '', result: '', info: '', time: '', user: '' };
+    query = { code: '', system: '', result: '', info: '', time: '', user: '' };
     renderQuerySection();
     renderTable();
 }

@@ -30,14 +30,440 @@
             padding: 32px 24px 24px 24px;
         }
         .dashboard-header {
-            background: transparent;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
             color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 0 24px 0 #3fa7ff33;
-            padding: 32px 0 24px 0;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            padding: 18px 0 14px 0;
             margin-bottom: 32px;
             text-align: center;
             letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 科技线条装饰 */
+        .tech-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .tech-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #3fa7ff, transparent);
+            height: 1px;
+            animation: techline-flow 4s linear infinite;
+        }
+        
+        .tech-line:nth-child(1) {
+            top: 15%;
+            left: -100%;
+            width: 200px;
+            animation-delay: 0s;
+        }
+        
+        .tech-line:nth-child(2) {
+            top: 35%;
+            left: -100%;
+            width: 150px;
+            animation-delay: 1s;
+        }
+        
+        .tech-line:nth-child(3) {
+            top: 55%;
+            left: -100%;
+            width: 180px;
+            animation-delay: 2s;
+        }
+        
+        .tech-line:nth-child(4) {
+            top: 75%;
+            left: -100%;
+            width: 120px;
+            animation-delay: 3s;
+        }
+        
+        @keyframes techline-flow {
+            0% { transform: translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 200px)); opacity: 0; }
+        }
+        
+        /* 几何图形装饰 */
+        .tech-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .tech-triangle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            opacity: 0.3;
+            animation: triangle-rotate 8s linear infinite;
+        }
+        
+        .tech-triangle:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            border-width: 0 15px 26px 15px;
+            border-color: transparent transparent #3fa7ff transparent;
+            animation-delay: 0s;
+        }
+        
+        .tech-triangle:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            border-width: 15px 0 15px 26px;
+            border-color: transparent transparent transparent #7ecbff;
+            animation-delay: 2s;
+        }
+        
+        .tech-triangle:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            border-width: 26px 15px 0 15px;
+            border-color: #3fa7ff transparent transparent transparent;
+            animation-delay: 4s;
+        }
+        
+        .tech-triangle:nth-child(4) {
+            bottom: 25%;
+            right: 10%;
+            border-width: 15px 26px 15px 0;
+            border-color: transparent #7ecbff transparent transparent;
+            animation-delay: 6s;
+        }
+        
+        @keyframes triangle-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 六边形装饰 */
+        .tech-hexagon {
+            position: absolute;
+            width: 30px;
+            height: 34px;
+            background: linear-gradient(45deg, #3fa7ff, #7ecbff);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            opacity: 0.2;
+            animation: hexagon-pulse 3s ease-in-out infinite;
+        }
+        
+        .tech-hexagon:nth-child(1) {
+            top: 15%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .tech-hexagon:nth-child(2) {
+            top: 25%;
+            right: 8%;
+            animation-delay: 1s;
+        }
+        
+        .tech-hexagon:nth-child(3) {
+            bottom: 20%;
+            left: 8%;
+            animation-delay: 2s;
+        }
+        
+        @keyframes hexagon-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.2); opacity: 0.4; }
+        }
+        
+        /* 电路板线条 */
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .circuit-line {
+            position: absolute;
+            background: #3fa7ff;
+            opacity: 0.3;
+        }
+        
+        .circuit-line:nth-child(1) {
+            top: 30%;
+            left: 0;
+            width: 80px;
+            height: 1px;
+        }
+        
+        .circuit-line:nth-child(2) {
+            top: 30%;
+            left: 80px;
+            width: 1px;
+            height: 20px;
+        }
+        
+        .circuit-line:nth-child(3) {
+            top: 50%;
+            left: 80px;
+            width: 1px;
+            height: 20px;
+        }
+        
+        .circuit-line:nth-child(4) {
+            top: 50%;
+            left: 0;
+            width: 80px;
+            height: 1px;
+        }
+        
+        .circuit-line:nth-child(5) {
+            top: 70%;
+            right: 0;
+            width: 60px;
+            height: 1px;
+        }
+        
+        .circuit-line:nth-child(6) {
+            top: 70%;
+            right: 60px;
+            width: 1px;
+            height: 15px;
+        }
+        
+        .circuit-line:nth-child(7) {
+            top: 55%;
+            right: 60px;
+            width: 1px;
+            height: 15px;
+        }
+        
+        .circuit-line:nth-child(8) {
+            top: 55%;
+            right: 0;
+            width: 60px;
+            height: 1px;
+        }
+        
+        /* 数据节点 */
+        .data-nodes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .data-node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #3fa7ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #3fa7ff;
+            animation: node-blink 2s ease-in-out infinite;
+        }
+        
+        .data-node:nth-child(1) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+        
+        .data-node:nth-child(2) {
+            top: 45%;
+            right: 20%;
+            animation-delay: 0.5s;
+        }
+        
+        .data-node:nth-child(3) {
+            bottom: 30%;
+            left: 25%;
+            animation-delay: 1s;
+        }
+        
+        .data-node:nth-child(4) {
+            bottom: 40%;
+            right: 15%;
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes node-blink {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+        
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(63, 167, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(63, 167, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 30%, rgba(63, 167, 255, 0.05) 50%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .dashboard-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #3fa7ff, transparent);
+            animation: scanline 3s ease-in-out infinite;
+        }
+        
+        @keyframes scanline {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        
+        .tech-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(63, 167, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(63, 167, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .tech-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .tech-circle {
+            position: absolute;
+            border: 1px solid rgba(63, 167, 255, 0.3);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .tech-circle:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 20px;
+            left: 20px;
+            animation-delay: 0s;
+        }
+        
+        .tech-circle:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            top: 40px;
+            right: 30px;
+            animation-delay: 1s;
+        }
+        
+        .tech-circle:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 30px;
+            left: 50px;
+            animation-delay: 2s;
+        }
+        
+        .tech-circle:nth-child(4) {
+            width: 30px;
+            height: 30px;
+            bottom: 20px;
+            right: 20px;
+            animation-delay: 3s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.6;
+            }
+        }
+        
+        .data-flow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .data-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #3fa7ff;
+            border-radius: 50%;
+            animation: dataflow 6s linear infinite;
+        }
+        
+        .data-particle:nth-child(1) {
+            top: 10%;
+            left: 0;
+            animation-delay: 0s;
+        }
+        
+        .data-particle:nth-child(2) {
+            top: 30%;
+            left: 0;
+            animation-delay: 2s;
+        }
+        
+        .data-particle:nth-child(3) {
+            top: 50%;
+            left: 0;
+            animation-delay: 4s;
+        }
+        
+        @keyframes dataflow {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100vw);
+                opacity: 0;
+            }
         }
         .dashboard-header h1 {
             font-size: 36px;
@@ -98,7 +524,7 @@
             box-shadow: var(--card-shadow);
             padding: 18px 16px 16px 16px;
             min-width: 0;
-            height: 1500px;
+            height: 1950px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -292,30 +718,204 @@
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1>主数据管理驾驶舱</h1>
-            <p>实时监控主数据质量、审批流程、服务状态和管理情况</p>
+            <!-- 科技网格背景 -->
+            <div class="tech-grid"></div>
+            
+            <!-- 科技线条装饰 -->
+            <div class="tech-lines">
+                <div class="tech-line"></div>
+                <div class="tech-line"></div>
+                <div class="tech-line"></div>
+                <div class="tech-line"></div>
+            </div>
+            
+            <!-- 几何图形装饰 -->
+            <div class="tech-shapes">
+                <div class="tech-triangle"></div>
+                <div class="tech-triangle"></div>
+                <div class="tech-triangle"></div>
+                <div class="tech-triangle"></div>
+            </div>
+            
+            <!-- 六边形装饰 -->
+            <div class="tech-shapes">
+                <div class="tech-hexagon"></div>
+                <div class="tech-hexagon"></div>
+                <div class="tech-hexagon"></div>
+            </div>
+            
+            <!-- 电路板线条 -->
+            <div class="circuit-lines">
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+                <div class="circuit-line"></div>
+            </div>
+            
+            <!-- 数据节点 -->
+            <div class="data-nodes">
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+            </div>
+            
+            <!-- 科技圆圈 -->
+            <div class="tech-circles">
+                <div class="tech-circle"></div>
+                <div class="tech-circle"></div>
+                <div class="tech-circle"></div>
+                <div class="tech-circle"></div>
+            </div>
+            
+            <!-- 数据流粒子 -->
+            <div class="data-flow">
+                <div class="data-particle"></div>
+                <div class="data-particle"></div>
+                <div class="data-particle"></div>
+            </div>
+            
+            <!-- 主要内容 -->
+            <div style="position: relative; z-index: 2;">
+                <h1>主数据管理驾驶舱</h1>
+                <p>实时监控主数据质量、审批流程、服务状态和管理情况</p>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--text-color-secondary); opacity: 0.8;">
+                    最后更新时间：<span id="lastUpdateTime">2024-01-15 14:30:25</span>
+                </div>
+            </div>
         </div>
         <div class="dashboard-grid">
-            <!-- 数据质量看板 -->
+            <!-- 数据质量监控 -->
             <div class="quality-card">
-                <div class="card-header">数据质量看板</div>
+                <div class="card-header">数据质量监控</div>
                 <div class="card-subtitle">监控数据质量指标和质检情况</div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value">40.4M</div>
-                        <div class="stat-label">主数据总行数</div>
+                <!-- 综合得分 -->
+                <div style="text-align: center; margin-bottom: 20px; padding: 20px; background: transparent; border-radius: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 16px #3fa7ff22;">
+                    <div style="font-size: 16px; color: var(--text-color-secondary); margin-bottom: 16px;">综合质量得分</div>
+                    
+                    <!-- 半圆仪表盘 -->
+                    <div style="position: relative; width: 200px; height: 120px; margin: 0 auto 16px;">
+                        <svg width="200" height="120" style="position: absolute; top: 0; left: 0;">
+                            <!-- 背景半圆 -->
+                            <path d="M 20 100 A 80 80 0 0 1 180 100" 
+                                  fill="none" 
+                                  stroke="#e5e7eb" 
+                                  stroke-width="8" 
+                                  stroke-linecap="round"/>
+                            
+                            <!-- 进度半圆 -->
+                            <path d="M 20 100 A 80 80 0 0 1 180 100" 
+                                  fill="none" 
+                                  stroke="#3fa7ff" 
+                                  stroke-width="8" 
+                                  stroke-linecap="round"
+                                  stroke-dasharray="251.2"
+                                  stroke-dashoffset="7.536"
+                                  style="filter: drop-shadow(0 0 4px #3fa7ff);"/>
+                            
+                            <!-- 刻度线 -->
+                            <line x1="20" y1="100" x2="20" y2="95" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="50" y1="85" x2="50" y2="80" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="80" y1="60" x2="80" y2="55" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="110" y1="35" x2="110" y2="30" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="140" y1="20" x2="140" y2="15" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="170" y1="15" x2="170" y2="10" stroke="#7ecbff" stroke-width="2"/>
+                            <line x1="180" y1="20" x2="180" y2="15" stroke="#7ecbff" stroke-width="2"/>
+                            
+                            <!-- 指针 -->
+                            <g transform="rotate(175.5 100 100)">
+                                <line x1="100" y1="100" x2="100" y2="25" 
+                                      stroke="#ff6b6b" 
+                                      stroke-width="3" 
+                                      stroke-linecap="round"
+                                      style="filter: drop-shadow(0 0 2px #ff6b6b);"/>
+                                <circle cx="100" cy="100" r="4" fill="#ff6b6b" style="filter: drop-shadow(0 0 2px #ff6b6b);"/>
+                            </g>
+                            
+                            <!-- 中心点 -->
+                            <circle cx="100" cy="100" r="6" fill="#3fa7ff" style="filter: drop-shadow(0 0 4px #3fa7ff);"/>
+                        </svg>
+                        
+                        <!-- 分数显示 -->
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <div style="font-size: 32px; font-weight: 700; color: var(--primary-color); text-shadow: 0 0 8px #3fa7ff55;">97.7</div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">39.9M</div>
-                        <div class="stat-label">业务系统总行数</div>
+                    
+                    <!-- 评分等级条 -->
+                    <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; width: 200px; margin-left: auto; margin-right: auto;">
+                        <div style="flex: 1; background: #ef4444;"></div>
+                        <div style="flex: 1; background: #f97316;"></div>
+                        <div style="flex: 1; background: #eab308;"></div>
+                        <div style="flex: 1; background: #22c55e;"></div>
+                        <div style="flex: 1; background: #3fa7ff;"></div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">1.24%</div>
-                        <div class="stat-label">差异率</div>
+                    
+                    <!-- 底部信息 -->
+                    <div style="display: flex; justify-content: center; align-items: center; font-size: 12px;">
+                        <span style="color: #22c55e;">同比 ▲ 2.1%</span>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">94.2%</div>
-                        <div class="stat-label">质量评分</div>
+                </div>
+
+                <!-- 质量趋势图 -->
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            质量趋势图
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <select id="qualityDataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="all">全部主数据</option>
+                                <option value="customer">客户主数据</option>
+                                <option value="product">产品主数据</option>
+                                <option value="supplier">供应商主数据</option>
+                                <option value="organization">组织架构</option>
+                                <option value="employee">员工主数据</option>
+                                <option value="material">物料主数据</option>
+                            </select>
+                            <select id="qualityTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">最近七天</option>
+                                <option value="30days">最近30天</option>
+                                <option value="90days">最近90天</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                        <!-- 折线图 -->
+                        <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <!-- 折线路径：模拟质量趋势 -->
+                            <path d="M 20 40 L 60 35 L 100 30 L 140 25 L 180 20 L 220 15 L 260 10" 
+                                  stroke="#4ade80" 
+                                  stroke-width="3" 
+                                  fill="none" 
+                                  stroke-linecap="round" 
+                                  stroke-linejoin="round"
+                                  filter="drop-shadow(0 0 4px #4ade80)"/>
+                            
+                            <!-- 数据点 -->
+                            <circle cx="20" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="60" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="100" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="140" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="180" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="220" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="260" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                        </svg>
+                        
+                        <!-- 底部标签 -->
+                        <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 12px;">
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周一</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周二</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周三</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周四</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
+                            <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                        </div>
                     </div>
                 </div>
 
@@ -326,17 +926,29 @@
                     </div>
                     <!-- 三个统计卡片 -->
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #ff8a65;">
-                            <div style="font-size: 16px; font-weight: 700; color: #ff8a65; margin-bottom: 2px;">189</div>
-                            <div style="font-size: 10px; color: var(--text-color-secondary);">数据差异</div>
+                        <div style="flex: 1; min-width: 0; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative; height: 80px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                                <div style="width: 100%;">
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px; word-wrap: break-word; line-height: 1.2;">数据不一致</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1219</div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #f7b500;">
-                            <div style="font-size: 16px; font-weight: 700; color: #f7b500; margin-bottom: 2px;">245</div>
-                            <div style="font-size: 10px; color: var(--text-color-secondary);">业务系统缺失数据</div>
+                        <div style="flex: 1; min-width: 0; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative; height: 80px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                                <div style="width: 100%;">
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px; word-wrap: break-word; line-height: 1.2;">业务系统缺失数量</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">211</div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="flex: 1; background: transparent; border-radius: 8px; padding: 8px 6px; text-align: center; border: 1px solid #a259e6;">
-                            <div style="font-size: 16px; font-weight: 700; color: #a259e6; margin-bottom: 2px;">67</div>
-                            <div style="font-size: 10px; color: var(--text-color-secondary);">业务系统冗余数据</div>
+                        <div style="flex: 1; min-width: 0; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative; height: 80px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                                <div style="width: 100%;">
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px; word-wrap: break-word; line-height: 1.2;">业务系统冗余数量</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">72</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="table-container">
@@ -345,7 +957,7 @@
                                 <tr>
                                     <th>主数据类型</th>
                                     <th>主数据数量</th>
-                                    <th>业务系统主数据</th>
+                                    <th>业务系统</th>
                                     <th>业务系统数量</th>
                                     <th>差异条数</th>
                                 </tr>
@@ -354,28 +966,28 @@
                                 <tr>
                                     <td>客户</td>
                                     <td>12,500</td>
-                                    <td>客户A</td>
+                                    <td>营销系统</td>
                                     <td>12,345</td>
                                     <td style="color: #ff6b6b; font-weight: 600;">155</td>
                                 </tr>
                                 <tr>
                                     <td>产品</td>
                                     <td>8,900</td>
-                                    <td>产品B</td>
+                                    <td>ERP系统</td>
                                     <td>8,756</td>
                                     <td style="color: #ff6b6b; font-weight: 600;">144</td>
                                 </tr>
                                 <tr>
                                     <td>供应商</td>
                                     <td>3,200</td>
-                                    <td>供应商C</td>
+                                    <td>采购系统</td>
                                     <td>3,133</td>
                                     <td style="color: #ff6b6b; font-weight: 600;">67</td>
                                 </tr>
                                 <tr>
                                     <td>物料</td>
                                     <td>15,800</td>
-                                    <td>物料D</td>
+                                    <td>仓储系统</td>
                                     <td>15,678</td>
                                     <td style="color: #ff6b6b; font-weight: 600;">122</td>
                                 </tr>
@@ -602,38 +1214,210 @@
             <!-- 第二栏：数据管理看板 + 数据审批看板 -->
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <!-- 数据管理看板 -->
-                <div class="dashboard-card" style="height: 674px;">
-                    <div class="card-header">数据管理看板</div>
+                <div class="dashboard-card" style="height: 1074px;">
+                    <div class="card-header">数据管理统计</div>
                     <div class="card-subtitle">监控主数据新增、变更等统计信息</div>
                     <!-- 第一排：主数据模型个数、主数据总数据量 -->
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                        <div class="stat-item" style="flex: 1; padding: 11px 6px;">
-                            <div class="stat-value" style="font-size: 18px;">156</div>
-                            <div class="stat-label" style="font-size: 11px;">主数据模型个数</div>
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">主数据模型个数</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">156</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +12.5%
                         </div>
-                        <div class="stat-item" style="flex: 1; padding: 11px 6px;">
-                            <div class="stat-value" style="font-size: 18px;">68.2M</div>
-                            <div class="stat-label" style="font-size: 11px;">主数据总数据量</div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="9" y1="9" x2="9" y2="9"/>
+                                        <line x1="15" y1="9" x2="15" y2="9"/>
+                                        <line x1="9" y1="15" x2="9" y2="15"/>
+                                        <line x1="15" y1="15" x2="15" y2="15"/>
+                                    </svg>
+                                </div>
                         </div>
                     </div>
                     
-                    <!-- 第二排：正常状态数、停用数、归档数、审核中 -->
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">主数据总数据量</div>
+                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">68200000</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +8.3%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二排：正常、已停用、已归档、审核中 -->
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
-                            <div class="stat-value" style="font-size: 16px;">65.8M</div>
-                            <div class="stat-label" style="font-size: 10px;">正常状态数</div>
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">正常</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">65800000</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +5.2%
                         </div>
-                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
-                            <div class="stat-value" style="font-size: 16px;">1.2M</div>
-                            <div class="stat-label" style="font-size: 10px;">停用数</div>
                         </div>
-                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
-                            <div class="stat-value" style="font-size: 16px;">856K</div>
-                            <div class="stat-label" style="font-size: 10px;">归档数</div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    </svg>
                         </div>
-                        <div class="stat-item" style="flex: 1; padding: 9px 4px;">
-                            <div class="stat-value" style="font-size: 16px;">234</div>
-                            <div class="stat-label" style="font-size: 10px;">审核中</div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">已停用</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1200000</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        -2.1%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                        <rect x="6" y="4" width="4" height="16"/>
+                                        <rect x="14" y="4" width="4" height="16"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">已归档</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">856000</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 12h16" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        0.0%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #6b7280;">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">审核中</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">234</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #3b82f6;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +15.8%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12,6 12,12 16,14"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主数据数据量统计 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                            主数据数据量统计
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                            <!-- 客户主数据 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">👥</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">客户主数据</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">25,680,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 37.7%</div>
+                            </div>
+                            
+                            <!-- 产品主数据 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">📦</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">产品主数据</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">18,450,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 27.1%</div>
+                            </div>
+                            
+                            <!-- 供应商主数据 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">🏢</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">供应商主数据</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">12,800,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 18.8%</div>
+                            </div>
+                            
+                            <!-- 物料主数据 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">📋</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">物料主数据</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">8,920,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 13.1%</div>
+                            </div>
+                            
+                            <!-- 组织架构 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">🏛️</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">组织架构</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">1,250,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 1.8%</div>
+                            </div>
+                            
+                            <!-- 员工主数据 -->
+                            <div style="background: transparent; border-radius: 8px; padding: 10px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                                    <span style="font-size: 14px;">👤</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #fff;">员工主数据</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 4px;">900,000</div>
+                                <div style="font-size: 10px; color: var(--text-color-secondary);">占比: 1.3%</div>
+                            </div>
                         </div>
                     </div>
 
@@ -788,11 +1572,11 @@
                                     <option value="employee">员工主数据</option>
                                     <option value="material">物料主数据</option>
                                 </select>
-                                <select id="timeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                                    <option value="7days">近7日</option>
-                                    <option value="30days">近30天</option>
-                                    <option value="1year">近1年</option>
-                                </select>
+                                                            <select id="timeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <option value="7days">最近七天</option>
+                                <option value="30days">最近30天</option>
+                                <option value="90days">最近90天</option>
+                            </select>
                             </div>
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
@@ -904,50 +1688,177 @@
                     </div>
                 </div>
 
-                <!-- 数据审批看板 -->
+                <!-- 数据审批分析 -->
                 <div class="dashboard-card" style="height: 1200px;">
-                    <div class="card-header">数据审批看板</div>
+                    <div class="card-header">数据审批分析</div>
                     <div class="card-subtitle">监控审批流程和效率指标</div>
-                    <!-- 时间范围选择器 -->
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <span style="font-size: 12px; color: var(--text-color-secondary);">时间范围：</span>
-                            <select id="approvalTimeRange" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                                <option value="7days">近7日</option>
-                                <option value="30days">近30天</option>
-                                <option value="1year">近1年</option>
-                            </select>
+                    
+                    <!-- 审批数据统计 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                                审批数据统计
+                            </div>
+                                                    <select id="approvalTimeRange" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                            <option value="today">今日</option>
+                            <option value="7days">最近七天</option>
+                            <option value="30days">最近30天</option>
+                            <option value="90days">最近90天</option>
+                        </select>
+                        </div>
+                    <!-- 第一排：申请总数、审批通过、驳回数、待审批总数 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">申请总数</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1247</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +12.5%
+                        </div>
+                        </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                        <path d="M9 12l2 2 4-4"/>
+                                        <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+                                    </svg>
+                        </div>
+                        </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">审批通过数</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1189</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +13.7%
+                        </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                        <path d="M20 6L9 17l-5-5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">驳回数</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">58</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        -2.1%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">待审批总数</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">23</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        -8.2%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v6l4 2"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value">1,247</div>
-                            <div class="stat-label">已审批总数</div>
+
+                    <!-- 第二排：审批完成率、驳回率、平均审批时长 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">审批完成率</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">98.2%</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        +1.8%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">23</div>
-                            <div class="stat-label">待审批总数</div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">驳回率</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">4.7%</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        -0.8%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">98.2%</div>
-                            <div class="stat-label">审批完成率</div>
+                        
+                        <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">平均审批时长</div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">2.3h</div>
+                                    <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                            <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        -15.3%
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v6l4 2"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">2.3h</div>
-                            <div class="stat-label">平均审批时长</div>
-                        </div>
-                        <div class="stat-item" style="grid-column: 1 / 3;">
-                            <div class="stat-value">1,189</div>
-                            <div class="stat-label">通过审批数</div>
-                        </div>
-                        <div class="stat-item" style="grid-column: 3 / 4;">
-                            <div class="stat-value">58</div>
-                            <div class="stat-label">驳回数</div>
-                        </div>
-                        <div class="stat-item" style="grid-column: 4 / 5;">
-                            <div class="stat-value">4.7%</div>
-                            <div class="stat-label">驳回率</div>
-                        </div>
+                    </div>
                     </div>
 
                     <!-- 总审批量趋势图 -->
@@ -965,6 +1876,11 @@
                                     <option value="organization">组织架构</option>
                                     <option value="employee">员工主数据</option>
                                     <option value="material">物料主数据</option>
+                                </select>
+                                <select style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="7days">最近七天</option>
+                                    <option value="30days">最近30天</option>
+                                    <option value="90days">最近90天</option>
                                 </select>
                             </div>
                         </div>
@@ -1019,6 +1935,11 @@
                                     <option value="employee">员工主数据</option>
                                     <option value="material">物料主数据</option>
                                 </select>
+                                <select style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="7days">最近七天</option>
+                                    <option value="30days">最近30天</option>
+                                    <option value="90days">最近90天</option>
+                                </select>
                             </div>
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 100px; position: relative;">
@@ -1067,7 +1988,7 @@
                             <!-- 第一栏：分模型的平均审批时长 -->
                             <div>
                                 <div style="font-size: 13px; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; border-left: 2px solid var(--primary-color); padding-left: 6px;">
-                                    模型平均审批时长 TOP10
+                                    主数据平均审批时长 TOP10
                                 </div>
                                 <div style="background: transparent; border-radius: 6px; border: 1px solid #3fa7ff22; padding: 8px;">
                                     <div class="metric-row">
@@ -1263,69 +2184,269 @@
             </div>
             <!-- 数据服务看板 -->
             <div class="dashboard-card" style="height: 1850px; width: calc(100% - 10px);">
-                <div class="card-header">数据服务看板</div>
+                <div class="card-header">数据服务监控</div>
                 <div class="card-subtitle">监控数据分发和接口服务状态</div>
                 <!-- 第一排：服务个数 -->
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">采集服务个数</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">采集服务数</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">12</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +8.5%
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">8</div>
-                        <div class="stat-label">推送服务个数</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">15</div>
-                        <div class="stat-label">查询服务个数</div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">推送服务数</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">8</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +12.3%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                                    <path d="M22 2L11 13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">查询服务数</div>
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">15</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +15.7%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color);">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 第二排：数据总数 -->
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
-                        <div class="stat-value">45.6K</div>
-                        <div class="stat-label">数据采集总数</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据采集总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">45600</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +6.8%
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">23.4K</div>
-                        <div class="stat-label">数据推送总数</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">89.2K</div>
-                        <div class="stat-label">查询数据总数</div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                    <path d="M13 8H7"/>
+                                    <path d="M17 12H7"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据推送总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">23400</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +9.2%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+                                    <path d="M22 2L11 13"/>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">查询数据总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">89200</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +11.5%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #8b5cf6;">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="M21 21l-4.35-4.35"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 第三排：成功总数 -->
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
-                        <div class="stat-value">44.2K</div>
-                        <div class="stat-label">数据采集成功总数</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据采集成功总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">44200</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +7.2%
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">22.8K</div>
-                        <div class="stat-label">数据推送成功总数</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">87.1K</div>
-                        <div class="stat-label">查询数据成功总数</div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据推送成功总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">22800</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +8.9%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">查询数据成功总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">87100</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #22c55e;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    +12.1%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 第四排：失败总数 -->
-                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
-                        <div class="stat-value">1.4K</div>
-                        <div class="stat-label">数据采集失败总数</div>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据采集失败总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1400</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    -3.2%
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">600</div>
-                        <div class="stat-label">数据推送失败总数</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">2.1K</div>
-                        <div class="stat-label">查询数据失败总数</div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">数据推送失败总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">600</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    -1.8%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px;">查询数据失败总数</div>
+                                <div style="font-size: 20px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">2100</div>
+                                <div style="display: flex; align-items: center; font-size: 12px; color: #f59e0b;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
+                                        <path d="M4 7l6 6 4-4 6 6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    -2.5%
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1346,9 +2467,9 @@
                                 <option value="material">物料主数据</option>
                             </select>
                             <select id="collectionTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                                <option value="7days">近7日</option>
-                                <option value="30days">近30天</option>
-                                <option value="1year">近1年</option>
+                                <option value="7days">最近七天</option>
+                                <option value="30days">最近30天</option>
+                                <option value="90days">最近90天</option>
                             </select>
                             <div style="display: flex; gap: 4px;">
                                 <button id="collectionSuccessBtn" class="tab active" onclick="switchCollectionTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
@@ -1433,9 +2554,9 @@
                                 <option value="material">物料主数据</option>
                             </select>
                             <select id="pushTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                                <option value="7days">近7日</option>
-                                <option value="30days">近30天</option>
-                                <option value="1year">近1年</option>
+                                <option value="7days">最近七天</option>
+                                <option value="30days">最近30天</option>
+                                <option value="90days">最近90天</option>
                             </select>
                             <div style="display: flex; gap: 4px;">
                                 <button id="pushSuccessBtn" class="tab active" onclick="switchPushTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
@@ -1520,9 +2641,9 @@
                                 <option value="material">物料主数据</option>
                             </select>
                             <select id="queryTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                                <option value="7days">近7日</option>
-                                <option value="30days">近30天</option>
-                                <option value="1year">近1年</option>
+                                <option value="7days">最近七天</option>
+                                <option value="30days">最近30天</option>
+                                <option value="90days">最近90天</option>
                             </select>
                             <div style="display: flex; gap: 4px;">
                                 <button id="querySuccessBtn" class="tab active" onclick="switchQueryTrend('success')" style="padding: 4px 8px; font-size: 11px;">成功趋势</button>
@@ -1593,15 +2714,16 @@
 
 
                 <!-- 数据服务明细 -->
-                <div style="margin-top: 20px; background: transparent; border-radius: 8px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22;">
+                <div style="margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
                             数据服务明细
                         </div>
                         <select id="serviceTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
-                            <option value="7days">近7日</option>
-                            <option value="30days">近30天</option>
-                            <option value="1year">近1年</option>
+                            <option value="today">今日</option>
+                            <option value="7days">最近七天</option>
+                            <option value="30days">最近30天</option>
+                            <option value="90days">最近90天</option>
                         </select>
                     </div>
                     
@@ -1849,8 +2971,8 @@
                         case '30days':
                             labels = ['第1周', '第2周', '第3周', '第4周'];
                             break;
-                        case '1year':
-                            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                        case '90days':
+                            labels = ['第1月', '第2月', '第3月'];
                             break;
                     }
                     
@@ -1865,7 +2987,7 @@
                     });
                     
                     // 调整标签间距
-                    if (selectedRange === '1year') {
+                    if (selectedRange === '90days') {
                         chartLabels.style.fontSize = '9px';
                     } else {
                         chartLabels.style.fontSize = '10px';
@@ -1887,8 +3009,8 @@
                         case '30days':
                             labels = ['第1周', '第2周', '第3周', '第4周'];
                             break;
-                        case '1year':
-                            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                        case '90days':
+                            labels = ['第1月', '第2月', '第3月'];
                             break;
                     }
                     
@@ -1899,7 +3021,7 @@
                             labelContainer.innerHTML = '';
                             labels.forEach(label => {
                                 const div = document.createElement('div');
-                                div.style.fontSize = selectedRange === '1year' ? '9px' : '9px';
+                                div.style.fontSize = selectedRange === '90days' ? '9px' : '9px';
                                 div.style.color = 'var(--text-color-secondary)';
                                 div.textContent = label;
                                 labelContainer.appendChild(div);

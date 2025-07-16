@@ -1983,6 +1983,22 @@
                             <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
                                 审批时长分布统计
                             </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="approvalDurationDataTypeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="all">全部主数据</option>
+                                    <option value="customer">客户主数据</option>
+                                    <option value="product">产品主数据</option>
+                                    <option value="supplier">供应商主数据</option>
+                                    <option value="organization">组织架构</option>
+                                    <option value="employee">员工主数据</option>
+                                    <option value="material">物料主数据</option>
+                                </select>
+                                <select id="approvalDurationTimeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                    <option value="7days">最近七天</option>
+                                    <option value="30days">最近30天</option>
+                                    <option value="90days">最近90天</option>
+                                </select>
+                            </div>
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
                             <!-- 柱状图 -->

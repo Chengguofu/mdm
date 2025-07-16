@@ -781,8 +781,8 @@
             
             <!-- 主要内容 -->
             <div style="position: relative; z-index: 2;">
-                <h1>主数据管理驾驶舱</h1>
-                <p>实时监控主数据质量、审批流程、服务状态和管理情况</p>
+            <h1>主数据管理驾驶舱</h1>
+            <p>实时监控主数据质量、审批流程、服务状态和管理情况</p>
                 <div style="margin-top: 8px; font-size: 12px; color: var(--text-color-secondary); opacity: 0.8;">
                     最后更新时间：<span id="lastUpdateTime">2024-01-15 14:30:25</span>
                 </div>
@@ -843,7 +843,7 @@
                         <!-- 分数显示 -->
                         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
                             <div style="font-size: 32px; font-weight: 700; color: var(--primary-color); text-shadow: 0 0 8px #3fa7ff55;">97.7</div>
-                        </div>
+                    </div>
                     </div>
                     
                     <!-- 评分等级条 -->
@@ -886,9 +886,9 @@
                     </div>
                     <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
                         <!-- 折线图 -->
-                        <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                        <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                             <!-- 折线路径：模拟质量趋势 -->
-                            <path d="M 20 40 L 60 35 L 100 30 L 140 25 L 180 20 L 220 15 L 260 10" 
+                            <path d="M 5% 40 L 20% 35 L 35% 30 L 50% 25 L 65% 20 L 80% 15 L 95% 10" 
                                   stroke="#4ade80" 
                                   stroke-width="3" 
                                   fill="none" 
@@ -897,13 +897,13 @@
                                   filter="drop-shadow(0 0 4px #4ade80)"/>
                             
                             <!-- 数据点 -->
-                            <circle cx="20" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="60" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="100" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="140" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="180" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="220" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                            <circle cx="260" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="5%" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="20%" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="35%" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="50%" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="65%" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="80%" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                            <circle cx="95%" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
                         </svg>
                         
                         <!-- 底部标签 -->
@@ -931,8 +931,8 @@
                                 <div style="width: 100%;">
                                     <div style="font-size: 14px; color: var(--text-color-secondary); margin-bottom: 4px; word-wrap: break-word; line-height: 1.2;">数据不一致</div>
                                     <div style="font-size: 24px; font-weight: 700; color: var(--primary-color); margin-bottom: 8px;">1219</div>
-                                </div>
-                            </div>
+                        </div>
+                        </div>
                         </div>
                         <div style="flex: 1; min-width: 0; background: transparent; border-radius: 12px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; position: relative; height: 80px; display: flex; flex-direction: column; justify-content: center;">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
@@ -1572,11 +1572,11 @@
                                     <option value="employee">员工主数据</option>
                                     <option value="material">物料主数据</option>
                                 </select>
-                                                            <select id="timeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                                <select id="timeRangeSelect" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
                                 <option value="7days">最近七天</option>
                                 <option value="30days">最近30天</option>
                                 <option value="90days">最近90天</option>
-                            </select>
+                                </select>
                             </div>
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
@@ -1689,7 +1689,7 @@
                 </div>
 
                 <!-- 数据审批分析 -->
-                <div class="dashboard-card" style="height: 1200px;">
+                <div class="dashboard-card" style="height: 1400px;">
                     <div class="card-header">数据审批分析</div>
                     <div class="card-subtitle">监控审批流程和效率指标</div>
                     
@@ -1699,12 +1699,12 @@
                             <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
                                 审批数据统计
                             </div>
-                                                    <select id="approvalTimeRange" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
+                            <select id="approvalTimeRange" style="background: transparent; border: 1px solid #3fa7ff33; border-radius: 4px; color: var(--text-color); padding: 4px 8px; font-size: 12px; outline: none; box-shadow: 0 0 4px #3fa7ff22;">
                             <option value="today">今日</option>
                             <option value="7days">最近七天</option>
                             <option value="30days">最近30天</option>
                             <option value="90days">最近90天</option>
-                        </select>
+                            </select>
                         </div>
                     <!-- 第一排：申请总数、审批通过、驳回数、待审批总数 -->
                     <div style="display: flex; gap: 8px; margin-bottom: 8px;">
@@ -1718,7 +1718,7 @@
                                             <path d="M4 17l6-6 4 4 6-6" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
                                         +12.5%
-                        </div>
+                    </div>
                         </div>
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
@@ -1740,7 +1740,7 @@
                                         </svg>
                                         +13.7%
                         </div>
-                                </div>
+                        </div>
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;">
                                         <path d="M20 6L9 17l-5-5"/>
@@ -1858,7 +1858,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        </div>
                     </div>
 
                     <!-- 总审批量趋势图 -->
@@ -1886,9 +1886,9 @@
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 100px; position: relative;">
                             <!-- 折线图 -->
-                            <svg width="100%" height="60" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="60" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟审批量趋势 -->
-                                <path d="M 20 45 L 60 35 L 100 25 L 140 30 L 180 20 L 220 40 L 260 15" 
+                                <path d="M 5% 45 L 20% 35 L 35% 25 L 50% 30 L 65% 20 L 80% 40 L 95% 15" 
                                       stroke="#4ade80" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -1897,13 +1897,13 @@
                                       filter="drop-shadow(0 0 4px #4ade80)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="45" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="60" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="100" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="140" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="180" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="220" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="260" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="5%" cy="45" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="20%" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="35%" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="50%" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="65%" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="80%" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="95%" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
                             </svg>
                             
                             <!-- 底部标签 -->
@@ -1944,9 +1944,9 @@
                         </div>
                         <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 100px; position: relative;">
                             <!-- 折线图 -->
-                            <svg width="100%" height="60" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="60" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟时长趋势（越低越好） -->
-                                <path d="M 20 20 L 60 25 L 100 35 L 140 30 L 180 40 L 220 25 L 260 15" 
+                                <path d="M 5% 20 L 20% 25 L 35% 35 L 50% 30 L 65% 40 L 80% 25 L 95% 15" 
                                       stroke="#fbbf24" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -1955,13 +1955,13 @@
                                       filter="drop-shadow(0 0 4px #fbbf24)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="20" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="60" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="100" cy="35" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="140" cy="30" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="180" cy="40" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="220" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
-                                <circle cx="260" cy="15" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="5%" cy="20" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="20%" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="35%" cy="35" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="50%" cy="30" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="65%" cy="40" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="80%" cy="25" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <circle cx="95%" cy="15" r="3" fill="#fbbf24" filter="drop-shadow(0 0 4px #fbbf24)"/>
                             </svg>
                             
                             <!-- 底部标签 -->
@@ -1973,6 +1973,71 @@
                                 <div style="font-size: 9px; color: var(--text-color-secondary);">周五</div>
                                 <div style="font-size: 9px; color: var(--text-color-secondary);">周六</div>
                                 <div style="font-size: 9px; color: var(--text-color-secondary);">周日</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 审批时长分布统计柱状图 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color); border-left: 3px solid var(--primary-color); padding-left: 8px;">
+                                审批时长分布统计
+                            </div>
+                        </div>
+                        <div style="background: transparent; border-radius: 8px; padding: 16px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
+                            <!-- 柱状图 -->
+                            <svg width="calc(100% - 32px)" height="80" style="position: absolute; top: 16px; left: 16px;">
+                                <!-- Y轴标签 -->
+                                <text x="8" y="15" font-size="10" fill="var(--text-color-secondary)">100%</text>
+                                <text x="8" y="35" font-size="10" fill="var(--text-color-secondary)">75%</text>
+                                <text x="8" y="55" font-size="10" fill="var(--text-color-secondary)">50%</text>
+                                <text x="8" y="75" font-size="10" fill="var(--text-color-secondary)">25%</text>
+                                
+                                <!-- 网格线 -->
+                                <line x1="30" y1="15" x2="calc(100% - 20)" y2="15" stroke="#3fa7ff22" stroke-width="1"/>
+                                <line x1="30" y1="35" x2="calc(100% - 20)" y2="35" stroke="#3fa7ff22" stroke-width="1"/>
+                                <line x1="30" y1="55" x2="calc(100% - 20)" y2="55" stroke="#3fa7ff22" stroke-width="1"/>
+                                <line x1="30" y1="75" x2="calc(100% - 20)" y2="75" stroke="#3fa7ff22" stroke-width="1"/>
+                                
+                                <!-- 柱状图数据 - 使用百分比定位 -->
+                                <!-- 1小时 -->
+                                <rect x="8%" y="25" width="10%" height="50" fill="#4ade80" rx="2" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <text x="13%" y="20" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">85%</text>
+                                
+                                <!-- 2小时 -->
+                                <rect x="22%" y="35" width="10%" height="40" fill="#3fa7ff" rx="2" filter="drop-shadow(0 0 4px #3fa7ff)"/>
+                                <text x="27%" y="30" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">65%</text>
+                                
+                                <!-- 4小时 -->
+                                <rect x="36%" y="45" width="10%" height="30" fill="#fbbf24" rx="2" filter="drop-shadow(0 0 4px #fbbf24)"/>
+                                <text x="41%" y="40" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">45%</text>
+                                
+                                <!-- 8小时 -->
+                                <rect x="50%" y="55" width="10%" height="20" fill="#f97316" rx="2" filter="drop-shadow(0 0 4px #f97316)"/>
+                                <text x="55%" y="50" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">25%</text>
+                                
+                                <!-- 24小时 -->
+                                <rect x="64%" y="65" width="10%" height="10" fill="#ef4444" rx="2" filter="drop-shadow(0 0 4px #ef4444)"/>
+                                <text x="69%" y="60" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">12%</text>
+                                
+                                <!-- 48小时 -->
+                                <rect x="78%" y="70" width="10%" height="5" fill="#dc2626" rx="2" filter="drop-shadow(0 0 4px #dc2626)"/>
+                                <text x="83%" y="65" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">6%</text>
+                                
+                                <!-- 48小时以上 -->
+                                <rect x="92%" y="72" width="10%" height="3" fill="#991b1b" rx="2" filter="drop-shadow(0 0 4px #991b1b)"/>
+                                <text x="97%" y="67" font-size="9" fill="var(--text-color-secondary)" text-anchor="middle">3%</text>
+                            </svg>
+                            
+                            <!-- 底部标签 -->
+                            <div style="position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 16px;">
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">1小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">2小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">4小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">8小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">24小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">48小时</div>
+                                <div style="font-size: 9px; color: var(--text-color-secondary); text-align: center; flex: 1;">48小时以上</div>
                             </div>
                         </div>
                     </div>
@@ -2480,9 +2545,9 @@
                     <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
                         <!-- 成功趋势图 -->
                         <div id="collection-success-trend" class="trend-content active">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟采集成功趋势 -->
-                                <path d="M 20 30 L 60 25 L 100 20 L 140 35 L 180 15 L 220 40 L 260 10" 
+                                <path d="M 5% 30 L 20% 25 L 35% 20 L 50% 35 L 65% 15 L 80% 40 L 95% 10" 
                                       stroke="#4ade80" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2491,21 +2556,21 @@
                                       filter="drop-shadow(0 0 4px #4ade80)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="60" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="100" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="140" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="180" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="220" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="260" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="5%" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="20%" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="35%" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="50%" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="65%" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="80%" cy="40" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="95%" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
                             </svg>
                         </div>
                         
                         <!-- 失败趋势图 -->
                         <div id="collection-failure-trend" class="trend-content">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟采集失败趋势 -->
-                                <path d="M 20 60 L 60 55 L 100 50 L 140 65 L 180 45 L 220 70 L 260 40" 
+                                <path d="M 5% 60 L 20% 55 L 35% 50 L 50% 65 L 65% 45 L 80% 70 L 95% 40" 
                                       stroke="#f87171" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2514,13 +2579,13 @@
                                       filter="drop-shadow(0 0 4px #f87171)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="60" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="100" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="140" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="180" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="220" cy="70" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="260" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="5%" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="20%" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="35%" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="50%" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="65%" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="80%" cy="70" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="95%" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
                             </svg>
                         </div>
                         
@@ -2567,9 +2632,9 @@
                     <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
                         <!-- 成功趋势图 -->
                         <div id="push-success-trend" class="trend-content active">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟推送成功趋势 -->
-                                <path d="M 20 25 L 60 20 L 100 15 L 140 30 L 180 10 L 220 35 L 260 5" 
+                                <path d="M 5% 25 L 20% 20 L 35% 15 L 50% 30 L 65% 10 L 80% 35 L 95% 5" 
                                       stroke="#4ade80" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2578,21 +2643,21 @@
                                       filter="drop-shadow(0 0 4px #4ade80)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="60" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="100" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="140" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="180" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="220" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="260" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="5%" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="20%" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="35%" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="50%" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="65%" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="80%" cy="35" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="95%" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
                             </svg>
                         </div>
                         
                         <!-- 失败趋势图 -->
                         <div id="push-failure-trend" class="trend-content">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟推送失败趋势 -->
-                                <path d="M 20 55 L 60 50 L 100 45 L 140 60 L 180 40 L 220 65 L 260 35" 
+                                <path d="M 5% 55 L 20% 50 L 35% 45 L 50% 60 L 65% 40 L 80% 65 L 95% 35" 
                                       stroke="#f87171" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2601,13 +2666,13 @@
                                       filter="drop-shadow(0 0 4px #f87171)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="60" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="100" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="140" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="180" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="220" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="260" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="5%" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="20%" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="35%" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="50%" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="65%" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="80%" cy="65" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="95%" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
                             </svg>
                         </div>
                         
@@ -2654,9 +2719,9 @@
                     <div style="background: transparent; border-radius: 8px; padding: 12px; border: 1px solid #3fa7ff33; box-shadow: 0 0 8px #3fa7ff22; min-height: 120px; position: relative;">
                         <!-- 成功趋势图 -->
                         <div id="query-success-trend" class="trend-content active">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟查询成功趋势 -->
-                                <path d="M 20 20 L 60 15 L 100 10 L 140 25 L 180 5 L 220 30 L 260 0" 
+                                <path d="M 5% 20 L 20% 15 L 35% 10 L 50% 25 L 65% 5 L 80% 30 L 95% 0" 
                                       stroke="#4ade80" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2665,21 +2730,21 @@
                                       filter="drop-shadow(0 0 4px #4ade80)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="60" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="100" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="140" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="180" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="220" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
-                                <circle cx="260" cy="0" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="5%" cy="20" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="20%" cy="15" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="35%" cy="10" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="50%" cy="25" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="65%" cy="5" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="80%" cy="30" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
+                                <circle cx="95%" cy="0" r="3" fill="#4ade80" filter="drop-shadow(0 0 4px #4ade80)"/>
                             </svg>
                         </div>
                         
                         <!-- 失败趋势图 -->
                         <div id="query-failure-trend" class="trend-content">
-                            <svg width="100%" height="80" style="position: absolute; top: 12px; left: 12px;">
+                            <svg width="calc(100% - 24px)" height="80" style="position: absolute; top: 12px; left: 12px;">
                                 <!-- 折线路径：模拟查询失败趋势 -->
-                                <path d="M 20 50 L 60 45 L 100 40 L 140 55 L 180 35 L 220 60 L 260 30" 
+                                <path d="M 5% 50 L 20% 45 L 35% 40 L 50% 55 L 65% 35 L 80% 60 L 95% 30" 
                                       stroke="#f87171" 
                                       stroke-width="3" 
                                       fill="none" 
@@ -2688,13 +2753,13 @@
                                       filter="drop-shadow(0 0 4px #f87171)"/>
                                 
                                 <!-- 数据点 -->
-                                <circle cx="20" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="60" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="100" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="140" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="180" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="220" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
-                                <circle cx="260" cy="30" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="5%" cy="50" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="20%" cy="45" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="35%" cy="40" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="50%" cy="55" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="65%" cy="35" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="80%" cy="60" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
+                                <circle cx="95%" cy="30" r="3" fill="#f87171" filter="drop-shadow(0 0 4px #f87171)"/>
                             </svg>
                         </div>
                         
